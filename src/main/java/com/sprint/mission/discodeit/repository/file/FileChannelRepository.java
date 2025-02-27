@@ -14,8 +14,6 @@ import java.io.File;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.CHANNEL_NOT_FOUND;
-
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)

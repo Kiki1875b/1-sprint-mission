@@ -10,8 +10,6 @@ import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
-
 public class BinaryContentUtil {
   private BinaryContentUtil() {
   }

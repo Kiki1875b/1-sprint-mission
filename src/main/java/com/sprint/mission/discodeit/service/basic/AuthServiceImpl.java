@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -17,9 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
-
-import static com.sprint.mission.discodeit.constant.ErrorConstant.PASSWORD_MATCH_ERROR;
-import static com.sprint.mission.discodeit.constant.ErrorConstant.USER_NOT_FOUND;
 
 @Service
 @Slf4j

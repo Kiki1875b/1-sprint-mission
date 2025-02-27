@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.Objects;
 
 @Getter
-
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class BinaryContent implements Serializable {

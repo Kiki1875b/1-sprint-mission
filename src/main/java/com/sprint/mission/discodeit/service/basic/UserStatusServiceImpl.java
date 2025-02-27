@@ -23,9 +23,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.DEFAULT_ERROR_MESSAGE;
-import static com.sprint.mission.discodeit.constant.ErrorConstant.USER_NOT_FOUND;
-
 @Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
@@ -72,18 +69,18 @@ public class UserStatusServiceImpl implements UserStatusService {
         () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE)
     );
 
-    status.updateLastOnline(dto.newLastActiveAt());
+    status.updateLastOnline(dto.newLastActivityAt());
 
 
     Instant now = Instant.now();
-    long minutes = Duration.between(dto.newLastActiveAt(), now).toMinutes();
+    long minutes = Duration.between(dto.newLastActivityAt(), now).toMinutes();
 
     if (minutes < 10) {
-      status.setUserStatus(UserStatusType.ONLINE);
+      status.updateStatus(UserStatusType.ONLINE);
     } else if (minutes <= 60) {
-      status.setUserStatus(UserStatusType.IDLE);
+      status.updateStatus(UserStatusType.IDLE);
     } else {
-      status.setUserStatus(UserStatusType.OFFLINE);
+      status.updateStatus(UserStatusType.OFFLINE);
     }
 
 

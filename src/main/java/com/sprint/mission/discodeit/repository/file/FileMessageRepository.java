@@ -15,8 +15,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.MESSAGE_NOT_FOUND;
-
 
 @Repository
 @ConditionalOnProperty(name = "app.repository.type", havingValue = "file",  matchIfMissing = true)

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.error.ErrorCode;
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
 
 @Getter
 public class CustomException extends RuntimeException{

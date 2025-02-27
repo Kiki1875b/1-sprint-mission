@@ -15,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.*;
 import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
 
 @Slf4j
@@ -30,9 +29,7 @@ public class BasicUserService implements UserService {
 
   @Override
   public User saveUser(User user) {
-
     validateUserInformationWhenCreate(user, user.getId());
-
     return userRepository.create(user);
   }
 
@@ -85,7 +82,7 @@ public class BasicUserService implements UserService {
       validEmail(updatedUser.newEmail(), originalUser.getId(), users);
     }
 
-    originalUser.updateProfile(
+    originalUser.updateFields(
         updatedUser.newUsername(),
         updatedUser.newEmail(),
         updatedUser.newPassword() == null ? null : PasswordEncryptor.hashPassword(updatedUser.newPassword())

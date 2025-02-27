@@ -16,8 +16,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.USER_NOT_FOUND;
-
 
 @Slf4j
 @Component

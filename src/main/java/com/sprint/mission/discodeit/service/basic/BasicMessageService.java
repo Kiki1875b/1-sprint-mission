@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -17,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static com.sprint.mission.discodeit.constant.ErrorConstant.MESSAGE_NOT_FOUND;
 
 
 @Slf4j
@@ -59,7 +56,7 @@ public class BasicMessageService implements MessageService {
     return messageRepository.findLatestChannelMessage(channelId);
   }
 
-  @Override
+  @Override // TODO : repository 에서 한번에 불러오기
   public Map<String, Instant> getLatestMessageForChannels(List<Channel> channels) {
     List<String> channelIds = channels.stream().map(Channel::getId).toList();
     return channelIds.stream()

@@ -4,6 +4,6 @@ import java.time.Instant;
 
 
 public record UpdateUserStatusDto(
-    Instant newLastActiveAt
+    Instant newLastActivityAt
 ) {
 }

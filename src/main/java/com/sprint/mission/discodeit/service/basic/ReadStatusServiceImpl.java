@@ -18,8 +18,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.sprint.mission.discodeit.constant.ErrorConstant.*;
-
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     validateDuplicateUserChannelStatus(dto.userId(), dto.channelId());
 
     ReadStatus status = new ReadStatus(dto.channelId(), dto.userId());
-    status.setLastReadAt(dto.lastReadAt());
+    status.updateLastReadAt(dto.lastReadAt());
 
     return readStatusRepository.save(status);
   }

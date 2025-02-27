@@ -40,7 +40,7 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
 
     }
 
-    user.setProfileId(profileBinary == null ? "" : profileBinary.getId());
+    user.updateProfileImage(profileBinary == null ? "" : profileBinary.getId());
     user.updateStatus(new UserStatus(user.getId(), Instant.now()));
     userService.saveUser(user);
 

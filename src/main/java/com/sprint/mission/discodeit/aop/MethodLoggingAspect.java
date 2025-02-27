@@ -30,6 +30,7 @@ public class MethodLoggingAspect {
     String methodName = joinPoint.getSignature().getName();
 
     String methodLink = String.format("%s.%s", className, methodName);
+
     methodTrace.get().add(methodLink);
 
     return joinPoint.proceed();

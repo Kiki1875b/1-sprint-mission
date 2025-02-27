@@ -4,20 +4,21 @@ import com.sprint.mission.discodeit.util.UuidGenerator;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
+import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
+
 @Getter
-@Setter
+
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class User implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  private String id = UuidGenerator.generateid();
+  private String id;
   private String username;
   private String password;
   private String email;
@@ -50,13 +51,13 @@ public class User implements Serializable {
         + '}';
   }
 
-  public void updateProfile(
+  public void updateFields(
       String username,
       String email,
       String password
   ) {
     if (username != null) this.username = username;
-    if (email != null && email.contains("@")) this.email = email;
+    if (email != null && email.matches(EMAIL_REGEX)) this.email = email;
     if (password != null) this.password = password;
     this.updatedAt = Instant.now();
   }
