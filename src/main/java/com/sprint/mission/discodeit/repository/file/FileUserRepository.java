@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import ch.qos.logback.core.spi.ErrorCodes;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
@@ -11,6 +12,8 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
@@ -79,8 +82,11 @@ public class FileUserRepository extends AbstractFileRepository<User> implements 
 
   @Override
   public void clear() {
-    File file = new File(getFilePath());
-    if(file.exists()) file.delete();
+    try (FileWriter writer = new FileWriter(getFilePath(), false)) {
+      writer.write("");
+    } catch (IOException e) {
+      throw new CustomException(ErrorCode.FILE_ERROR);
+    }
   }
 
   @PostConstruct

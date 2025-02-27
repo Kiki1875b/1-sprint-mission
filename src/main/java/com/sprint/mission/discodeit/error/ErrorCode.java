@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
+  FILE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 오류"),
   REQUIRED_FIELD_EMPTY(HttpStatus.BAD_REQUEST, "필수 입력 필드가 비어있습니다."),
   DEFAULT_ERROR_MESSAGE(HttpStatus.BAD_REQUEST, "허용되지 않은 작업입니다."),
   PASSWORD_MATCH_ERROR(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),

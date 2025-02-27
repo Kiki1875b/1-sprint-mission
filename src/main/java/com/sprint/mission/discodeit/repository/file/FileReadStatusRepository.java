@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.exception.FileException;
 import com.sprint.mission.discodeit.repository.AbstractFileRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -9,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
+import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -92,12 +95,10 @@ public class FileReadStatusRepository extends AbstractFileRepository<ReadStatus>
 
   @Override
   public void clear() {
-    Path path = Paths.get(getFilePath());
-
-    try {
-      Files.deleteIfExists(path);
+    try (FileWriter writer = new FileWriter(getFilePath(), false)) {
+      writer.write("");
     } catch (IOException e) {
-      throw new FileException();
+      throw new CustomException(ErrorCode.FILE_ERROR);
     }
   }
 
