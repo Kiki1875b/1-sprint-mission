@@ -12,7 +12,6 @@ import java.util.Objects;
 import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
 
 @Getter
-
 @Builder(toBuilder = true)
 @AllArgsConstructor
 public class User implements Serializable {
