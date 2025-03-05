@@ -12,6 +12,24 @@ app:
     read-status-file: "${app.file.base-dir}read_status.ser"
     binary-content-file: "${app.file.base-dir}binary_content.ser"
 
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: true
+
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: false
+
+logging:
+  level:
+    p6spy: DEBUG
 
 springdoc:
   default-flat-param-object: true
