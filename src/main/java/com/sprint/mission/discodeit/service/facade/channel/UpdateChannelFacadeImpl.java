@@ -1,26 +1,47 @@
 package com.sprint.mission.discodeit.service.facade.channel;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.ReadStatusService;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class UpdateChannelFacadeImpl implements UpdateChannelFacade{
   private final ChannelService channelService;
+  private final ReadStatusService readStatusService;
+  private final MessageService messageService;
   private final ChannelMapper channelMapper;
   @Override
-  public UpdateChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
+  public ChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
+
     Channel channel = channelService.updateChannel(channelId, channelUpdateDto);
 
-    return channelMapper.toUpdateResponse(
-        channel
-    );
+    Instant lastMessageTime = Optional.ofNullable(messageService.getLatestMessageByChannel(channelId))
+        .map(Message::getCreatedAt)
+        .orElse(Instant.EPOCH);
+
+    List<ReadStatus> participants = readStatusService.findAllByChannelId(channelId);
+    List<User> users = participants.stream().map(ReadStatus::getUser).toList();
+
+    return channelMapper.toDto(channel, lastMessageTime, users);
   }
 }

@@ -23,10 +23,10 @@ public class BinaryContentUtil {
   }
 
   public static String convertToBase64(BinaryContent binaryContent) {
-    if (binaryContent == null || binaryContent.getData() == null) {
+    if (binaryContent == null || binaryContent.getBytes() == null) {
       return null;
     }
-    return Base64.getEncoder().encodeToString(binaryContent.getData());
+    return Base64.getEncoder().encodeToString(binaryContent.getBytes());
   }
 
   public static List<String> convertMultipleBinaryContentToBase64(List<BinaryContent> contents) {

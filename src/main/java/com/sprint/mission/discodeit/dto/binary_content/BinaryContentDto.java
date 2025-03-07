@@ -3,19 +3,18 @@ package com.sprint.mission.discodeit.dto.binary_content;
 import jakarta.validation.constraints.NotBlank;
 
 import java.time.Instant;
+import java.util.UUID;
 
 public record BinaryContentDto(
     @NotBlank
-    String id,
-    @NotBlank
-    Instant createdAt,
+    UUID id,
     @NotBlank
     String fileName,
     @NotBlank
-    int size,
+    Long size,
     @NotBlank
     String contentType,
     @NotBlank
-    String bytes
+    byte[] bytes
 ) {
 }

@@ -1,62 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.UuidGenerator;
-import jakarta.annotation.Nullable;
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Objects;
 
+@Entity
 @Getter
-@Builder(toBuilder = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class BinaryContent implements Serializable {
-  private static final long serialVersionUID = 1L;
-  private final String id;
-  @Nullable
-  private String channelId;
-  private final String userId;
-  @Nullable
-  private final String messageId;
-  private final String fileName;
-  private final String fileType;
-  private final long fileSize;
-  private final byte[] data;
-  private final boolean isProfilePicture;
-  private final Instant createdAt;
+@Table(name = "binary_contents")
+public class BinaryContent extends BaseEntity {
 
-  public static class BinaryContentBuilder{
-    private String id = UuidGenerator.generateid();
-    private Instant createdAt = Instant.now();
-  }
+  @Column(name = "file_name", nullable = false)
+  private String fileName;
+  @Column(nullable = false)
+  private Long size;
+  @Column(name = "content_type", nullable = false)
+  private String contentType;
+  @Column(nullable = false)
+  private byte[] bytes;
 
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     BinaryContent content = (BinaryContent) o;
-    return Objects.equals(id, content.id);
+    return Objects.equals(getId(), content.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
-  }
-
-  @Override
-  public String toString() {
-    return "BinaryContent{" +
-        "channelId='" + channelId + '\'' +
-        ", userId='" + userId + '\'' +
-        ", messageId='" + messageId + '\'' +
-        ", fileName='" + fileName + '\'' +
-        ", fileType=" + fileType +
-        ", fileSize=" + fileSize +
-        ", data=" + Arrays.toString(data) +
-        '}';
+    return Objects.hash(getId());
   }
 }

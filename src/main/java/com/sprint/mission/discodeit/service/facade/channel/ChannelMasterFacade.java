@@ -1,15 +1,20 @@
 package com.sprint.mission.discodeit.service.facade.channel;
 
-import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
 
 import java.util.List;
 
 public interface ChannelMasterFacade {
-  PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto);
-  PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto);
-  FindChannelResponseDto getChannelById(String channelId);
-  List<FindChannelResponseDto> findAllChannelsByUserId(String userId);
+  ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto);
+  ChannelResponseDto createPublicChannel(CreateChannelDto channelDto);
+  ChannelResponseDto getChannelById(String channelId);
+  List<ChannelResponseDto> findAllChannelsByUserId(String userId);
 
-  UpdateChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto);
+  ChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto);
   void deleteChannel(String channelId);
 }

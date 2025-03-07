@@ -1,64 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.UuidGenerator;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.List;
 import java.util.Objects;
-
+@Entity
 @Getter
-@Builder(toBuilder = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Channel implements Serializable {
-  private static final long serialVersionUID = 1L;
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  private String name;
+  private String description;
 
   public enum ChannelType {
     PRIVATE, PUBLIC
   }
 
-  private String id;
-  private ChannelType channelType;
-  private String channelName;
-  private String description;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private List<String> participatingUsers;
-
-
-  public static class ChannelBuilder{
-    private String id = UuidGenerator.generateid();
-    private Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
-  }
 
   public void updateChannelName(String channelName){
-    this.channelName = channelName;
-    updateUpdatedAt();
+    this.name = channelName;
   }
 
   public void updateDescription(String description){
     this.description = description;
-    updateUpdatedAt();
   }
 
 
-
-  public void updateUpdatedAt() {
-    this.updatedAt = Instant.now();
-  }
 
   @Override
   public String toString() {
     return "Channel{" +
-        "id='" + id + '\'' +
-        ", channelType=" + channelType +
-        ", channelName='" + channelName + '\'' +
-        ", createdAt=" + createdAt +
-        ", updatedAt=" + updatedAt +
+        "id='" + getId() + '\'' +
+        ", channelType=" + type +
+        ", channelName='" + name + '\'' +
+        ", createdAt=" + getCreatedAt() +
+        ", updatedAt=" + getUpdatedAt() +
         '}';
   }
 
@@ -67,11 +56,11 @@ public class Channel implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Channel channel = (Channel) o;
-    return Objects.equals(id, channel.id);
+    return Objects.equals(getId(), channel.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(getId());
   }
 }

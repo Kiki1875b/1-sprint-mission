@@ -1,20 +1,23 @@
 package com.sprint.mission.discodeit.service.facade.channel;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.PublicChannelResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.validator.EntityValidator;
+import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
@@ -22,27 +25,24 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class CreateChannelFacadeImpl implements CreateChannelFacade{
 
+  private final UserService userService;
   private final ChannelService channelService;
   private final ReadStatusService readStatusService;
   private final ChannelMapper channelMapper;
-  private final EntityValidator validator;
 
   @Override
-  public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
-    channelDto.participantIds().forEach(
-        id -> validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND))
-    );
-
+  public ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
     Channel channel = channelService.createPrivateChannel(channelMapper.toEntity(channelDto));
+    List<User> users = userService.validateAndFindAllUsersIn(channelDto.participantIds());
+    readStatusService.createMultipleReadStatus(users, channel);
 
-    readStatusService.createMultipleReadStatus(channelDto.participantIds(), channel.getId());
 
-    return channelMapper.toPrivateDto(channel);
+    return channelMapper.toDto(channel, Instant.EPOCH, users);
   }
 
   @Override
-  public PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
+  public ChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
     Channel channel = channelService.createPublicChannel(channelMapper.toEntity(channelDto));
-    return channelMapper.toPublicDto(channel);
+    return channelMapper.toDto(channel, Instant.EPOCH, Collections.emptyList());
   }
 }

@@ -11,5 +11,6 @@ import java.util.Optional;
  * @param <ID> 엔티티 식별자 타입
  */
 public interface BaseRepository<T, ID> {
-  Optional<T> findById(ID id);
+
+  Optional<T> findByIds(ID id);
 }

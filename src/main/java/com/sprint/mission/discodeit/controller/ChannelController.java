@@ -1,13 +1,25 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.ChannelApiDocs;
-import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
 import com.sprint.mission.discodeit.service.facade.channel.ChannelMasterFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 
@@ -21,23 +33,23 @@ public class ChannelController implements ChannelApiDocs {
 
   @Override
   @PostMapping("/private")
-  public ResponseEntity<PrivateChannelResponseDto> createPrivateChannel(@RequestBody CreatePrivateChannelDto channelDto) {
-    PrivateChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
+  public ResponseEntity<ChannelResponseDto> createPrivateChannel(@RequestBody CreatePrivateChannelDto channelDto) {
+    ChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
     return ResponseEntity.status(201).body(channel);
   }
 
 
   @Override
   @PostMapping("/public")
-  public ResponseEntity<PublicChannelResponseDto> createPublicChannel(@RequestBody CreateChannelDto channelDto) {
-    PublicChannelResponseDto channel = channelMasterFacade.createPublicChannel(channelDto);
+  public ResponseEntity<ChannelResponseDto> createPublicChannel(@RequestBody CreateChannelDto channelDto) {
+    ChannelResponseDto channel = channelMasterFacade.createPublicChannel(channelDto);
     return ResponseEntity.status(201).body(channel);
   }
 
   @Override
   @PatchMapping("/{channelId}")
-  public ResponseEntity<UpdateChannelResponseDto> updateChannel(@PathVariable String channelId, @RequestBody ChannelUpdateDto channelDto) {
-    UpdateChannelResponseDto channel = channelMasterFacade.updateChannel(channelId, channelDto);
+  public ResponseEntity<ChannelResponseDto> updateChannel(@PathVariable String channelId, @RequestBody ChannelUpdateDto channelDto) {
+    ChannelResponseDto channel = channelMasterFacade.updateChannel(channelId, channelDto);
     return ResponseEntity.ok(channel);
   }
 
@@ -52,8 +64,8 @@ public class ChannelController implements ChannelApiDocs {
 
   @Override
   @GetMapping
-  public ResponseEntity<List<FindChannelResponseDto>> findChannelVisibleToUser(@RequestParam String userId){
-    List<FindChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(userId);
+  public ResponseEntity<List<ChannelResponseDto>> findChannelVisibleToUser(@RequestParam String userId){
+    List<ChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(userId);
     return ResponseEntity.ok(channels);
   }
 }

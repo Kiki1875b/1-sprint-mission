@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller.openapi;
 
 import com.sprint.mission.discodeit.dto.auth.LoginDto;
 import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -35,5 +36,5 @@ public interface AuthApiDocs {
           )
       ),
   })
-  ResponseEntity<LoginResponseDto> userLogin(@Parameter(required = true, description = "로그인 정보") LoginDto loginDto);
+  ResponseEntity<UserResponseDto> userLogin(@Parameter(required = true, description = "로그인 정보") LoginDto loginDto);
 }

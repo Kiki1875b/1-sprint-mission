@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -27,21 +27,24 @@ public class AuthServiceImpl implements AuthService {
   private final UserStatusService userStatusService;
   private final UserMapper userMapper;
 
+  /**
+   * FETCH JOIN 으로 user 불러올 때, 관련 BinaryContent, UserStatus 불러온 후
+   * 온라인시간 업데이트
+   */
   @Override
-  public LoginResponseDto login(String username, String password) {
+  public UserResponseDto login(String username, String password) {
 
-    User targetUser = userRepository.findByUsername(username).orElseThrow(() -> new CustomException(ErrorCode.USER_NOT_FOUND));
+    User targetUser = userRepository.findByUsernameWithProfileAndStatus(username)
+        .orElseThrow(
+            () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        );
 
     if(!PasswordEncryptor.checkPassword(password, targetUser.getPassword())){
       throw new CustomException(ErrorCode.PASSWORD_MATCH_ERROR);
     }
+    targetUser.getStatus().updateLastOnline(Instant.now()); // 삭제 할 수도
+    userRepository.save(targetUser);
 
-    UserStatus userStatus = userStatusRepository.findByUserId(targetUser.getId()).orElseGet(() -> userStatusService.create(new UserStatus(targetUser.getId(),Instant.now())));
-
-    userStatus.updateLastOnline(Instant.now());
-
-    userStatusRepository.save(userStatus);
-
-    return userMapper.toLoginResponse(targetUser);
+    return userMapper.toDto(targetUser);
   }
 }

@@ -9,5 +9,7 @@ import org.mapstruct.Mapping;
 public interface ReadStatusMapper {
 
   @Mapping(target = "id", source = "id")
+  @Mapping(target = "userId", source = "user.id")
+  @Mapping(target = "channelId", source = "channel.id")
   ReadStatusResponseDto toReadStatusResponseDto(ReadStatus status);
 }

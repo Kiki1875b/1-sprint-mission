@@ -1,21 +1,18 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.util.PasswordEncryptor;
-import com.sprint.mission.discodeit.validator.EntityValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-
-import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
+import java.util.Objects;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -25,36 +22,21 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
 
-  private final EntityValidator validator;
-
   @Override
   public User saveUser(User user) {
-    validateUserInformationWhenCreate(user, user.getId());
-    return userRepository.create(user);
+    return userRepository.save(user);
   }
 
   @Override
   public User update(User user){
-    return userRepository.update(user);
+    return userRepository.save(user);
   }
-
-  private void validateUserInformationWhenCreate(User user, String userId) {
-    List<User> users = userRepository.findAll();
-    validEmail(user.getEmail(), userId, users);
-
-  }
-
-  private void validEmail(String email, String id, List<User> users) {
-    if (!email.matches(EMAIL_REGEX)) throw new CustomException(ErrorCode.ERROR_INVALID_EMAIL);
-    if (users.stream()
-        .anyMatch(u -> u.getEmail().equals(email) && !u.getId().equals(id)))
-      throw new CustomException(ErrorCode.DUPLICATE_EMAIL);
-  }
-
 
   @Override
   public User findUserById(String id) {
-    return validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND));
+    return userRepository.findById(UUID.fromString(id)).orElseThrow(
+        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+    );
   }
 
   @Override
@@ -62,38 +44,30 @@ public class BasicUserService implements UserService {
     return userRepository.findAll();
   }
 
-
   @Override
-  public User updateUser(String id, UserUpdateDto updatedUser) {
+  public List<User> validateAndFindAllUsersIn(List<String> userIds) {
+    List<UUID> userUuids = userIds.stream()
+        .map(id -> {
+          try {
+            return UUID.fromString(id);
+          } catch (IllegalArgumentException e) {
+            // TODO : 예외를 던질지, 로그를 찍을지 고민
+            log.warn("Invalid UUID: {}", id);
+            return null;
+          }
+        }).filter(Objects::nonNull)
+        .toList();
 
-    User originalUser = validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND));
-
-    synchronized (originalUser) {
-      updateFields(originalUser, updatedUser);
+    // TODO : 상세 exception message 작성
+    if (userUuids.isEmpty()) {
+      throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
 
-    return userRepository.update(originalUser);
-  }
-
-  private void updateFields(User originalUser, UserUpdateDto updatedUser) {
-    List<User> users = userRepository.findAll();
-
-    if (updatedUser.newEmail() != null) {
-      validEmail(updatedUser.newEmail(), originalUser.getId(), users);
-    }
-
-    originalUser.updateFields(
-        updatedUser.newUsername(),
-        updatedUser.newEmail(),
-        updatedUser.newPassword() == null ? null : PasswordEncryptor.hashPassword(updatedUser.newPassword())
-    );
-
+    return userRepository.findAllById(userUuids);
   }
 
   @Override
   public void deleteUser(String id) {
-    validator.findOrThrow(User.class, id, new CustomException(ErrorCode.USER_NOT_FOUND));
-
-    userRepository.delete(id);
+    userRepository.deleteById(UUID.fromString(id));
   }
 }

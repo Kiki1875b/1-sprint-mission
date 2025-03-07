@@ -22,7 +22,7 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
   private final UserDeleteFacade userDeleteFacade;
 
   @Override
-  public CreateUserResponse createUser(CreateUserRequest request, MultipartFile profile) {
+  public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
     return userCreationFacade.createUser(request, profile);
   }
 
@@ -32,7 +32,7 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
   }
 
   @Override
-  public CreateUserResponse updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
+  public UserResponseDto updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
     return userUpdateFacade.updateUser(userId, profile, updateDto);
   }
 

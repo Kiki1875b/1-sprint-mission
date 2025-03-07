@@ -18,9 +18,5 @@ public class DeleteChannelFacadeImpl implements DeleteChannelFacade{
   @Override
   public void deleteChannel(String channelId) {
     channelService.deleteChannel(channelId);
-    readStatusService.deleteByChannel(channelId);
-    //TODO : deleteAll()
-    messageService.getMessagesByChannel(channelId).stream()
-        .forEach(message -> messageService.deleteMessage(message.getId()));
   }
 }

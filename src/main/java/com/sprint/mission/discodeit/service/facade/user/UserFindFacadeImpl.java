@@ -28,9 +28,6 @@ public class UserFindFacadeImpl implements UserFindFacade {
   @Override
   public List<UserResponseDto> findAllUsers() {
     List<User> users = userService.findAllUsers();
-
     return users.stream().map(userMapper::toDto).toList();
   }
-
-
 }

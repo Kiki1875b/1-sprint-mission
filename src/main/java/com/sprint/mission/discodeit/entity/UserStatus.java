@@ -1,32 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.UserStatusType;
-import com.sprint.mission.discodeit.util.UuidGenerator;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
-
+@Entity
 @Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name = "user_statuses")
+public class UserStatus extends BaseUpdatableEntity {
 
-public class UserStatus implements Serializable {
-  private static final long serialVersionUID = 1L;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-  private String id;
-  private String userId;
-  private Instant createdAt;
-  private Instant lastOnlineAt;
-  private UserStatusType userStatus;
-  private Instant updatedAt;
+  @Column(name = "last_active_at")
+  private Instant lastActiveAt;
 
-  public UserStatus(String userId, Instant lastOnlineAt) {
-    this.id = UuidGenerator.generateid();
-    this.userId = userId;
-    this.createdAt = Instant.now();
-    this.updatedAt = Instant.now();
-    this.lastOnlineAt = lastOnlineAt;
-    this.userStatus = UserStatusType.ONLINE;
+  public static UserStatus create(User user){
+    return new UserStatus(user, Instant.now());
   }
 
   @Override
@@ -34,20 +37,15 @@ public class UserStatus implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     UserStatus status = (UserStatus) o;
-    return Objects.equals(id, status.id);
+    return Objects.equals(getId(), status.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(getId());
   }
 
   public void updateLastOnline(Instant now) {
-    updatedAt = now;
-    lastOnlineAt = now;
-  }
-
-  public void updateStatus(UserStatusType type){
-    this.userStatus = type;
+    lastActiveAt = now;
   }
 }

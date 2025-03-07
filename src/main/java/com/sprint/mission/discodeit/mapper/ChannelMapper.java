@@ -1,58 +1,40 @@
 package com.sprint.mission.discodeit.mapper;
 
 
-import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import org.mapstruct.Builder;
+import com.sprint.mission.discodeit.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false), imports = Objects.class)
+@Mapper(componentModel = "spring", uses = UserMapper.class, imports = Objects.class)
 public interface ChannelMapper {
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "channelName", source = "name")
-  @Mapping(target = "channelType", constant = "PUBLIC")
-  @Mapping(target = "participatingUsers", expression = "java(new java.util.ArrayList<>())")
-  @Mapping(target = "createdAt", expression = "java(Instant.now())")
-  @Mapping(target = "updatedAt", expression = "java(Instant.now())")
+  @Mapping(target = "name", source = "name")
+  @Mapping(target = "type", constant = "PUBLIC")
   Channel toEntity(CreateChannelDto dto);
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "channelType", constant = "PRIVATE")
-  @Mapping(source = "participantIds", target = "participatingUsers")
-  @Mapping(target = "createdAt", expression = "java(Instant.now())")
-  @Mapping(target = "updatedAt", expression = "java(Instant.now())")
+  @Mapping(target = "type", constant = "PRIVATE")
   Channel toEntity(CreatePrivateChannelDto dto);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "channelType", target = "type")
-  @Mapping(source = "channelName", target = "name")
-  @Mapping(source = "createdAt", target = "createdAt")
-  @Mapping(source = "updatedAt", target = "updatedAt")
-  @Mapping(source = "description", target = "description")
-  PublicChannelResponseDto toPublicDto(Channel channel);
-
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "channelType", target = "type")
-  @Mapping(source = "participatingUsers", target = "participantIds")
-  PrivateChannelResponseDto toPrivateDto(Channel channel);
-
   @Mapping(source = "channel.id", target = "id")
-  @Mapping(source = "channel.channelType", target = "type")
-  @Mapping(target = "name", expression = "java(Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ? null : channel.getChannelName())")
-  @Mapping(target = "description", source = "channel.description")
-  @Mapping(target = "participantIds", source = "channel.participatingUsers")
-  @Mapping(target = "lastMessagedAt", source = "lastMessagedAt")
-  FindChannelResponseDto toFindChannelDto(Channel channel, Instant lastMessagedAt);
-
-
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "type", source = "channelType")
-  @Mapping(target = "name", source = "channelName")
-  UpdateChannelResponseDto toUpdateResponse(Channel channel);
+  @Mapping(source = "channel.type", target = "type")
+  @Mapping(target = "name", source = "channel.name", defaultExpression = "java(\"\")")
+  @Mapping(target = "description", source = "channel.description", defaultExpression = "java(\"\")")
+  @Mapping(target = "lastMessageAt", source = "lastMessageAt", defaultExpression = "java(Instant.EPOCH)")
+  @Mapping(target = "participants", source = "participants", defaultExpression = "java(new ArrayList<>())")
+  ChannelResponseDto toDto(Channel channel, Instant lastMessageAt, List<User> participants);
 
 }
 

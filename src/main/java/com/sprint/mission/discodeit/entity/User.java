@@ -1,55 +1,44 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.UuidGenerator;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
 
 import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
-
+@Entity
+@Table(name = "users")
 @Getter
-
-@Builder(toBuilder = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class User implements Serializable {
-  private static final long serialVersionUID = 1L;
+public class User extends BaseUpdatableEntity {
 
-  private String id;
+  @Column(nullable = false, unique = true)
   private String username;
-  private String password;
+
+  @Column(nullable = false, unique = true)
   private String email;
 
-  private Instant createdAt;
-  private Instant updatedAt;
-  private String profileId;
+  @Column(nullable = false)
+  private String password;
+
+  @OneToOne(cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
+  @JoinColumn(name = "profile_id")
+  private BinaryContent profile;
+
+  @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY) // nullable 고려
   private UserStatus status;
 
-  public static class UserBuilder{
-    private String id = UuidGenerator.generateid();
-    private Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
-    private String profileId = "";
-    private UserStatus status = null;
-    public String getId(){
-      return this.id;
-    }
-  }
-
-  @Override
-  public String toString() {
-    return "User{"
-        + "id='" + id + '\''
-        + ", username='" + username + '\''
-        + ", createdAt=" + createdAt
-        + ", updatedAt=" + updatedAt
-        + ", profileImage=" + profileId
-        + ", status=" + status
-        + '}';
-  }
 
   public void updateFields(
       String username,
@@ -59,15 +48,14 @@ public class User implements Serializable {
     if (username != null) this.username = username;
     if (email != null && email.matches(EMAIL_REGEX)) this.email = email;
     if (password != null) this.password = password;
-    this.updatedAt = Instant.now();
   }
 
   public void updateStatus(UserStatus status){
     this.status = status;
   }
 
-  public void updateProfileImage(String profileId){
-    this.profileId = profileId;
+  public void updateProfileImage(BinaryContent profile){
+    this.profile = profile;
   }
 
   @Override
@@ -75,11 +63,11 @@ public class User implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     User user = (User) o;
-    return Objects.equals(id, user.id);
+    return Objects.equals(getId(), user.getId());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+    return Objects.hash(getId());
   }
 }

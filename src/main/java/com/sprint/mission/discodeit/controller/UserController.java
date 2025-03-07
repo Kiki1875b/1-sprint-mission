@@ -10,7 +10,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -35,7 +42,7 @@ public class UserController implements UserApiDocs {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<CreateUserResponse> createUser(
+  public ResponseEntity<UserResponseDto> createUser(
 
       @RequestPart("userCreateRequest")
       CreateUserRequest createUserRequest,
@@ -43,7 +50,7 @@ public class UserController implements UserApiDocs {
       @RequestPart(value = "profile", required = false)
       MultipartFile profile)
   {
-    CreateUserResponse user = userFacade.createUser(createUserRequest, profile);
+    UserResponseDto user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(201).body(user);
   }
 
@@ -60,14 +67,14 @@ public class UserController implements UserApiDocs {
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
-  public ResponseEntity<CreateUserResponse> updateUser(
+  public ResponseEntity<UserResponseDto> updateUser(
       @PathVariable String id,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
       @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto
 
   ) {
 
-    CreateUserResponse user = userFacade.updateUser(id, profile, updateDto);
+    UserResponseDto user = userFacade.updateUser(id, profile, updateDto);
     return ResponseEntity.ok(user);
   }
 

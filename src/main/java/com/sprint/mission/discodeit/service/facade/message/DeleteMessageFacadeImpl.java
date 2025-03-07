@@ -13,9 +13,9 @@ public class DeleteMessageFacadeImpl implements DeleteMessageFacade{
   private final BinaryContentService binaryContentService;
   private final MessageService messageService;
 
-  @Override
+  @Override //TODO : 여기 하던중
   public void deleteMessage(String messageId) {
-    binaryContentService.deleteByMessageId(messageId);
+    // binaryContentService.deleteByMessageId(messageId);
     messageService.deleteMessage(messageId);
   }
 }

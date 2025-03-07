@@ -8,7 +8,11 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Slf4j
 @RestController
@@ -23,7 +27,6 @@ public class UserStatusController implements UserStatusApiDocs {
   public ResponseEntity<UserStatusResponseDto> updateUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto userStatusDto){
 
     UserStatusResponseDto status = userStatusService.updateByUserId(userId, userStatusDto);
-
     return ResponseEntity.ok(status);
   }
 }

@@ -4,19 +4,25 @@ import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
-import java.util.Map;
+import java.util.UUID;
 
 public interface ReadStatusService {
-  ReadStatus create(CreateReadStatusDto dto, boolean skipValidation);
-  List<ReadStatus> createMultipleReadStatus(List<String> userIds, String channelId);
+  ReadStatus create(CreateReadStatusDto dto);
+  List<ReadStatus> createMultipleReadStatus(List<User> users, Channel channel);
   ReadStatus find(String id);
   List<ReadStatus> findAllByUserId(String userId);
-  ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id);
+  List<UUID> findAllChannelIdsByUserId(String userId);
+
+  List<ReadStatus> findAllReadStatusRelatedToUserId(String userId);
+
+  List<UUID> findParticipantsByChannelId(String channelId);
+
   List<ReadStatus> findAllByChannelId(String channelId);
-  Map<String,List<String>> getUserIdsForChannelReadStatuses(List<Channel> channels);
-  ReadStatus update(CreateReadStatusDto dto);
-  void deleteByChannel(String id);
-  void delete(String id);
+
+  ReadStatus findByUserAndChannel(User user, Channel channel);
+  ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id);
+
 }

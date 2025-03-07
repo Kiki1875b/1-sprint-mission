@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.controller.openapi;
 
-import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,7 +33,7 @@ public interface ChannelApiDocs {
           )
       )
   })
-  ResponseEntity<PrivateChannelResponseDto> createPrivateChannel(@Parameter(required = true, description = "Private Channel 생성 정보") CreatePrivateChannelDto channelDto);
+  ResponseEntity<ChannelResponseDto> createPrivateChannel(@Parameter(required = true, description = "Private Channel 생성 정보") CreatePrivateChannelDto channelDto);
 
   @Operation(summary = "Public Channel 생성")
   @ApiResponses({
@@ -42,7 +47,7 @@ public interface ChannelApiDocs {
           )
       )
   })
-  ResponseEntity<PublicChannelResponseDto> createPublicChannel(@Parameter(required = true, description = "Public Channel 생성 정보") CreateChannelDto channelDto);
+  ResponseEntity<ChannelResponseDto> createPublicChannel(@Parameter(required = true, description = "Public Channel 생성 정보") CreateChannelDto channelDto);
 
 
   @Operation(summary = "Public Channel 업데이트")
@@ -65,7 +70,7 @@ public interface ChannelApiDocs {
           )
       ),
   })
-  ResponseEntity<UpdateChannelResponseDto> updateChannel(
+  ResponseEntity<ChannelResponseDto> updateChannel(
       @Parameter(description = "업데이트 Channel UUID", required = true) String channelId,
       @Parameter(description = "업데이트 정보", required = true) ChannelUpdateDto channelDto
   );
@@ -90,5 +95,5 @@ public interface ChannelApiDocs {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Channel 조회 성공")
   })
-  ResponseEntity<List<FindChannelResponseDto>> findChannelVisibleToUser(@Parameter(required = true, description = "User UUID") String userId);
+  ResponseEntity<List<ChannelResponseDto>> findChannelVisibleToUser(@Parameter(required = true, description = "User UUID") String userId);
 }

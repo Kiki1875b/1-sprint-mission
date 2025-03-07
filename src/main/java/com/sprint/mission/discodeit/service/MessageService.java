@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 public interface MessageService {
   Message createMessage(Message message);
@@ -13,8 +14,7 @@ public interface MessageService {
   Message getMessageById(String messageId);
   List<Message> getMessagesByChannel(String channelId);
   Message getLatestMessageByChannel(String channelId);
-  Map<String, Instant> getLatestMessageForChannels(List<Channel> channels);
-
+  Map<UUID, Instant> getLatestMessageForChannels(List<Channel> channels);
   void deleteMessage(String messageId);
 
 }

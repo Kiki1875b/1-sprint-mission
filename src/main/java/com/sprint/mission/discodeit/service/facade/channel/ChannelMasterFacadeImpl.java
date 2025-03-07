@@ -1,6 +1,11 @@
 package com.sprint.mission.discodeit.service.facade.channel;
 
-import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -15,27 +20,27 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   private final UpdateChannelFacade updateChannelFacade;
   private final DeleteChannelFacade deleteChannelFacade;
   @Override
-  public PrivateChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
+  public ChannelResponseDto createPrivateChannel(CreatePrivateChannelDto channelDto) {
     return createChannelFacade.createPrivateChannel(channelDto);
   }
 
   @Override
-  public PublicChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
+  public ChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
     return createChannelFacade.createPublicChannel(channelDto);
   }
 
   @Override
-  public FindChannelResponseDto getChannelById(String channelId) {
+  public ChannelResponseDto getChannelById(String channelId) {
     return findChannelFacade.findChannelById(channelId);
   }
 
   @Override
-  public List<FindChannelResponseDto> findAllChannelsByUserId(String userId) {
+  public List<ChannelResponseDto> findAllChannelsByUserId(String userId) {
     return findChannelFacade.findAllChannelsByUserId(userId);
   }
 
   @Override
-  public UpdateChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
+  public ChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
     return updateChannelFacade.updateChannel(channelId, channelUpdateDto);
 
   }

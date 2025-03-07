@@ -1,39 +1,50 @@
 package com.sprint.mission.discodeit.mapper;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.MessageAttachment;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
-import org.mapstruct.*;
+import org.mapstruct.Context;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
-import java.util.Base64;
 import java.util.List;
+import java.util.UUID;
 
 @Mapper(
     componentModel = "spring",
-    uses = BinaryContentMapper.class,
-    imports = BinaryContentUtil.class,
-    builder = @Builder(disableBuilder = false)
+    uses = {BinaryContentMapper.class, UserMapper.class},
+    imports = BinaryContentUtil.class
 )
 public interface MessageMapper {
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "isEdited", ignore = true)
   @Mapping(target = "createdAt", ignore = true)
   @Mapping(target = "updatedAt", ignore = true)
-  Message toEntity(CreateMessageDto dto, String channelId, @Context BinaryContentMapper binaryContentMapper);
+  @Mapping(target = "attachments", expression = "java(new ArrayList<>())")
+  Message toEntity(CreateMessageDto dto);
 
   @Mapping(target = "id", source = "id")
+  @Mapping(target = "createdAt", source = "createdAt")
+  @Mapping(target = "updatedAt", source = "updatedAt")
+  @Mapping(target = "content", source = "content")
+  @Mapping(target = "channelId", source = "channel.id")
+  @Mapping(target = "author", source="author")
+  @Mapping(target = "attachments", source = "attachments")
   MessageResponseDto toResponseDto(Message message);
 
 
-  @Named("convertToBase64")
-  default List<String> convertToBase64(List<BinaryContent> binaryContents) {
-    return binaryContents == null || binaryContents.isEmpty()
-        ? null
-        : binaryContents.stream()
-        .map(content -> Base64.getEncoder().encodeToString(content.getData()))
-        .toList();
-  }
+//  @Named("convertToBase64")
+//  default List<String> convertToBase64(List<BinaryContent> binaryContents) {
+//    return binaryContents == null || binaryContents.isEmpty()
+//        ? null
+//        : binaryContents.stream()
+//        .map(content -> Base64.getEncoder().encodeToString(content.getData()))
+//        .toList();
+//  }
 }

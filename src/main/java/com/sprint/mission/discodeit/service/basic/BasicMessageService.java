@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -22,54 +22,56 @@ import java.util.stream.Collectors;
 @Service
 @ConditionalOnProperty(name = "app.service.type", havingValue = "basic")
 @RequiredArgsConstructor
-public class BasicMessageService implements MessageService {
+public class
+BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
 
   @Override
   public Message createMessage(Message message) {
-    return messageRepository.create(message);
+    return messageRepository.save(message);
   }
 
   @Override
   public Message updateMessage(Message message, String content) {
     if (content != null && !content.isEmpty()) {
-      message.setContent(content);
+      message.addContent(content);
     }
-
-    message.setIsEdited();
-    return messageRepository.update(message);
+    return messageRepository.save(message);
   }
 
   @Override
   public Message getMessageById(String messageId) {
-    return messageRepository.findById(messageId).orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+    return messageRepository.findById(UUID.fromString(messageId))
+        .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
   }
 
   @Override
   public List<Message> getMessagesByChannel(String channelId) {
-    return messageRepository.findByChannel(channelId);
+    return messageRepository.findByChannel_Id(UUID.fromString(channelId));
   }
 
   @Override
   public Message getLatestMessageByChannel(String channelId) {
-    return messageRepository.findLatestChannelMessage(channelId);
+    return messageRepository.findTopByChannel_IdOrderByCreatedAtDesc(UUID.fromString(channelId))
+        .orElse(null);
   }
 
-  @Override // TODO : repository 에서 한번에 불러오기
-  public Map<String, Instant> getLatestMessageForChannels(List<Channel> channels) {
-    List<String> channelIds = channels.stream().map(Channel::getId).toList();
-    return channelIds.stream()
+  @Override
+  public Map<UUID, Instant> getLatestMessageForChannels(List<Channel> channels) {
+    List<UUID> channelIds = channels.stream().map(Channel::getId).toList();
+
+    List<Message> latestMessages = messageRepository.findLatestMessagesForEachChannel(channelIds);
+
+    return latestMessages.stream()
         .collect(Collectors.toMap(
-            id -> id,
-            id -> Optional.ofNullable(
-                messageRepository.findLatestChannelMessage(id)
-            ).map(Message::getCreatedAt).orElse(Instant.EPOCH)
+            message -> message.getChannel().getId(),
+            Message::getCreatedAt
         ));
   }
 
   @Override
   public void deleteMessage(String messageId) {
-    messageRepository.delete(messageId);
+    messageRepository.deleteById(UUID.fromString(messageId));
   }
 }
