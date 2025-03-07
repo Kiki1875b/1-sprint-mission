@@ -17,26 +17,23 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL
-    ,imports = BinaryContentUtil.class, builder = @Builder(disableBuilder = false))
+    ,imports = BinaryContentUtil.class)
 public interface BinaryContentMapper {
 
   @Mapping(source = "file.originalFilename", target = "fileName")
   @Mapping(source = "file.contentType", target = "contentType")
   @Mapping(source = "file.size", target = "size")
-  @Mapping(target = "bytes", expression = "java(BinaryContentUtil.convertToBytes(file))")
   BinaryContent toMessageBinaryContent(MultipartFile file);
 
   @Mapping(source = "file.originalFilename", target = "fileName")
   @Mapping(source = "file.contentType", target = "contentType")
   @Mapping(source = "file.size", target = "size")
-  @Mapping(target = "bytes", expression = "java(BinaryContentUtil.convertToBytes(file))")
   BinaryContent toProfileBinaryContent(MultipartFile file);
 
   @Mapping(target = "id", source = "attachment.id")
   @Mapping(target = "fileName", source = "attachment.fileName")
   @Mapping(target = "size", source = "attachment.size")
   @Mapping(target = "contentType", source = "attachment.contentType")
-  @Mapping(target = "bytes", source = "attachment.bytes")
   BinaryContentDto toBinaryContentDto(MessageAttachment attachment);
 
   default BinaryContent safeToMessageBinaryContent(MultipartFile file) {
@@ -54,11 +51,9 @@ public interface BinaryContentMapper {
         .collect(Collectors.toList());
   }
 
-
   @Mapping(target = "id", source = "id")
   @Mapping(target = "size", source = "size")
   @Mapping(target = "contentType", source = "contentType")
-  @Mapping(target = "bytes", source = "bytes")
   BinaryContentDto toDto(BinaryContent content);
 
   List<BinaryContentDto> toDtoList(List<BinaryContent> contents);

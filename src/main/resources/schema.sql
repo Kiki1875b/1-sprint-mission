@@ -14,7 +14,6 @@ CREATE TABLE binary_contents (
     file_name VARCHAR(255) NOT NULL,
     size BIGINT NOT NULL,
     content_type VARCHAR(100) NOT NULL,
-    bytes BYTEA
 );
 
 CREATE TABLE user_statuses (

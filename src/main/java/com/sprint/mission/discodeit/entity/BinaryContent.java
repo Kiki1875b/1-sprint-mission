@@ -24,8 +24,6 @@ public class BinaryContent extends BaseEntity {
   private Long size;
   @Column(name = "content_type", nullable = false)
   private String contentType;
-  @Column(nullable = false)
-  private byte[] bytes;
 
   @Override
   public boolean equals(Object o) {
