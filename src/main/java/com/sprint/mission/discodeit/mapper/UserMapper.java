@@ -16,6 +16,7 @@ import org.mapstruct.Named;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class, BinaryContentUtil.class})
@@ -50,9 +51,8 @@ public interface UserMapper {
   @Mapping(target = "lastActivityAt", source = "status.lastActiveAt")
   UserStatusResponseDto withStatus(User user);
 
-//  @Mapping(target = "id", source = "id")
-//  @Mapping(target = "profileId", source = "profile.id")
-//  UserResponseDto toLoginResponse(User user);
+  List<UserResponseDto> toDtoList(List<User> users);
+
   @Named("userStatusSetter")
   default boolean userStatusToBoolean(UserStatus status){
     Instant now = Instant.now();

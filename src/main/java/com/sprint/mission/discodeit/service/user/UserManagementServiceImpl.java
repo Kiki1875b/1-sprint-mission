@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -37,12 +38,20 @@ public class UserManagementServiceImpl implements UserManagementService {
   public User updateUser(String userId, User tmpUser, MultipartFile profile) {
     User userToUpdate = userService.findUserById(userId);
     userToUpdate.updateFields(tmpUser.getUsername(), tmpUser.getEmail(), tmpUser.getPassword());
-
     if (profile != null && !profile.isEmpty()) {
       withProfile(userToUpdate, profile);
     }
-
     return userService.saveUser(userToUpdate);
+  }
+
+  @Override
+  public User findSingleUser(String userId) {
+    return userService.findUserById(userId);
+  }
+
+  @Override
+  public List<User> findAllUsers() {
+    return userService.findAllUsers();
   }
 
   private void setStatusToUser(User user) {

@@ -21,6 +21,7 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
 
   private final UserCreationFacade userCreationFacade;
   private final UserUpdateFacade userUpdateFacade;
+
   private final UserFindFacade userFindFacade;
   private final UserDeleteFacade userDeleteFacade;
 
@@ -36,7 +37,8 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
 
   @Override
   public UserResponseDto findUserById(String id) {
-    return userFindFacade.findUserById(id);
+    User user = userManagementService.findSingleUser(id);
+    return userMapper.toDto(user);
   }
 
   @Override
@@ -48,7 +50,8 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
 
   @Override
   public List<UserResponseDto> findAllUsers() {
-    return userFindFacade.findAllUsers();
+    List<User> users = userManagementService.findAllUsers();
+    return userMapper.toDtoList(users);
   }
 
   @Override
