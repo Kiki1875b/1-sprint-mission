@@ -26,33 +26,32 @@ public class UserManagementServiceImpl implements UserManagementService {
   @Override
   @Transactional
   public User createUser(User user, MultipartFile profile) {
-
-    User createdUser;
-
-    if (profile == null || profile.isEmpty()) {
-      createdUser = withoutProfile(user);
-    } else {
-      createdUser = withProfile(user, profile);
+    setStatusToUser(user);
+    if (profile != null && !profile.isEmpty()) {
+      withProfile(user, profile);
     }
-
-    return createdUser;
-  }
-
-  @Override
-  public User updateUser(String userId, User user, MultipartFile profile) {
-    return null;
-  }
-
-  private User withoutProfile(User user) {
-    UserStatus status = UserStatus.create(user);
-    user.updateStatus(status);
     return userService.saveUser(user);
   }
 
-  private User withProfile(User user, MultipartFile file) {
+  @Override
+  public User updateUser(String userId, User tmpUser, MultipartFile profile) {
+    User userToUpdate = userService.findUserById(userId);
+    userToUpdate.updateFields(tmpUser.getUsername(), tmpUser.getEmail(), tmpUser.getPassword());
+
+    if (profile != null && !profile.isEmpty()) {
+      withProfile(userToUpdate, profile);
+    }
+
+    return userService.saveUser(userToUpdate);
+  }
+
+  private void setStatusToUser(User user) {
     UserStatus status = UserStatus.create(user);
     user.updateStatus(status);
+  }
 
+
+  private void withProfile(User user, MultipartFile file) {
     try {
       BinaryContent profile = binaryContentMapper.toProfileBinaryContent(file);
       user.updateProfileImage(profile);
@@ -61,7 +60,5 @@ public class UserManagementServiceImpl implements UserManagementService {
       // TODO : 저장된 파일 삭제
       throw new CustomException(ErrorCode.FILE_ERROR);
     }
-
-    return userService.saveUser(user);
   }
 }

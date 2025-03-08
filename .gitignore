@@ -44,3 +44,5 @@ bin/
 
 .env
 
+/sprint-mission
+/sprint-mission/**

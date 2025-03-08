@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -27,6 +28,11 @@ public interface UserMapper {
   @Mapping(target = "profile", ignore = true)
   @Mapping(target = "status", ignore = true)
   User toEntity(CreateUserRequest dto);
+
+  @Mapping(target = "username", source = "newUsername")
+  @Mapping(target = "email", source = "newEmail")
+  @Mapping(target = "password", expression = "java(PasswordEncryptor.hashPassword(dto.newPassword()))")
+  User toEntity(UserUpdateDto dto);
 
   @Mapping(target = "id", source = "id")
   @Mapping(target = "username", source = "username")
