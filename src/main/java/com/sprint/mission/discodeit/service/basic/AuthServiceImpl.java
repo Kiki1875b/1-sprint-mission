@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 
@@ -32,6 +33,7 @@ public class AuthServiceImpl implements AuthService {
    * 온라인시간 업데이트
    */
   @Override
+  @Transactional
   public UserResponseDto login(String username, String password) {
 
     User targetUser = userRepository.findByUsernameWithProfileAndStatus(username)

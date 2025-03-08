@@ -4,9 +4,14 @@ import com.sprint.mission.discodeit.controller.openapi.MessageApiDocs;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.facade.message.MessageMasterFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.data.web.SpringDataWebProperties;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -21,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 
 @Slf4j
@@ -62,8 +68,12 @@ public class MessageController implements MessageApiDocs {
 
   @Override
   @GetMapping("/messages")
-  public ResponseEntity<List<MessageResponseDto>> getChannelMessages(@RequestParam String channelId){
-    List<MessageResponseDto> messages = messageMasterFacade.findMessagesByChannel(channelId);
+  public ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(
+      @RequestParam String channelId,
+      @RequestParam(required = false) Instant cursor,
+      @PageableDefault(size =50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+
+    PageResponse<MessageResponseDto> messages = messageMasterFacade.findMessagesByChannel(channelId, cursor, pageable);
     return ResponseEntity.ok(messages);
   }
 }

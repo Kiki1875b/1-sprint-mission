@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.facade.user;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -10,8 +9,11 @@ import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.service.user.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -29,6 +31,10 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
   private final UserMapper userMapper;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentService binaryContentService;
+
+  @PersistenceContext
+  private final EntityManager em;
 
   @Override
   @Transactional
@@ -39,18 +45,23 @@ public class UserCreationFacadeImpl implements UserCreationFacade {
     BinaryContent profileBinary = null;
 
     if (profile != null && !profile.isEmpty()) {
+      profileBinary = binaryContentMapper.toProfileBinaryContent(profile);
+      user.updateProfileImage(profileBinary);
+    }
+
+    UserStatus status = UserStatus.create(user);
+    user.updateStatus(status);
+    userService.saveUser(user);
+
+
+    if (profileBinary != null) {
       try {
-        profileBinary = binaryContentMapper.toProfileBinaryContent(profile);
         binaryContentStorage.put(profileBinary.getId(), profile.getBytes());
-        user.updateProfileImage(profileBinary);
       } catch (IOException e) {
         throw new CustomException(ErrorCode.FILE_ERROR);
       }
     }
 
-
-    user.updateStatus(UserStatus.create(user));
-    userService.saveUser(user);
     return userMapper.toDto(user);
   }
 }

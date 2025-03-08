@@ -13,8 +13,7 @@ public record BinaryContentDto(
     @NotBlank
     Long size,
     @NotBlank
-    String contentType,
-    @NotBlank
-    byte[] bytes
+    String contentType
+
 ) {
 }

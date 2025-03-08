@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
-
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Slf4j
@@ -20,6 +20,7 @@ public class UpdateMessageFacadeImpl implements UpdateMessageFacade{
   private final MessageMapper messageMapper;
 
   @Override
+  @Transactional
   public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
 
     Message message = messageService.getMessageById(messageId);

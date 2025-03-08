@@ -3,10 +3,14 @@ package com.sprint.mission.discodeit.service.facade.message;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -30,8 +34,8 @@ public class MessageMasterFacadeImpl implements MessageMasterFacade {
   }
 
   @Override
-  public List<MessageResponseDto> findMessagesByChannel(String channelId) {
-    return findMessageFacade.findMessagesByChannel(channelId);
+  public PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant nextCursor, Pageable pageable) {
+    return findMessageFacade.findMessagesByChannel(channelId, nextCursor, pageable);
   }
 
   @Override

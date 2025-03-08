@@ -4,6 +4,9 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -21,9 +24,14 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
   private final UserFindFacade userFindFacade;
   private final UserDeleteFacade userDeleteFacade;
 
+  private final UserManagementService userManagementService;
+  private final UserMapper userMapper;
+
   @Override
   public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
-    return userCreationFacade.createUser(request, profile);
+    User user = userMapper.toEntity(request);
+    User createdUser = userManagementService.createUser(user, profile);
+    return userMapper.toDto(createdUser);
   }
 
   @Override

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller.openapi;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -11,9 +12,11 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 
 @Tag(name = "Message API", description = "Message 작업")
@@ -77,5 +80,7 @@ public interface MessageApiDocs {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Message 조회 성공")
   })
-  ResponseEntity<List<MessageResponseDto>> getChannelMessages(@Parameter(required = true, description = "조회할 Channel UUID") String channelId);
+  ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(@Parameter(required = true, description = "조회할 Channel UUID") String channelId,
+                                                                      Instant cursor,
+                                                                      Pageable pageable);
 }

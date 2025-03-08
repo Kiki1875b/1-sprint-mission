@@ -13,7 +13,11 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  @EntityGraph(attributePaths = {"status"})
+
+  @EntityGraph(attributePaths = {"profile", "status"})
+  Optional<User> findById(UUID id);
+
+  @EntityGraph(attributePaths = {"profile", "status"})
   List<User> findAll();
 
   Optional<User> findByUsername(String username);

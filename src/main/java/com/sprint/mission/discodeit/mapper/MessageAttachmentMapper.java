@@ -14,6 +14,5 @@ public interface MessageAttachmentMapper {
   @Mapping(target = "fileName", source = "attachment.fileName")
   @Mapping(target = "size", source = "attachment.size")
   @Mapping(target = "contentType", source = "attachment.contentType")
-  @Mapping(target = "bytes", source = "attachment.bytes")
   BinaryContentDto toBinaryContentDto(MessageAttachment attachment);
 }

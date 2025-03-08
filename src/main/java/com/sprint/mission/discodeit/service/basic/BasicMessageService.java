@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
@@ -47,8 +49,17 @@ BasicMessageService implements MessageService {
   }
 
   @Override
-  public List<Message> getMessagesByChannel(String channelId) {
-    return messageRepository.findByChannel_Id(UUID.fromString(channelId));
+  public Page<Message> getMessagesByChannel(String channelId, Pageable pageable) {
+
+    return messageRepository.findByChannel_Id(UUID.fromString(channelId), pageable);
+  }
+
+  @Override
+  public Page<Message> getMessagesByChannelWithCursor(String channelId, Instant nextCursor, Pageable pageable)  {
+    if(nextCursor == null){
+      nextCursor = Instant.now();
+    }
+    return messageRepository.findByChannel_IdAndCreatedAtLessThanOrderByCreatedAtDesc(UUID.fromString(channelId), nextCursor, pageable);
   }
 
   @Override

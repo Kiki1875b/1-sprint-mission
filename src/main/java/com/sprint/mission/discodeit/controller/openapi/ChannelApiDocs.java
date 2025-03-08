@@ -37,15 +37,7 @@ public interface ChannelApiDocs {
 
   @Operation(summary = "Public Channel 생성")
   @ApiResponses({
-      @ApiResponse(responseCode = "201", description = "Public Channel 생성 성공"),
-      @ApiResponse(
-          responseCode = "404",
-          description = "User를 찾을 수 없음",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = ErrorResponse.class)
-          )
-      )
+      @ApiResponse(responseCode = "201", description = "Public Channel 생성 성공")
   })
   ResponseEntity<ChannelResponseDto> createPublicChannel(@Parameter(required = true, description = "Public Channel 생성 정보") CreateChannelDto channelDto);
 

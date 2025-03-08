@@ -7,9 +7,13 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -22,10 +26,31 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
   private final MessageAttachmentRepository messageAttachmentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public BinaryContent save(BinaryContent content) {
-    return binaryContentRepository.save(content);
+  public ResponseEntity<Resource> download(String id){
+    ResponseEntity<?> response = null;
+    try {
+      response = binaryContentStorage.download(UUID.fromString(id));
+    }catch (IOException e){
+      throw new IllegalArgumentException();
+    }
+    if(response.getBody() instanceof Resource resource){
+      return ResponseEntity.status(response.getStatusCode())
+          .headers(response.getHeaders())
+          .body(resource);
+    }
+
+    throw new CustomException(ErrorCode.FILE_ERROR);
+  }
+
+  @Override
+  public BinaryContent save(BinaryContent content, byte[] bytes) {
+    BinaryContent savedContent = binaryContentRepository.save(content);
+    binaryContentRepository.flush();
+    binaryContentStorage.put(savedContent.getId(), bytes);
+    return savedContent;
   }
 
   @Override

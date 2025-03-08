@@ -10,7 +10,7 @@ public enum ErrorCode {
 
   NO_ACCESS_TO_CHANNEL(HttpStatus.UNAUTHORIZED, "접근 권한이 없는 채널입니다."),
   DUPLICATE_READ_STATUS(HttpStatus.BAD_REQUEST, "중복된 읽기 상태입니다."),
-  FILE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 오류"),
+  FILE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 오류 입니다."),
   REQUIRED_FIELD_EMPTY(HttpStatus.BAD_REQUEST, "필수 입력 필드가 비어있습니다."),
   DEFAULT_ERROR_MESSAGE(HttpStatus.BAD_REQUEST, "허용되지 않은 작업입니다."),
   PASSWORD_MATCH_ERROR(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),

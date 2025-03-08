@@ -9,10 +9,11 @@ import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.Collections;
@@ -33,8 +34,8 @@ public class FindChannelFacadeImpl implements FindChannelFacade {
   private final ReadStatusService readStatusService;
   private final ChannelMapper channelMapper;
 
-
   @Override
+  @Transactional
   public ChannelResponseDto findChannelById(String channelId) {
     Channel channel = channelService.findChannelById(channelId);
 
@@ -52,6 +53,7 @@ public class FindChannelFacadeImpl implements FindChannelFacade {
   }
 
   @Override // TODO : 최적화 1순위
+  @Transactional
   public List<ChannelResponseDto> findAllChannelsByUserId(String userId) {
 
     // userid 와 관련된 모든 readstatus

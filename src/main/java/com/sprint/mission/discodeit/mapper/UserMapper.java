@@ -50,7 +50,7 @@ public interface UserMapper {
   @Named("userStatusSetter")
   default boolean userStatusToBoolean(UserStatus status){
     Instant now = Instant.now();
-    long minutes = Duration.between(status.getLastActiveAt(), now).toMinutes();
+    long minutes = Duration.between((status.getLastActiveAt() != null ? status.getLastActiveAt() : Instant.EPOCH), now).toMinutes();
     if(minutes <= 10) return true;
     return false;
   }

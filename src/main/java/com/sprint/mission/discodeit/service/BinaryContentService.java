@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 
 import java.util.List;
 
 public interface BinaryContentService {
-  BinaryContent save(BinaryContent content);
+  ResponseEntity<Resource> download(String id);
+
+  BinaryContent save(BinaryContent content, byte[] bytes);
   BinaryContent find(String id);
   List<BinaryContent> findByMessageId(String messageId);
   List<BinaryContent> findAllByIdIn(List<String> ids);

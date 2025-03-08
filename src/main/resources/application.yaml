@@ -6,7 +6,7 @@ discodeit:
   storage:
     type: "local"
     local:
-      root-path: "${user.dir}"
+      root-path: "${user.dir}/sprint-mission"
 
 decorator:
   datasource:
@@ -25,6 +25,7 @@ spring:
     properties:
       hibernate:
         generate_statistics: true
+    open-in-view: false
 
 logging:
   level:
@@ -36,5 +37,4 @@ springdoc:
     path: /api-docs  # OpenAPI 문서 접근 경로
   swagger-ui:
     path: /swagger-ui.html  # Swagger UI 경로 (기본값)
-    url: /apiV2.json
 
