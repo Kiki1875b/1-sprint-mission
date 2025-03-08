@@ -21,7 +21,6 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
 
   private final UserCreationFacade userCreationFacade;
   private final UserUpdateFacade userUpdateFacade;
-
   private final UserFindFacade userFindFacade;
   private final UserDeleteFacade userDeleteFacade;
 
@@ -56,6 +55,6 @@ public class UserMasterFacadeImpl implements UserMasterFacade {
 
   @Override
   public void deleteUser(String id) {
-    userDeleteFacade.delete(id);
+    userManagementService.deleteUser(id);
   }
 }

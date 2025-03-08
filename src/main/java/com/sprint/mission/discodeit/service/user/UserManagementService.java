@@ -18,4 +18,6 @@ public interface UserManagementService {
 
   List<User> findAllUsers();
 
+  void deleteUser(String userId);
+
 }

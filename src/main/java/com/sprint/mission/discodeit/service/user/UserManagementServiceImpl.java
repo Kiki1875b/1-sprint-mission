@@ -54,6 +54,16 @@ public class UserManagementServiceImpl implements UserManagementService {
     return userService.findAllUsers();
   }
 
+  @Override
+  public void deleteUser(String userId) {
+    User user = userService.findUserById(userId);
+
+    if(user.getProfile() != null){
+      binaryContentService.delete(String.valueOf(user.getProfile().getId()));
+    }
+    userService.deleteUser(userId);
+  }
+
   private void setStatusToUser(User user) {
     UserStatus status = UserStatus.create(user);
     user.updateStatus(status);
