@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.mapper;
 
 
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

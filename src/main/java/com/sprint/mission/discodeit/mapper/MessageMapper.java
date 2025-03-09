@@ -1,20 +1,13 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.MessageAttachment;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.Named;
 
 import java.util.List;
-import java.util.UUID;
 
 @Mapper(
     componentModel = "spring",
@@ -38,7 +31,7 @@ public interface MessageMapper {
   @Mapping(target = "attachments", source = "attachments")
   MessageResponseDto toResponseDto(Message message);
 
-
+  List<MessageResponseDto> fromEntityList(List<Message> messages);
 //  @Named("convertToBase64")
 //  default List<String> convertToBase64(List<BinaryContent> binaryContents) {
 //    return binaryContents == null || binaryContents.isEmpty()

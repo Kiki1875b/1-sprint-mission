@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.facade.user;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
@@ -18,11 +17,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class UserMasterFacadeImpl implements UserMasterFacade {
-
-  private final UserCreationFacade userCreationFacade;
-  private final UserUpdateFacade userUpdateFacade;
-  private final UserFindFacade userFindFacade;
-  private final UserDeleteFacade userDeleteFacade;
 
   private final UserManagementService userManagementService;
   private final UserMapper userMapper;

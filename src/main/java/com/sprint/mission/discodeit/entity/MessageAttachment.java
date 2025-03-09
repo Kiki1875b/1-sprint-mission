@@ -30,12 +30,12 @@ public class MessageAttachment {
   @EmbeddedId
   private MessageAttachmentId id;
 
-  @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST)
+  @ManyToOne(fetch = FetchType.LAZY)
   @MapsId("messageId")
   @JoinColumn(name = "message_id", nullable = false)
   private Message message;
 
-  @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, orphanRemoval = true)
+  @OneToOne(fetch = FetchType.LAZY)
   @MapsId("attachmentId")
   @JoinColumn(name = "attachment_id", nullable = false)
   private BinaryContent attachment;

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.controller.openapi.AuthApiDocs;
 import com.sprint.mission.discodeit.dto.auth.LoginDto;
-import com.sprint.mission.discodeit.dto.user.LoginResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;

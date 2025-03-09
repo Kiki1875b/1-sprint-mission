@@ -12,10 +12,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -29,14 +31,14 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public ResponseEntity<Resource> download(String id){
+  public ResponseEntity<Resource> download(String id) {
     ResponseEntity<?> response = null;
     try {
       response = binaryContentStorage.download(UUID.fromString(id));
-    }catch (IOException e){
+    } catch (IOException e) {
       throw new IllegalArgumentException();
     }
-    if(response.getBody() instanceof Resource resource){
+    if (response.getBody() instanceof Resource resource) {
       return ResponseEntity.status(response.getStatusCode())
           .headers(response.getHeaders())
           .body(resource);
@@ -48,10 +50,32 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent save(BinaryContent content, byte[] bytes) {
     BinaryContent savedContent = binaryContentRepository.save(content);
+
     binaryContentRepository.flush();
     binaryContentStorage.put(savedContent.getId(), bytes);
+
     return savedContent;
   }
+
+  @Override
+  public List<BinaryContent> saveBinaryContents(List<BinaryContent> contents, List<MultipartFile> files) {
+    if (contents == null || contents.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<BinaryContent> savedContents = binaryContentRepository.saveAll(contents);
+    binaryContentRepository.flush();
+
+    for (MultipartFile file : files) {
+      try {
+        BinaryContent content = contents.stream().filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst().orElseThrow();
+        binaryContentStorage.put(content.getId(), file.getBytes());
+      } catch (IOException e) {
+        throw new CustomException(ErrorCode.FILE_ERROR);
+      }
+    }
+    return savedContents;
+  }
+
 
   @Override
   public BinaryContent find(String id) {
@@ -86,13 +110,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     binaryContentRepository.deleteAllById(contents);
   }
 
-  @Override
-  public List<BinaryContent> saveBinaryContents(List<BinaryContent> contents) {
-    if (contents == null || contents.isEmpty()) {
-      return Collections.emptyList();
-    }
-    return binaryContentRepository.saveAll(contents);
-  }
 
 //  @Override
 //  public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {
@@ -104,7 +121,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 //  }
 
   @Override
-  public List<BinaryContent> findAll(){
+  public List<BinaryContent> findAll() {
     return binaryContentRepository.findAll();
   }
 }

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.dto.user;
 
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 
-import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponseDto(

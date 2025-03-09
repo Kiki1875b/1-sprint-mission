@@ -8,8 +8,6 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import org.mapstruct.AfterMapping;
-import org.mapstruct.BeforeMapping;
-import org.mapstruct.Builder;
 import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -20,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL
@@ -30,7 +27,7 @@ public interface BinaryContentMapper {
   @Mapping(source = "file.originalFilename", target = "fileName")
   @Mapping(source = "file.contentType", target = "contentType")
   @Mapping(source = "file.size", target = "size")
-  BinaryContent toMessageBinaryContent(MultipartFile file, @Context BinaryContentStorage binaryContentStorage);
+  BinaryContent toMessageBinaryContent(MultipartFile file);
 
   @Mapping(source = "file.originalFilename", target = "fileName")
   @Mapping(source = "file.contentType", target = "contentType")
@@ -51,27 +48,26 @@ public interface BinaryContentMapper {
 //  }
 
 
-  default List<BinaryContent> fromMessageFiles(List<MultipartFile> files, @Context BinaryContentStorage binaryContentStorage) {
-
+  default List<BinaryContent> fromMessageFiles(List<MultipartFile> files) {
     return files == null || files.isEmpty() ? Collections.emptyList()
         : files.stream()
-        .map(file -> toMessageBinaryContent(file, binaryContentStorage))
+        .map(file -> toMessageBinaryContent(file))
         .collect(Collectors.toList());
   }
 
-  @AfterMapping
-  default void afterMappingMessageContents(@MappingTarget BinaryContent binaryContent,
-                                           MultipartFile file,
-                                           @Context BinaryContentStorage binaryContentStorage){
-
-    if (binaryContent != null && binaryContent.getId() != null && file != null) {
-      try {
-        binaryContentStorage.put(binaryContent.getId(), file.getBytes());
-      } catch (IOException e) {
-        throw new CustomException(ErrorCode.FILE_ERROR);
-      }
-    }
-  }
+//  @AfterMapping
+//  default void afterMappingMessageContents(@MappingTarget BinaryContent binaryContent,
+//                                           MultipartFile file,
+//                                           @Context BinaryContentStorage binaryContentStorage){
+//
+//    if (binaryContent != null && binaryContent.getId() != null && file != null) {
+//      try {
+//        binaryContentStorage.put(binaryContent.getId(), file.getBytes());
+//      } catch (IOException e) {
+//        throw new CustomException(ErrorCode.FILE_ERROR);
+//      }
+//    }
+//  }
 
 
   @Mapping(target = "id", source = "id")

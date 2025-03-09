@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.facade.channel;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
 
 public interface CreateChannelFacade {
 

@@ -18,7 +18,7 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
 
 
 
-  Page<Message> findByChannel_IdAndCreatedAtLessThanOrderByCreatedAtDesc(UUID channelId, Instant createdAt, Pageable pageable);
+  Page<Message> findByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(UUID channelId, Instant createdAt, Pageable pageable);
   @Query("""
         SELECT m FROM Message m 
         WHERE m.channel.id IN :channelIds

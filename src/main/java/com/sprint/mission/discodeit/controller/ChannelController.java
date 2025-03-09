@@ -5,8 +5,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
-import com.sprint.mission.discodeit.dto.channel.PrivateChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.UpdateChannelResponseDto;
 import com.sprint.mission.discodeit.service.facade.channel.ChannelMasterFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

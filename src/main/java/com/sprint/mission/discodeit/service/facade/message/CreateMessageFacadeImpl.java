@@ -60,7 +60,7 @@ public class CreateMessageFacadeImpl implements CreateMessageFacade{
     message.addAuthor(user);
 
 
-    List<BinaryContent> contents =  binaryContentMapper.fromMessageFiles(files, binaryContentStorage);
+    List<BinaryContent> contents =  binaryContentMapper.fromMessageFiles(files);
 
 
     if(contents != null && !contents.isEmpty()){
@@ -69,7 +69,7 @@ public class CreateMessageFacadeImpl implements CreateMessageFacade{
           .map(content -> new MessageAttachment(message, content))
           .toList();
 
-      binaryContentService.saveBinaryContents(contents);
+      // binaryContentService.saveBinaryContents(contents);
 
       for(MultipartFile file : files){
         try {

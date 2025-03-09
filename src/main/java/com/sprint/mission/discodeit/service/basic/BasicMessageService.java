@@ -59,7 +59,7 @@ BasicMessageService implements MessageService {
     if(nextCursor == null){
       nextCursor = Instant.now();
     }
-    return messageRepository.findByChannel_IdAndCreatedAtLessThanOrderByCreatedAtDesc(UUID.fromString(channelId), nextCursor, pageable);
+    return messageRepository.findByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(UUID.fromString(channelId), nextCursor, pageable);
   }
 
   @Override

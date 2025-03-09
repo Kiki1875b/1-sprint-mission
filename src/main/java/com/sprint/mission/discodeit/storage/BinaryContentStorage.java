@@ -1,7 +1,5 @@
 package com.sprint.mission.discodeit.storage;
 
-import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.springframework.http.ResponseEntity;
 
 import java.io.IOException;
