@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -16,5 +17,8 @@ public interface MessageManagementService {
 
   Message findSingleMessage(String messageId);
 
-  PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant cursor, Pageable pageable);
+  Page<Message> findMessagesByChannel(String channelId, Instant cursor, Pageable pageable);
+
+  Message updateMessage(String messageId, String newContent);
+  void deleteMessage(String messageId);
 }

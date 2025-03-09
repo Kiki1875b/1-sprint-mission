@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.message;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -10,13 +8,9 @@ import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -66,20 +60,22 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   }
 
   @Override
+  public Page<Message> findMessagesByChannel(String channelId, Instant cursor, Pageable pageable) {
+    return messageService.getMessagesByChannelWithCursor(channelId, cursor, pageable);
+  }
+
+  @Override
   @Transactional
-  public PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant cursor, Pageable pageable) {
+  public Message updateMessage(String messageId, String newContent) {
+    Message message = messageService.getMessageById(messageId);
+    messageService.updateMessage(message, newContent);
+    return message;
+  }
 
-    Page<Message> channelMessages = messageService.getMessagesByChannelWithCursor(channelId, cursor, pageable);
-    List<MessageResponseDto> dtoList = messageMapper.fromEntityList(channelMessages.getContent());
-    Instant newCursor = dtoList.isEmpty() ? null : dtoList.get(dtoList.size() - 1).createdAt();
-
-    return new PageResponse<>(
-        dtoList,
-        newCursor,
-        pageable.getPageSize(),
-        channelMessages.hasNext(),
-        channelMessages.getTotalElements()
-    );
+  @Override
+  @Transactional
+  public void deleteMessage(String messageId) {
+    messageService.deleteMessage(messageId);
   }
 
   private void withFiles(List<MultipartFile> files, Message message) {
@@ -93,6 +89,4 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
     message.getAttachments().addAll(attachments);
   }
-
-
 }

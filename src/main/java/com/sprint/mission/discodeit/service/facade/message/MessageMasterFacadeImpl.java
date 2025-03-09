@@ -8,8 +8,10 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.message.MessageManagementService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
@@ -18,12 +20,6 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class MessageMasterFacadeImpl implements MessageMasterFacade {
-
-
-  private final CreateMessageFacade createMessageFacade;
-  private final FindMessageFacade findMessageFacade;
-  private final UpdateMessageFacade updateMessageFacade;
-  private final DeleteMessageFacade deleteMessageFacade;
 
   private final MessageManagementService messageManagementService;
   private final MessageMapper messageMapper;
@@ -41,18 +37,31 @@ public class MessageMasterFacadeImpl implements MessageMasterFacade {
   }
 
   @Override
+  @Transactional
   public PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant nextCursor, Pageable pageable) {
-    return messageManagementService.findMessagesByChannel(channelId, nextCursor, pageable);
+    Page<Message> messagePage = messageManagementService.findMessagesByChannel(channelId, nextCursor, pageable);
+    List<MessageResponseDto> dtoList = messageMapper.fromEntityList(messagePage.getContent());
+    Instant newCursor = dtoList.isEmpty() ? null : dtoList.get(dtoList.size() - 1).createdAt();
+
+    return new PageResponse<>(
+        dtoList,
+        newCursor,
+        pageable.getPageSize(),
+        messagePage.hasNext(),
+        messagePage.getTotalElements()
+    );
+
   }
 
   @Override
   public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
-    return updateMessageFacade.updateMessage(messageId, messageDto);
+    Message message = messageManagementService.updateMessage(messageId, messageDto.newContent());
+    return messageMapper.toResponseDto(message);
   }
 
   @Override
   public void deleteMessage(String messageId) {
-    deleteMessageFacade.deleteMessage(messageId);
+    messageManagementService.deleteMessage(messageId);
   }
 
 }
