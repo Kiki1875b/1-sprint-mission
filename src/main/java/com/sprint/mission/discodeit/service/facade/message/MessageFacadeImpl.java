@@ -19,14 +19,14 @@ import java.util.List;
 
 @Component
 @RequiredArgsConstructor
-public class MessageMasterFacadeImpl implements MessageMasterFacade {
+public class MessageFacadeImpl implements MessageFacade {
 
   private final MessageManagementService messageManagementService;
   private final MessageMapper messageMapper;
 
   @Override
   public MessageResponseDto createMessage(CreateMessageDto messageDto, List<MultipartFile> files) {
-    Message message = messageManagementService.createMessage(messageDto, files);
+    Message message = messageManagementService.createMessage(messageDto.content(), messageDto.channelId(), messageDto.authorId(), files);
     return messageMapper.toResponseDto(message);
   }
 

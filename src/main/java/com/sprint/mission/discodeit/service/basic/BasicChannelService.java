@@ -8,7 +8,7 @@ import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.channel.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -59,15 +59,17 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
-  public List<Channel> findAllPublicOrChannelsIn(List<UUID> channelIds){
-    // TODO : 한번에 가져오는 쿼리
-    List<Channel> privateVisible = channelRepository.findAllById(channelIds);
+  public List<Channel> findAllChannelsByUserId(String userId) {
+
+    List<Channel> privateChannel = channelRepository.findPrivateChannels(UUID.fromString(userId));
+
     List<Channel> publicChannel = channelRepository.findAllByType(Channel.ChannelType.PUBLIC);
 
-
-    return List.of(privateVisible, publicChannel).stream()
+    return List.of(privateChannel, publicChannel).stream()
         .flatMap(List::stream).collect(Collectors.toList());
   }
+
+
 
 
   @Override

@@ -9,7 +9,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,13 +37,13 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
   @Override
   @Transactional
-  public Message createMessage(CreateMessageDto messageDto, List<MultipartFile> files) {
+  public Message createMessage(String content, String channelId, String authorId, List<MultipartFile> files) {
 
-    Channel channel = channelService.findChannelById(messageDto.channelId());
-    User author = userService.findUserById(messageDto.authorId());
+    Channel channel = channelService.findChannelById(channelId);
+    User author = userService.findUserById(authorId);
 
     channelService.validateUserAccess(channel, author);
-    Message message = messageMapper.toEntity(messageDto);
+    Message message = messageMapper.toEntity(content);
     message.addChannel(channel);
     message.addAuthor(author);
 

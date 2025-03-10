@@ -5,13 +5,22 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = UserMapper.class, imports = Objects.class)
 public interface ChannelMapper {
@@ -32,6 +41,31 @@ public interface ChannelMapper {
   @Mapping(target = "participants", source = "participants", defaultExpression = "java(new ArrayList<>())")
   ChannelResponseDto toDto(Channel channel, Instant lastMessageAt, List<User> participants);
 
+  default List<ChannelResponseDto> toListResponse(
+      List<Channel> channels,
+      Map<UUID, Instant> latestMessageByChannel,
+      Map<UUID, List<User>> channelParticipants
+  ){
+    return channels.stream()
+        .map(channel -> toDto(
+            channel,
+            latestMessageByChannel.getOrDefault(channel.getId(), Instant.EPOCH),
+            channelParticipants.getOrDefault(channel.getId(), Collections.emptyList())
+        )).collect(Collectors.toList());
+  }
+
+  default Map<UUID, List<User>> channelToParticipants(List<Channel> channels) {
+    Map<UUID, List<User>> channelParticipants = new HashMap<>();
+
+    for (Channel channel : channels) {
+      channelParticipants.put(channel.getId(), new ArrayList<>());
+      for (ReadStatus status : channel.getStatuses()) {
+        channelParticipants.get(channel.getId()).add(status.getUser());
+      }
+    }
+
+    return channelParticipants;
+  }
 }
 
 

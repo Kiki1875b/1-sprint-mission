@@ -54,6 +54,14 @@ public class ReadStatus extends BaseUpdatableEntity {
     lastReadAt = time;
   }
 
+  public void addChannel(Channel channel){
+    this.channel = channel;
+  }
+
+  public void addUser(User user){
+    this.user = user;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;

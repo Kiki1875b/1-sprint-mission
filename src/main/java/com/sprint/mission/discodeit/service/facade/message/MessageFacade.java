@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.List;
 
-public interface MessageMasterFacade {
+public interface MessageFacade {
   MessageResponseDto createMessage(CreateMessageDto messageDto, List<MultipartFile> files);
   MessageResponseDto findMessageById(String id);
   PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant nextCursor, Pageable pageable);

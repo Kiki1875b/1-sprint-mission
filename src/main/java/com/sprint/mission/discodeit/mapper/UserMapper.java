@@ -16,6 +16,7 @@ import org.mapstruct.Named;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class, BinaryContentUtil.class})
@@ -59,4 +60,5 @@ public interface UserMapper {
     if(minutes <= 10) return true;
     return false;
   }
+
 }

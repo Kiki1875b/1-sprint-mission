@@ -7,7 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface UserMasterFacade {
+public interface UserFacade {
   UserResponseDto createUser(CreateUserRequest request, MultipartFile profile);
   UserResponseDto updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto);
   UserResponseDto findUserById(String id);

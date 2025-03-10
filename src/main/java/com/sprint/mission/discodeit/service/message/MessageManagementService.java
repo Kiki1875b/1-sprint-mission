@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface MessageManagementService {
 
-  Message createMessage(CreateMessageDto messageDto, List<MultipartFile> files);
+  Message createMessage(String content, String channelId, String authorId, List<MultipartFile> files);
 
   Message findSingleMessage(String messageId);
 

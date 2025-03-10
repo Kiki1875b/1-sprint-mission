@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.controller.openapi.UserApiDocs;
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-import com.sprint.mission.discodeit.service.facade.user.UserMasterFacade;
+import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
@@ -27,7 +27,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController implements UserApiDocs {
 
-  private final UserMasterFacade userFacade;
+  private final UserFacade userFacade;
 
   @GetMapping("/{id}")
   @Override

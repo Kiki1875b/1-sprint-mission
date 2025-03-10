@@ -22,6 +22,13 @@ public interface MessageMapper {
   @Mapping(target = "attachments", expression = "java(new ArrayList<>())")
   Message toEntity(CreateMessageDto dto);
 
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "createdAt", ignore = true)
+  @Mapping(target = "updatedAt", ignore = true)
+  @Mapping(target = "content", source = "content")
+  @Mapping(target = "attachments", expression = "java(new ArrayList<>())")
+  Message toEntity(String content);
+
   @Mapping(target = "id", source = "id")
   @Mapping(target = "createdAt", source = "createdAt")
   @Mapping(target = "updatedAt", source = "updatedAt")

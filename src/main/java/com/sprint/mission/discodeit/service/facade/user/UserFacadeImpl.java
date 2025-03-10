@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class UserMasterFacadeImpl implements UserMasterFacade {
+public class UserFacadeImpl implements UserFacade {
 
   private final UserManagementService userManagementService;
   private final UserMapper userMapper;
