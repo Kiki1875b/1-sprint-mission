@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
   private final MessageService messageService;
 
   @Override
+  @Transactional
   public Channel createPrivateChannel(Channel channel, List<String> userIds) {
 
     List<User> participants = userService.validateAndFindAllUsersIn(userIds);

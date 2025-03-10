@@ -18,12 +18,11 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -31,6 +30,7 @@ import java.util.UUID;
 public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
 
   private final ChannelManagementService channelManagementService;
+
   private final MessageService messageService;
   private final ChannelService channelService;
   private final ChannelMapper channelMapper;
@@ -74,6 +74,7 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   @Override
   @Transactional
   public List<ChannelResponseDto> findAllChannelsByUserId(String userId) {
+
     List<Channel> channels = channelService.findAllChannelsByUserId(userId);
     Map<UUID, Instant> latestMessageTimeByChannel = messageService.getLatestMessageForChannels(channels);
     Map<UUID, List<User>> channelParticipants = channelMapper.channelToParticipants(channels);
@@ -89,8 +90,11 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
     Instant lastMessageTime = channelManagementService
         .getLastMessageTimeForChannel(channelId);
 
-    List<User> users = channelManagementService
-        .getChannelParticipants(channelId);
+
+    List<User> users = channel.getStatuses().stream()
+        .map(status -> status.getUser()).collect(Collectors.toList());
+//    List<User> users = channelManagementService
+//        .getChannelParticipants(channelId);
 
     return channelMapper.toDto(channel, lastMessageTime, users);
   }

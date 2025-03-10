@@ -35,7 +35,6 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.save(channel);
   }
 
-
   @Override
   public Channel createPublicChannel(Channel channel) {
     return channelRepository.save(channel);
@@ -61,16 +60,14 @@ public class BasicChannelService implements ChannelService {
   @Override
   public List<Channel> findAllChannelsByUserId(String userId) {
 
+    // TODO : 합치기
     List<Channel> privateChannel = channelRepository.findPrivateChannels(UUID.fromString(userId));
+    //List<Channel> publicChannel = channelRepository.findAllByType(Channel.ChannelType.PUBLIC);
 
-    List<Channel> publicChannel = channelRepository.findAllByType(Channel.ChannelType.PUBLIC);
-
-    return List.of(privateChannel, publicChannel).stream()
-        .flatMap(List::stream).collect(Collectors.toList());
+    return privateChannel;
+//        List.of(privateChannel, publicChannel).stream()
+//        .flatMap(List::stream).collect(Collectors.toList());
   }
-
-
-
 
   @Override
   public Channel updateChannel(String channelId, ChannelUpdateDto dto) {

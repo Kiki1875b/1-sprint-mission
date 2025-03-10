@@ -56,11 +56,12 @@ public class UserManagementServiceImpl implements UserManagementService {
   @Override
   public void deleteUser(String userId) {
     User user = userService.findUserById(userId);
+    userService.deleteUser(userId);
 
     if(user.getProfile() != null){
       binaryContentService.delete(String.valueOf(user.getProfile().getId()));
     }
-    userService.deleteUser(userId);
+
   }
 
   private void setStatusToUser(User user) {

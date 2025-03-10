@@ -63,7 +63,7 @@ public class BasicUserService implements UserService {
       throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
 
-    return userRepository.findAllById(userUuids);
+    return userRepository.findAllByIdIn(userUuids);
   }
 
   @Override

@@ -25,7 +25,6 @@ public class UserStatusController implements UserStatusApiDocs {
   @Override
   @PatchMapping("/users/{userId}/userStatus")
   public ResponseEntity<UserStatusResponseDto> updateUserStatus(@PathVariable String userId, @RequestBody UpdateUserStatusDto userStatusDto){
-
     UserStatusResponseDto status = userStatusService.updateByUserId(userId, userStatusDto);
     return ResponseEntity.ok(status);
   }

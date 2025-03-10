@@ -43,6 +43,8 @@ public class MessageFacadeImpl implements MessageFacade {
     List<MessageResponseDto> dtoList = messageMapper.fromEntityList(messagePage.getContent());
     Instant newCursor = dtoList.isEmpty() ? null : dtoList.get(dtoList.size() - 1).createdAt();
 
+    System.out.println(messagePage.hasNext());
+
     return new PageResponse<>(
         dtoList,
         newCursor,

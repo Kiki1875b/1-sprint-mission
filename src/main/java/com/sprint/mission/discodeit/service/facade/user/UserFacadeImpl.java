@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.user.UserManagementService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -35,6 +36,7 @@ public class UserFacadeImpl implements UserFacade {
   }
 
   @Override
+  @Transactional
   public UserResponseDto updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
     User tmpUser = userMapper.toEntity(updateDto);
     User updatedUser =  userManagementService.updateUser(userId, tmpUser, profile);
@@ -48,6 +50,7 @@ public class UserFacadeImpl implements UserFacade {
   }
 
   @Override
+  @Transactional
   public void deleteUser(String id) {
     userManagementService.deleteUser(id);
   }

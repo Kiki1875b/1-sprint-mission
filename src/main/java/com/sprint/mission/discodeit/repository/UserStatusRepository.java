@@ -9,8 +9,8 @@ import java.util.UUID;
 
 public interface UserStatusRepository extends JpaRepository<UserStatus, UUID> {
 
-  @Query("""
-    SELECT us FROM UserStatus us JOIN FETCH us.user WHERE us.user.id = :userId
-      """)
+//  @Query("""
+//    SELECT us FROM UserStatus us JOIN FETCH us.user WHERE us.user.id = :userId
+//      """)
   Optional<UserStatus> findByUser_Id(UUID userId);
 }

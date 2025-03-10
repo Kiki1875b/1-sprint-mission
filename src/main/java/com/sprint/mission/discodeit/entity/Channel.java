@@ -34,10 +34,6 @@ public class Channel extends BaseUpdatableEntity {
   @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "channel")
   private List<ReadStatus> statuses = new ArrayList<>();
 
-  // Channel channel = channelRepository.findbyid(); channel.getStatuses();
-  // 한명의 사용자가 볼수있는 체널 목록 : 해당 유저가 참여중인 채널 + public -> private 인 경우, 모든 참여자를 조회
-  // channel 과 user N:M -> channel_user -> read_status
-
 
   public enum ChannelType {
     PRIVATE, PUBLIC

@@ -25,7 +25,9 @@ spring:
     properties:
       hibernate:
         generate_statistics: true
+        default_batch_fetch_size: 10
     open-in-view: false
+
 
 logging:
   level:
