@@ -32,13 +32,14 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public MessageResponseDto findMessageById(String id) {
     Message message = messageManagementService.findSingleMessage(id);
     return messageMapper.toResponseDto(message);
   }
 
   @Override
-  @Transactional //TODO : pageable
+  @Transactional(readOnly = true)
   public PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant nextCursor, Pageable pageable) {
     Page<Message> messagePage = messageManagementService.findMessagesByChannel(channelId, nextCursor, pageable);
     List<MessageResponseDto> dtoList = messageMapper.fromEntityList(messagePage.getContent());
@@ -60,6 +61,7 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
+  @Transactional
   public void deleteMessage(String messageId) {
     messageManagementService.deleteMessage(messageId);
   }

@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.util;
 public class BinaryContentUtil {
   private BinaryContentUtil() {
   }
-
 //  public static byte[] convertToBytes(MultipartFile mFile) {
 //    try {
 //      return mFile.getBytes();

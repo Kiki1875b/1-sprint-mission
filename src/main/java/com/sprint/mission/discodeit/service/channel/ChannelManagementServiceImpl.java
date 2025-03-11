@@ -7,8 +7,8 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
@@ -29,7 +29,7 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
   private final MessageService messageService;
 
   @Override
-  @Transactional
+  @Transactional(propagation = Propagation.REQUIRED)
   public Channel createPrivateChannel(Channel channel, List<String> userIds) {
 
     List<User> participants = userService.validateAndFindAllUsersIn(userIds);
@@ -43,6 +43,7 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
     return channelService.createPrivateChannel(channel);
   }
 
+  // affects only one row
   @Override
   public Channel createPublicChannel(Channel channel) {
     return channelService.createPublicChannel(channel);
@@ -67,19 +68,24 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
 
     List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
     List<UUID> extractedChannelIds = parseStatusToChannelUuid(statuses);
+
     List<Channel> channels = channelService.findAllChannelsInOrPublic(extractedChannelIds);
     List<ReadStatus> secondStatuses = getDifferentReadStatuses(channels, extractedChannelIds);
+
     List<UUID> newChannelIds = secondStatuses.stream().map(status -> status.getChannel().getId()).distinct().collect(Collectors.toList());
+
     List<Channel> newChannels = channelService.findAllChannelsInOrPublic(newChannelIds);
     List<Channel> mergedChannels = Stream.concat(channels.stream(), newChannels.stream())
         .distinct()
         .collect(Collectors.toList());
+
     List<ReadStatus> mergedStatuses = Stream.concat(secondStatuses.stream(), statuses.stream())
         .distinct()
         .collect(Collectors.toList());
 
     List<String> userIds = mergedStatuses.stream().map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
     List<User> users = userService.validateAndFindAllUsersIn(userIds);
+
     return mergedChannels;
   }
 

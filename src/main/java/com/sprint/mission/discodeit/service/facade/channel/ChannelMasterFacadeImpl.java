@@ -63,7 +63,7 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   }
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true)
   public ChannelResponseDto getChannelById(String channelId) {
     Channel channel = channelService.findChannelById(channelId);
 
@@ -77,7 +77,7 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   }
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true)
   public List<ChannelResponseDto> findAllChannelsByUserId(String userId) {
 
     List<Channel> channels = channelService.findAllChannelsByUserId(userId);
@@ -88,7 +88,7 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   }
 
   @Override // userId 가 주어졌을때, 해당 user 가 참여중인 체널은 readstatus에 정보가 있다. 하지만, 해당 user가 참여중이지 않은 채널은 첫 쿼리에서 불러오지 못한다 -> 불러오려면 join
-  @Transactional
+  @Transactional(readOnly = true)
   public List<ChannelResponseDto> findAllChannelsByUserIdV2(String userId) {
 
     // 쿼리 2번 -> userId 로 user 의 read status + 불러온 read status 에 포함된 모든 channel 의 다른 user 의 read status
@@ -132,9 +132,10 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   }
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true)
   public List<ChannelResponseDto> findAllChannelsByUserIdV3(String userId){
     List<Channel> channels = channelManagementService.findAllChannelsForUser(userId);
+
     Map<UUID, Instant> latestMessageTimeByChannel = messageService.getLatestMessageForChannels(channels);
     Map<UUID, List<User>> channelParticipants = channelMapper.channelToParticipants(channels);
     return channelMapper.toListResponse(channels, latestMessageTimeByChannel, channelParticipants);

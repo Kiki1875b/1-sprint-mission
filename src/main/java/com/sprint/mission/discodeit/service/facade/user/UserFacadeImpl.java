@@ -23,6 +23,7 @@ public class UserFacadeImpl implements UserFacade {
   private final UserMapper userMapper;
 
   @Override
+  @Transactional
   public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
     User user = userMapper.toEntity(request);
     User createdUser = userManagementService.createUser(user, profile);
@@ -30,6 +31,7 @@ public class UserFacadeImpl implements UserFacade {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public UserResponseDto findUserById(String id) {
     User user = userManagementService.findSingleUser(id);
     return userMapper.toDto(user);
@@ -44,6 +46,7 @@ public class UserFacadeImpl implements UserFacade {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<UserResponseDto> findAllUsers() {
     List<User> users = userManagementService.findAllUsers();
     return userMapper.toDtoList(users);

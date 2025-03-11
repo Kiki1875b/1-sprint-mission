@@ -12,16 +12,14 @@ import java.util.UUID;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-   @EntityGraph(attributePaths = {"profile", "status"})
-   Optional<User> findById(UUID id);
+  @EntityGraph(attributePaths = {"profile", "status"})
+  Optional<User> findById(UUID id);
 
   @EntityGraph(attributePaths = {"profile", "status"})
   List<User> findAll();
 
   @EntityGraph(attributePaths = {"profile", "status"})
   List<User> findAllByIdIn(List<UUID> userIds);
-
-  Optional<User> findByUsername(String username);
 
   @Query("""
        SELECT u FROM User u
@@ -30,12 +28,4 @@ public interface UserRepository extends JpaRepository<User, UUID> {
        WHERE u.username = :username
       """)
   Optional<User> findByUsernameWithProfileAndStatus(@Param("username") String username);
-
-  @Query("""
-          SELECT u FROM User u
-          LEFT JOIN FETCH u.profile
-          WHERE u.username = :username
-      """)
-  Optional<User> findByUsernameWithProfile(@Param("username") String username);
-
 }

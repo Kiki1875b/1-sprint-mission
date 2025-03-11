@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 
-
 import java.util.List;
 
 public interface ChannelMasterFacade {

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

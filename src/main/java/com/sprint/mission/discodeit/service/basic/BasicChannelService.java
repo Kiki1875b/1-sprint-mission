@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
-
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
@@ -10,15 +9,15 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
-
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,15 +31,15 @@ public class BasicChannelService implements ChannelService {
   private final ChannelRepository channelRepository;
   private final ReadStatusRepository readStatusRepository;
 
-
-
   @Override
+  @Transactional(propagation = Propagation.REQUIRED)
   public Channel createPrivateChannel(Channel channel) {
     return channelRepository.save(channel);
   }
 
 
   @Override
+  @Transactional
   public Channel createPublicChannel(Channel channel) {
     return channelRepository.save(channel);
   }
@@ -48,13 +47,11 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void validateUserAccess(Channel channel, User user) {
-
     if (Objects.equals(channel.getType(), Channel.ChannelType.PRIVATE)) {
       Optional<ReadStatus> status = readStatusRepository.findByUserAndChannel(user, channel);
       if (status.isEmpty()) {
         throw new CustomException(ErrorCode.NO_ACCESS_TO_CHANNEL);
       }
-
     }
   }
 
@@ -74,21 +71,15 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.findAllByType(type);
   }
 
-
   @Override
+  @Transactional
   public List<Channel> findAllChannelsByUserId(String userId) {
-
-    // TODO : 합치기
     List<Channel> privateChannel = channelRepository.findPrivateChannels(UUID.fromString(userId));
-    //List<Channel> publicChannel = channelRepository.findAllByType(Channel.ChannelType.PUBLIC);
-
     return privateChannel;
-//        List.of(privateChannel, publicChannel).stream()
-//        .flatMap(List::stream).collect(Collectors.toList());
-
   }
 
   @Override
+  @Transactional
   public Channel updateChannel(String channelId, ChannelUpdateDto dto) {
 
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElseThrow(
@@ -108,6 +99,7 @@ public class BasicChannelService implements ChannelService {
   }
 
   @Override
+  @Transactional
   public void deleteChannel(String channelId) {
     channelRepository.deleteById(UUID.fromString(channelId));
   }

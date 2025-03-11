@@ -15,9 +15,7 @@ public interface MessageService {
   Message updateMessage(Message message, String content);
   Message getMessageById(String messageId);
   Page<Message> getMessagesByChannel(String channelId, Pageable pageable);
-
   Page<Message> getMessagesByChannelWithCursor(String channelId, Instant nextCursor, Pageable pageable);
-
   Message getLatestMessageByChannel(String channelId);
   Map<UUID, Instant> getLatestMessageForChannels(List<Channel> channels);
   void deleteMessage(String messageId);

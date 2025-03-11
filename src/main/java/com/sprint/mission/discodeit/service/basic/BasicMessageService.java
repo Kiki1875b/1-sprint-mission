@@ -5,22 +5,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-
 import com.sprint.mission.discodeit.service.message.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
-
 import java.util.UUID;
-
 import java.util.stream.Collectors;
 
 
@@ -35,9 +32,7 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message createMessage(Message message) {
-
     return messageRepository.save(message);
-
   }
 
   @Override
@@ -71,12 +66,12 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message getLatestMessageByChannel(String channelId) {
-
     return messageRepository.findTopByChannel_IdOrderByCreatedAtDesc(UUID.fromString(channelId))
         .orElse(null);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public Map<UUID, Instant> getLatestMessageForChannels(List<Channel> channels) {
     List<UUID> channelIds = channels.stream().map(Channel::getId).toList();
 
@@ -91,6 +86,7 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
+  @Transactional
   public void deleteMessage(String messageId) {
     messageRepository.deleteById(UUID.fromString(messageId));
   }

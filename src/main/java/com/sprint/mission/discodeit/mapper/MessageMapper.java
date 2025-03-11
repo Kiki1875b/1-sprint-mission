@@ -2,17 +2,14 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.util.List;
 
 @Mapper(
-    uses = {BinaryContentMapper.class, UserMapper.class},
-    imports = BinaryContentUtil.class
+    uses = {BinaryContentMapper.class, UserMapper.class}
 )
 public interface MessageMapper {
 

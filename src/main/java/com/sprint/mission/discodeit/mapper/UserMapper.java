@@ -2,16 +2,12 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
-
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
-
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
-
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -19,10 +15,9 @@ import org.mapstruct.Named;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-@Mapper(uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class, BinaryContentUtil.class})
+@Mapper(uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class})
 public interface UserMapper {
 
   @Mapping(target = "id", ignore = true)

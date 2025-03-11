@@ -3,24 +3,16 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
-import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
-import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import com.sprint.mission.discodeit.util.BinaryContentUtil;
-import org.mapstruct.AfterMapping;
-import org.mapstruct.Context;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL
-    ,imports = BinaryContentUtil.class)
+@Mapper(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.SET_TO_NULL)
 public interface BinaryContentMapper {
 
   @Mapping(source = "file.originalFilename", target = "fileName")

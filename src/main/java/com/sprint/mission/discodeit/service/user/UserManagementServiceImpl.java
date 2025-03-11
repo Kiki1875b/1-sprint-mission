@@ -34,6 +34,7 @@ public class UserManagementServiceImpl implements UserManagementService {
   }
 
   @Override
+  @Transactional
   public User updateUser(String userId, User tmpUser, MultipartFile profile) {
     User userToUpdate = userService.findUserById(userId);
     userToUpdate.updateFields(tmpUser.getUsername(), tmpUser.getEmail(), tmpUser.getPassword());
@@ -54,6 +55,7 @@ public class UserManagementServiceImpl implements UserManagementService {
   }
 
   @Override
+  @Transactional
   public void deleteUser(String userId) {
     User user = userService.findUserById(userId);
     userService.deleteUser(userId);

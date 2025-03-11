@@ -5,14 +5,13 @@ import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
-
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
 import java.util.Objects;
 import java.util.UUID;
 
@@ -26,17 +25,19 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
 
   @Override
+  @Transactional
   public User saveUser(User user) {
     return userRepository.save(user);
-
   }
 
   @Override
+  @Transactional
   public User update(User user){
     return userRepository.save(user);
   }
 
   @Override
+  @Transactional(readOnly = true)
   public User findUserById(String id) {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
         () -> new CustomException(ErrorCode.USER_NOT_FOUND)
@@ -44,11 +45,13 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<User> findAllUsers() {
     return userRepository.findAll();
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<User> validateAndFindAllUsersIn(List<String> userIds) {
     List<UUID> userUuids = userIds.stream()
         .map(id -> {
@@ -71,12 +74,14 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  @Transactional(readOnly = true)
   public List<User> findByAllIn(List<UUID> userIds) {
     return userRepository.findAllByIdIn(userIds);
 
   }
 
   @Override
+  @Transactional
   public void deleteUser(String id) {
     userRepository.deleteById(UUID.fromString(id));
   }

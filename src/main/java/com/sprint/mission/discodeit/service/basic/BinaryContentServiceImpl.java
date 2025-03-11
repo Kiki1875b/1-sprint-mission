@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-
 import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
@@ -20,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-
 import java.util.stream.Collectors;
 
 
@@ -100,10 +98,8 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<String> ids) {
-
     List<UUID> uuids = ids.stream().map(UUID::fromString).toList();
     return Collections.unmodifiableList(binaryContentRepository.findAllById(uuids));
-
   }
 
   @Override

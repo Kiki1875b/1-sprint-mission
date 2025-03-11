@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.service.message;
 
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
-import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
-import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

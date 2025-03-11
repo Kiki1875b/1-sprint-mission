@@ -7,19 +7,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-
-//  @EntityGraph(attributePaths = {"statuses", "statuses.user", "statuses.user.status"})
-//  Optional<Channel> findByIdWithGraph(UUID channelId);
-
   List<Channel> findAllByType(Channel.ChannelType type);
 
   List<Channel> findByIdInOrType(List<UUID> channelIds, Channel.ChannelType type);
-
 
   @EntityGraph(attributePaths = {"statuses", "statuses.user", "statuses.user.status", "statuses.user.profile"})
   @Query("""
@@ -30,10 +24,4 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
           ) OR c.type = 'PUBLIC'
       """)
   List<Channel> findPrivateChannels(@Param("userId") UUID userId);
-
-  @Query("""
-      SELECT c FROM Channel c 
-      WHERE c.type = 'PUBLIC'
-        """)
-  List<Channel> findAllPublicChannels();
 }

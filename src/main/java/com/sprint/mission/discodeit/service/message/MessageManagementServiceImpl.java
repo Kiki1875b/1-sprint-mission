@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.service.message;
 
-import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
@@ -8,7 +7,6 @@ import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
-import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserService;
@@ -36,8 +34,6 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   private final MessageMapper messageMapper;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentService binaryContentService;
-
-  private final MessageAttachmentRepository messageAttachmentRepository;
 
   @Override
   @Transactional
