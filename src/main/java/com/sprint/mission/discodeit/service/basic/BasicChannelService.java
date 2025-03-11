@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -42,6 +41,7 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void validateUserAccess(Channel channel, User user) {
+
     if (Objects.equals(channel.getType(), Channel.ChannelType.PRIVATE)) {
       Optional<ReadStatus> status = readStatusRepository.findByUserAndChannel(user, channel);
       if (status.isEmpty()) {
@@ -54,7 +54,16 @@ public class BasicChannelService implements ChannelService {
   public Channel findChannelById(String channelId) {
     return channelRepository.findById(UUID.fromString(channelId))
         .orElseThrow(() -> new CustomException(ErrorCode.CHANNEL_NOT_FOUND));
+  }
 
+  @Override
+  public List<Channel> findAllChannelsInOrPublic(List<UUID> ids){
+    return channelRepository.findByIdInOrType(ids, Channel.ChannelType.PUBLIC);
+  }
+
+  @Override
+  public List<Channel> findByType(Channel.ChannelType type){
+    return channelRepository.findAllByType(type);
   }
 
   @Override

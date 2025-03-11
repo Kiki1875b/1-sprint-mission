@@ -16,8 +16,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -65,8 +69,31 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   }
 
   @Override
+  public List<ReadStatus> findByIds(List<UUID> uuids){
+    return readStatusRepository.findAllById(uuids);
+  }
+
+  /*
+  userId 로 user 의 read status -> 불러온 read status 에 있는 channel ID 로 다른 유저의 read status
+  쿼리 2번
+   */
+  @Override
   public List<ReadStatus> findAllByUserId(String userId) {
-    return readStatusRepository.findAllByUser_Id(UUID.fromString(userId));
+     List<ReadStatus> userStatuses =  readStatusRepository.findAllByUser_Id(UUID.fromString(userId));
+
+    List<UUID> channelIds = userStatuses.stream().map(status -> status.getChannel().getId()).collect(Collectors.toList());
+    List<ReadStatus> userStatuses2 = readStatusRepository.findAllByChannel_IdIn(channelIds);
+
+    Set<ReadStatus> merged = new HashSet<>();
+    merged.addAll(userStatuses);
+    merged.addAll(userStatuses2);
+
+    return new ArrayList<>(merged);
+  }
+
+  @Override
+  public List<ReadStatus> findAllInChannel(List<UUID> channelIds) {
+    return readStatusRepository.findAllByChannel_IdIn(channelIds);
   }
 
   @Override

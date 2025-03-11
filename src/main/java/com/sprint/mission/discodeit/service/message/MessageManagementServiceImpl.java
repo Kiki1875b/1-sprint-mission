@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserService;
@@ -20,6 +21,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
 
 @Service
@@ -34,6 +37,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentService binaryContentService;
 
+  private final MessageAttachmentRepository messageAttachmentRepository;
 
   @Override
   @Transactional
@@ -61,7 +65,16 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
   @Override
   public Page<Message> findMessagesByChannel(String channelId, Instant cursor, Pageable pageable) {
-    return messageService.getMessagesByChannelWithCursor(channelId, cursor, pageable);
+    Page<Message> channelMessages = messageService.getMessagesByChannelWithCursor(channelId, cursor, pageable);
+
+    List<UUID> authorIds = channelMessages.getContent().stream()
+        .map(message -> message.getAuthor().getId())
+        .distinct()
+        .collect(Collectors.toList());
+
+    List<User> users = userService.findByAllIn(authorIds);
+
+    return channelMessages;
   }
 
   @Override

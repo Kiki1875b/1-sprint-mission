@@ -16,13 +16,13 @@ import java.util.UUID;
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
 
-  @EntityGraph(attributePaths = {"author", "attachments"})
-  Optional<Message> findById(UUID channelId);
+//  @EntityGraph(attributePaths = {"author", "attachments"})
+//  Optional<Message> findById(UUID channelId);
 
   Page<Message>  findByChannel_Id(UUID channelId, Pageable pageable);
   Optional<Message> findTopByChannel_IdOrderByCreatedAtDesc(UUID channelId);
 
-  Page<Message> findByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(UUID channelId, Instant createdAt, Pageable pageable);
+  Page<Message> findByChannel_IdAndCreatedAtLessThan(UUID channelId, Instant createdAt, Pageable pageable);
   @Query("""
         SELECT m FROM Message m 
         WHERE m.channel.id IN :channelIds
@@ -33,4 +33,5 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
           )
       """)
   List<Message> findLatestMessagesForEachChannel(@Param("channelIds") List<UUID> channelIds);
+
 }

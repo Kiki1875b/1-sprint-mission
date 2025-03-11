@@ -12,10 +12,14 @@ import java.util.UUID;
 
 public interface ChannelRepository extends JpaRepository<Channel, UUID> {
 
-  @EntityGraph(attributePaths = {"statuses", "statuses.user", "statuses.user.status"})
-  Optional<Channel> findById(UUID channelId);
+
+//  @EntityGraph(attributePaths = {"statuses", "statuses.user", "statuses.user.status"})
+//  Optional<Channel> findByIdWithGraph(UUID channelId);
 
   List<Channel> findAllByType(Channel.ChannelType type);
+
+  List<Channel> findByIdInOrType(List<UUID> channelIds, Channel.ChannelType type);
+
 
   @EntityGraph(attributePaths = {"statuses", "statuses.user", "statuses.user.status", "statuses.user.profile"})
   @Query("""

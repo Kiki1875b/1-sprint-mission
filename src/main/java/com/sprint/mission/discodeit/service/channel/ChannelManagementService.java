@@ -19,4 +19,5 @@ public interface ChannelManagementService {
 
   List<User> getChannelParticipants(String channelId);
 
+  List<Channel> findAllChannelsForUser(String userId);
 }

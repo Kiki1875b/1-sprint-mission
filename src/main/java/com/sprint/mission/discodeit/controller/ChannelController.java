@@ -63,7 +63,7 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   @GetMapping
   public ResponseEntity<List<ChannelResponseDto>> findChannelVisibleToUser(@RequestParam String userId){
-    List<ChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserId(userId);
+    List<ChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserIdV3(userId);
     return ResponseEntity.ok(channels);
   }
 }

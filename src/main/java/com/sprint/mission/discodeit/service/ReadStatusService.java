@@ -13,7 +13,13 @@ public interface ReadStatusService {
   ReadStatus create(CreateReadStatusDto dto);
   List<ReadStatus> createMultipleReadStatus(List<User> users, Channel channel);
   ReadStatus find(String id);
+
+  List<ReadStatus> findByIds(List<UUID> uuids);
+
   List<ReadStatus> findAllByUserId(String userId);
+
+  List<ReadStatus> findAllInChannel(List<UUID> channelIds);
+
   List<UUID> findAllChannelIdsByUserId(String userId);
 
   List<ReadStatus> findAllReadStatusRelatedToUserId(String userId);

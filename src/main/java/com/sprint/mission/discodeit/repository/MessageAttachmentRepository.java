@@ -19,4 +19,6 @@ public interface MessageAttachmentRepository extends JpaRepository<MessageAttach
 
   @Query("SELECT ma.attachment.id FROM MessageAttachment ma JOIN ma.attachment WHERE ma.message.id = :messageId")
   List<UUID> findByMessageId(UUID messageId);
+
+  List<MessageAttachment> findAllByMessage_IdIn(List<UUID> messageIds);
 }

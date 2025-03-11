@@ -25,6 +25,7 @@ public class MessageFacadeImpl implements MessageFacade {
   private final MessageMapper messageMapper;
 
   @Override
+  @Transactional
   public MessageResponseDto createMessage(CreateMessageDto messageDto, List<MultipartFile> files) {
     Message message = messageManagementService.createMessage(messageDto.content(), messageDto.channelId(), messageDto.authorId(), files);
     return messageMapper.toResponseDto(message);
@@ -37,25 +38,22 @@ public class MessageFacadeImpl implements MessageFacade {
   }
 
   @Override
-  @Transactional
+  @Transactional //TODO : pageable
   public PageResponse<MessageResponseDto> findMessagesByChannel(String channelId, Instant nextCursor, Pageable pageable) {
     Page<Message> messagePage = messageManagementService.findMessagesByChannel(channelId, nextCursor, pageable);
     List<MessageResponseDto> dtoList = messageMapper.fromEntityList(messagePage.getContent());
     Instant newCursor = dtoList.isEmpty() ? null : dtoList.get(dtoList.size() - 1).createdAt();
-
-    System.out.println(messagePage.hasNext());
-
     return new PageResponse<>(
         dtoList,
         newCursor,
         pageable.getPageSize(),
         messagePage.hasNext(),
-        messagePage.getTotalElements()
+        null
     );
-
   }
 
   @Override
+  @Transactional
   public MessageResponseDto updateMessage(String messageId, MessageUpdateDto messageDto) {
     Message message = messageManagementService.updateMessage(messageId, messageDto.newContent());
     return messageMapper.toResponseDto(message);

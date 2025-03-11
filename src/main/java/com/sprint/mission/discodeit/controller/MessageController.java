@@ -70,7 +70,7 @@ public class MessageController implements MessageApiDocs {
   public ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(
       @RequestParam String channelId,
       @RequestParam(required = false) Instant cursor,
-      @PageableDefault(size =50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
 
     PageResponse<MessageResponseDto> messages = messageFacade.findMessagesByChannel(channelId, cursor, pageable);
     return ResponseEntity.ok(messages);

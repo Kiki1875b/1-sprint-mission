@@ -12,7 +12,8 @@ public interface ChannelMasterFacade {
   ChannelResponseDto createPublicChannel(CreateChannelDto channelDto);
   ChannelResponseDto getChannelById(String channelId);
   List<ChannelResponseDto> findAllChannelsByUserId(String userId);
-
+  List<ChannelResponseDto> findAllChannelsByUserIdV2(String userId);
+  List<ChannelResponseDto> findAllChannelsByUserIdV3(String userId);
   ChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto);
   void deleteChannel(String channelId);
 }

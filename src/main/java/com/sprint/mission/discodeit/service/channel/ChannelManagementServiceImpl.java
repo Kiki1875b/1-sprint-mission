@@ -1,27 +1,22 @@
 package com.sprint.mission.discodeit.service.channel;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
-import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @Service
@@ -65,5 +60,43 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
   public List<User> getChannelParticipants(String channelId) {
     List<ReadStatus> participants = readStatusService.findAllByChannelId(channelId);
     return participants.stream().map(ReadStatus::getUser).toList();
+  }
+
+  @Override
+  public List<Channel> findAllChannelsForUser(String userId) {
+
+    List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
+    List<UUID> extractedChannelIds = parseStatusToChannelUuid(statuses);
+    List<Channel> channels = channelService.findAllChannelsInOrPublic(extractedChannelIds);
+    List<ReadStatus> secondStatuses = getDifferentReadStatuses(channels, extractedChannelIds);
+    List<UUID> newChannelIds = secondStatuses.stream().map(status -> status.getChannel().getId()).distinct().collect(Collectors.toList());
+    List<Channel> newChannels = channelService.findAllChannelsInOrPublic(newChannelIds);
+    List<Channel> mergedChannels = Stream.concat(channels.stream(), newChannels.stream())
+        .distinct()
+        .collect(Collectors.toList());
+    List<ReadStatus> mergedStatuses = Stream.concat(secondStatuses.stream(), statuses.stream())
+        .distinct()
+        .collect(Collectors.toList());
+
+    List<String> userIds = mergedStatuses.stream().map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
+    List<User> users = userService.validateAndFindAllUsersIn(userIds);
+    return mergedChannels;
+  }
+
+
+  private List<UUID> parseStatusToChannelUuid(List<ReadStatus> statuses) {
+    return statuses.stream()
+        .map(status -> status.getChannel().getId())
+        .distinct()
+        .collect(Collectors.toList());
+  }
+
+  private List<ReadStatus> getDifferentReadStatuses(List<Channel> channels, List<UUID> originalChannelIds) {
+    List<UUID> difference = channels.stream()
+        .map(c -> c.getId())
+        .filter(id -> !originalChannelIds.contains(id))
+        .collect(Collectors.toList());
+
+    return readStatusService.findAllInChannel(difference);
   }
 }

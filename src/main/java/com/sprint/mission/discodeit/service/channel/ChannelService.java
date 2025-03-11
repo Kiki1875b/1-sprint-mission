@@ -11,6 +11,11 @@ public interface ChannelService {
   Channel createPrivateChannel(Channel channel);
   Channel createPublicChannel(Channel channel);
   Channel findChannelById(String channelId);
+
+  List<Channel> findAllChannelsInOrPublic(List<UUID> ids);
+
+  List<Channel> findByType(Channel.ChannelType type);
+
   List<Channel> findAllChannelsByUserId(String userId);
   Channel updateChannel(String channelId, ChannelUpdateDto dto);
   void deleteChannel(String channelId);

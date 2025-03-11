@@ -50,7 +50,6 @@ BasicMessageService implements MessageService {
 
   @Override
   public Page<Message> getMessagesByChannel(String channelId, Pageable pageable) {
-
     return messageRepository.findByChannel_Id(UUID.fromString(channelId), pageable);
   }
 
@@ -59,7 +58,7 @@ BasicMessageService implements MessageService {
     if(nextCursor == null){
       nextCursor = Instant.now();
     }
-    return messageRepository.findByChannel_IdAndCreatedAtLessThanOrderByCreatedAt(UUID.fromString(channelId), nextCursor, pageable);
+    return messageRepository.findByChannel_IdAndCreatedAtLessThan(UUID.fromString(channelId), nextCursor, pageable);
   }
 
   @Override

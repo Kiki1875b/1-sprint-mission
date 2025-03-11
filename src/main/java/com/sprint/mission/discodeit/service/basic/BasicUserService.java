@@ -67,6 +67,11 @@ public class BasicUserService implements UserService {
   }
 
   @Override
+  public List<User> findByAllIn(List<UUID> userIds) {
+    return userRepository.findAllByIdIn(userIds);
+  }
+
+  @Override
   public void deleteUser(String id) {
     userRepository.deleteById(UUID.fromString(id));
   }

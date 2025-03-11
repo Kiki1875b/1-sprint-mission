@@ -34,7 +34,7 @@ public interface MessageMapper {
   @Mapping(target = "updatedAt", source = "updatedAt")
   @Mapping(target = "content", source = "content")
   @Mapping(target = "channelId", source = "channel.id")
-  @Mapping(target = "author", source="author")
+  @Mapping(target = "author", source = "author")
   @Mapping(target = "attachments", source = "attachments")
   MessageResponseDto toResponseDto(Message message);
 
@@ -48,3 +48,4 @@ public interface MessageMapper {
 //        .toList();
 //  }
 }
+
