@@ -70,6 +70,10 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Amapstruct.defaultComponentModel=spring"
+}
+
 checkstyle {
     ignoreFailures = true
     //toolVersion = '10.12.1'

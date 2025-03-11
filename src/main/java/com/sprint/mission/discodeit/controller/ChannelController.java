@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.service.facade.channel.ChannelMasterFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -33,7 +34,7 @@ public class ChannelController implements ChannelApiDocs {
   @PostMapping("/private")
   public ResponseEntity<ChannelResponseDto> createPrivateChannel(@RequestBody CreatePrivateChannelDto channelDto) {
     ChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
-    return ResponseEntity.status(201).body(channel);
+    return ResponseEntity.status(HttpStatus.CREATED).body(channel);
   }
 
 
@@ -41,7 +42,7 @@ public class ChannelController implements ChannelApiDocs {
   @PostMapping("/public")
   public ResponseEntity<ChannelResponseDto> createPublicChannel(@RequestBody CreateChannelDto channelDto) {
     ChannelResponseDto channel = channelMasterFacade.createPublicChannel(channelDto);
-    return ResponseEntity.status(201).body(channel);
+    return ResponseEntity.status(HttpStatus.CREATED).body(channel);
   }
 
   @Override
@@ -56,7 +57,7 @@ public class ChannelController implements ChannelApiDocs {
   @DeleteMapping("/{channelId}")
   public ResponseEntity<Void> deleteChannel(@PathVariable String channelId) {
     channelMasterFacade.deleteChannel(channelId);
-    return ResponseEntity.status(204).build();
+    return ResponseEntity.noContent().build();
   }
 
 

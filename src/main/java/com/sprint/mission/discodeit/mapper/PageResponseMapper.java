@@ -6,7 +6,7 @@ import org.springframework.data.domain.Page;
 
 import java.time.Instant;
 
-@Mapper(componentModel = "spring")
+@Mapper
 public interface PageResponseMapper{
   default <T> PageResponse<T> fromPage(Page<T> page, Instant nextCursor){
     return new PageResponse<>(

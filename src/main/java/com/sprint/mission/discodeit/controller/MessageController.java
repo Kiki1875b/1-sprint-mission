@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -47,7 +48,7 @@ public class MessageController implements MessageApiDocs {
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files){
 
     MessageResponseDto message = messageFacade.createMessage(messageDto, files);
-    return ResponseEntity.status(201).body(message);
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
 
@@ -62,7 +63,7 @@ public class MessageController implements MessageApiDocs {
   @DeleteMapping("/messages/{messageId}")
   public ResponseEntity<Void> deleteMessage(@PathVariable String messageId){
     messageFacade.deleteMessage(messageId);
-    return ResponseEntity.status(204).build();
+    return ResponseEntity.noContent().build();
   }
 
   @Override

@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -34,7 +35,7 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @PostMapping("/readStatuses")
   public ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody CreateReadStatusDto dto){
     ReadStatusResponseDto status = readStatusMapper.toReadStatusResponseDto(readStatusService.create(dto));
-    return ResponseEntity.status(201).body(status);
+    return ResponseEntity.status(HttpStatus.CREATED).body(status);
   }
 
   @Override

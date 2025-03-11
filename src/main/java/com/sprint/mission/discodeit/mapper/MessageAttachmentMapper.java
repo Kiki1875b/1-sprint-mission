@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.entity.MessageAttachment;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-@Mapper(componentModel = "spring", uses = {BinaryContentMapper.class})
+@Mapper( uses = {BinaryContentMapper.class})
 public interface MessageAttachmentMapper {
 
   @Mapping(target = "id", source = "attachment.id")

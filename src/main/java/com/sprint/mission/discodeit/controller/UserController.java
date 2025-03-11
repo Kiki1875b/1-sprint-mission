@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -50,7 +51,7 @@ public class UserController implements UserApiDocs {
       MultipartFile profile)
   {
     UserResponseDto user = userFacade.createUser(createUserRequest, profile);
-    return ResponseEntity.status(201).body(user);
+    return ResponseEntity.status(HttpStatus.CREATED).body(user);
   }
 
   @Override
@@ -81,7 +82,7 @@ public class UserController implements UserApiDocs {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable String id) {
     userFacade.deleteUser(id);
-    return ResponseEntity.status(204).build();
+    return ResponseEntity.noContent().build();
   }
 
 }

@@ -22,7 +22,7 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", uses = UserMapper.class, imports = Objects.class)
+@Mapper(uses = UserMapper.class, imports = Objects.class)
 public interface ChannelMapper {
   @Mapping(target = "id", ignore = true)
   @Mapping(target = "name", source = "name")

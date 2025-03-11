@@ -19,7 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Mapper(componentModel = "spring", uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class, BinaryContentUtil.class})
+@Mapper(uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class, BinaryContentUtil.class})
 public interface UserMapper {
 
   @Mapping(target = "id", ignore = true)
