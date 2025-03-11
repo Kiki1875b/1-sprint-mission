@@ -5,14 +5,17 @@ import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
 import java.util.Objects;
 import java.util.UUID;
+
 
 @Slf4j
 @Service
@@ -25,6 +28,7 @@ public class BasicUserService implements UserService {
   @Override
   public User saveUser(User user) {
     return userRepository.save(user);
+
   }
 
   @Override
@@ -69,6 +73,7 @@ public class BasicUserService implements UserService {
   @Override
   public List<User> findByAllIn(List<UUID> userIds) {
     return userRepository.findAllByIdIn(userIds);
+
   }
 
   @Override

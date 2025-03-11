@@ -27,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+
 import java.util.List;
 
 @Slf4j
@@ -49,12 +50,14 @@ public class MessageController implements MessageApiDocs {
 
     MessageResponseDto message = messageFacade.createMessage(messageDto, files);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
+
   }
 
 
   @Override
   @PatchMapping("/messages/{messageId}")
   public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId, @RequestBody MessageUpdateDto messageDto){
+
     MessageResponseDto message = messageFacade.updateMessage(messageId, messageDto);
     return ResponseEntity.ok(message);
   }

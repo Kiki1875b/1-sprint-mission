@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.util;
 
+
 public class BinaryContentUtil {
   private BinaryContentUtil() {
   }
@@ -28,4 +29,5 @@ public class BinaryContentUtil {
 //        .map(BinaryContentUtil::convertToBase64)
 //        .toList();
 //  }
+
 }

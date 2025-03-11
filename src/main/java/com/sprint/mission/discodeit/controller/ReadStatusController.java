@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 import java.util.List;
 
 @Slf4j
@@ -34,8 +35,10 @@ public class ReadStatusController implements ReadStatusApiDocs {
   @Override
   @PostMapping("/readStatuses")
   public ResponseEntity<ReadStatusResponseDto> createReadStatus(@RequestBody CreateReadStatusDto dto){
+
     ReadStatusResponseDto status = readStatusMapper.toReadStatusResponseDto(readStatusService.create(dto));
     return ResponseEntity.status(HttpStatus.CREATED).body(status);
+
   }
 
   @Override

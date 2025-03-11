@@ -8,6 +8,7 @@ import static com.sprint.mission.discodeit.constant.UserConstant.PASSWORD_MIN_LE
 import static com.sprint.mission.discodeit.constant.UserConstant.USERNAME_MAX_LENGTH;
 import static com.sprint.mission.discodeit.constant.UserConstant.USERNAME_MIN_LENGTH;
 
+
 public record CreateUserRequest(
     @NotBlank
     @Size(

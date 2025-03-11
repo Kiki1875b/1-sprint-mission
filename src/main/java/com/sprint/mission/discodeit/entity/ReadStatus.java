@@ -60,6 +60,7 @@ public class ReadStatus extends BaseUpdatableEntity {
 
   public void addUser(User user){
     this.user = user;
+
   }
 
   @Override
@@ -67,7 +68,9 @@ public class ReadStatus extends BaseUpdatableEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     ReadStatus status = (ReadStatus) o;
+
     return Objects.equals(getId(), status.getId());
+
   }
 
   @Override

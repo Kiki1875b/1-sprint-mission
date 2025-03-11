@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
+
 @Mapper
 public interface ReadStatusMapper {
 

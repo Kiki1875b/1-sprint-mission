@@ -33,6 +33,7 @@ logging:
   level:
     p6spy: DEBUG
 
+
 springdoc:
   default-flat-param-object: true
   api-docs:
@@ -40,3 +41,4 @@ springdoc:
   swagger-ui:
     path: /swagger-ui.html  # Swagger UI 경로 (기본값)
     url: /apiV2.json
+

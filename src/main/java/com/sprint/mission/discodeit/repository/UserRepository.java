@@ -37,4 +37,5 @@ public interface UserRepository extends JpaRepository<User, UUID> {
           WHERE u.username = :username
       """)
   Optional<User> findByUsernameWithProfile(@Param("username") String username);
+
 }

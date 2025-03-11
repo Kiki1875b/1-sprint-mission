@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.util.UUID;
 
+
 @Service
 @RequiredArgsConstructor
 public class UserStatusServiceImpl implements UserStatusService {
@@ -42,5 +43,6 @@ public class UserStatusServiceImpl implements UserStatusService {
         userId,
         updateTime
     );
+
   }
 }

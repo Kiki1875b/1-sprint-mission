@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
+
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -16,8 +18,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Objects;
+
 import java.util.Optional;
 import java.util.UUID;
+
 
 @Slf4j
 @Service
@@ -29,15 +33,18 @@ public class BasicChannelService implements ChannelService {
   private final ReadStatusRepository readStatusRepository;
 
 
+
   @Override
   public Channel createPrivateChannel(Channel channel) {
     return channelRepository.save(channel);
   }
 
+
   @Override
   public Channel createPublicChannel(Channel channel) {
     return channelRepository.save(channel);
   }
+
 
   @Override
   public void validateUserAccess(Channel channel, User user) {
@@ -47,6 +54,7 @@ public class BasicChannelService implements ChannelService {
       if (status.isEmpty()) {
         throw new CustomException(ErrorCode.NO_ACCESS_TO_CHANNEL);
       }
+
     }
   }
 
@@ -66,6 +74,7 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.findAllByType(type);
   }
 
+
   @Override
   public List<Channel> findAllChannelsByUserId(String userId) {
 
@@ -76,6 +85,7 @@ public class BasicChannelService implements ChannelService {
     return privateChannel;
 //        List.of(privateChannel, publicChannel).stream()
 //        .flatMap(List::stream).collect(Collectors.toList());
+
   }
 
   @Override
@@ -86,6 +96,7 @@ public class BasicChannelService implements ChannelService {
     );
 
     if (Objects.equals(channel.getType(), Channel.ChannelType.PRIVATE)) {
+
       throw new CustomException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
     }
 
@@ -93,6 +104,7 @@ public class BasicChannelService implements ChannelService {
     channel.updateDescription(dto.newDescription());
 
     return channelRepository.save(channel);
+
   }
 
   @Override

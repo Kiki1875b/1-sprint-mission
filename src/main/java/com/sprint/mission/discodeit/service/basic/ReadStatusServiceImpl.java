@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Service
@@ -58,6 +59,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     } catch (DataIntegrityViolationException e) {
       log.warn("중복된 read status");
       throw new CustomException(ErrorCode.DUPLICATE_READ_STATUS);
+
     }
   }
 
@@ -135,6 +137,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
     return status;
   }
+
 
 
 }

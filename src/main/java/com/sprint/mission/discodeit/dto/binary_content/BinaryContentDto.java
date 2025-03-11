@@ -14,5 +14,6 @@ public record BinaryContentDto(
     @NotBlank
     String contentType
 
+
 ) {
 }

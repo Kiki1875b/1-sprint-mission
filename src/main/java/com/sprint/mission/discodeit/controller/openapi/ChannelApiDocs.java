@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
+
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -61,6 +62,7 @@ public interface ChannelApiDocs {
       ),
   })
   ResponseEntity<ChannelResponseDto> updateChannel(
+
       @Parameter(description = "업데이트 Channel UUID", required = true) String channelId,
       @Parameter(description = "업데이트 정보", required = true) ChannelUpdateDto channelDto
   );
@@ -85,5 +87,7 @@ public interface ChannelApiDocs {
   @ApiResponses({
       @ApiResponse(responseCode = "200", description = "Channel 조회 성공")
   })
-  ResponseEntity<List<ChannelResponseDto>> findChannelVisibleToUser(@Parameter(required = true, description = "User UUID") String userId);
+  ResponseEntity<List<ChannelResponseDto>> findChannelVisibleToUser
+      (@Parameter(required = true, description = "User UUID") String userId);
+
 }

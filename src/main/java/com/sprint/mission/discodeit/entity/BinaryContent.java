@@ -25,12 +25,15 @@ public class BinaryContent extends BaseEntity {
   @Column(name = "content_type", nullable = false)
   private String contentType;
 
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     BinaryContent content = (BinaryContent) o;
+
     return Objects.equals(getId(), content.getId());
+
   }
 
   @Override

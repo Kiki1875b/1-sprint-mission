@@ -12,7 +12,9 @@ public record MessageResponseDto(
     Instant updatedAt,
     String content,
     String channelId,
+
     UserResponseDto author,
     List<BinaryContentDto> attachments
+
 ) {
 }

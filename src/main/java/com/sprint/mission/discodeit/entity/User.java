@@ -50,6 +50,8 @@ public class User extends BaseUpdatableEntity {
     if (username != null) this.username = username;
     if (email != null && email.matches(EMAIL_REGEX)) this.email = email;
     if (password != null) this.password = password;
+
+
   }
 
   public void updateStatus(UserStatus status){
@@ -65,7 +67,9 @@ public class User extends BaseUpdatableEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     User user = (User) o;
+
     return Objects.equals(getId(), user.getId());
+
   }
 
   @Override

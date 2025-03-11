@@ -2,13 +2,16 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
+
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
+
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.util.BinaryContentUtil;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
+
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
@@ -39,6 +42,7 @@ public interface UserMapper {
   @Mapping(target = "username", source = "username")
   @Mapping(target = "email", source = "email")
   @Mapping(target = "profile", source = "profile")
+
   @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
   UserResponseDto toDto(User user);
 

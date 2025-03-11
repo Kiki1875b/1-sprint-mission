@@ -18,5 +18,6 @@ public interface BinaryContentService {
   void deleteByMessageId(String messageId);
   List<BinaryContent> saveBinaryContents(List<BinaryContent> contents, List<MultipartFile> files);
 //  Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId);
+
   List<BinaryContent> findAll();
 }

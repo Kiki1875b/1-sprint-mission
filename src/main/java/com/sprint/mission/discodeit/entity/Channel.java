@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -35,10 +36,10 @@ public class Channel extends BaseUpdatableEntity {
   private List<ReadStatus> statuses = new ArrayList<>();
 
 
+
   public enum ChannelType {
     PRIVATE, PUBLIC
   }
-
 
   public void updateChannelName(String channelName) {
     this.name = channelName;
@@ -73,6 +74,7 @@ public class Channel extends BaseUpdatableEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Channel channel = (Channel) o;
+
     return Objects.equals(getId(), channel.getId());
   }
 

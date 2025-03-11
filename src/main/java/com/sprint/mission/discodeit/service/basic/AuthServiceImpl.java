@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
+
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -13,7 +15,9 @@ import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
 import org.springframework.transaction.annotation.Transactional;
+
 
 import java.time.Instant;
 
@@ -26,6 +30,7 @@ public class AuthServiceImpl implements AuthService {
   private final UserStatusRepository userStatusRepository;
   private final UserStatusService userStatusService;
   private final UserMapper userMapper;
+
 
   /**
    * FETCH JOIN 으로 user 불러올 때, 관련 BinaryContent, UserStatus 불러온 후
@@ -40,12 +45,15 @@ public class AuthServiceImpl implements AuthService {
             () -> new CustomException(ErrorCode.USER_NOT_FOUND)
         );
 
+
     if(!PasswordEncryptor.checkPassword(password, targetUser.getPassword())){
       throw new CustomException(ErrorCode.PASSWORD_MATCH_ERROR);
     }
+
     targetUser.getStatus().updateLastOnline(Instant.now()); // 삭제 할 수도
     userRepository.save(targetUser);
 
     return userMapper.toDto(targetUser);
+
   }
 }

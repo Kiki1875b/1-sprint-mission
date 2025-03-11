@@ -52,14 +52,17 @@ public class Message extends BaseUpdatableEntity {
 
   public void addAuthor(User user){
     this.author = user;
+
   }
 
   @Override
   public String toString() {
     return "Message{"
+
         + "id='" + getId() + '\''
         + ", userid='" + author.getId() + '\''
         + ", channelid='" + channel.getId() + '\''
+
         + ", content='" + content + '\''
         + '}';
   }
@@ -69,11 +72,15 @@ public class Message extends BaseUpdatableEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Message message = (Message) o;
+
     return Objects.equals(getId(), message.getId());
+
   }
 
   @Override
   public int hashCode() {
+
     return Objects.hash(getId());
+
   }
 }

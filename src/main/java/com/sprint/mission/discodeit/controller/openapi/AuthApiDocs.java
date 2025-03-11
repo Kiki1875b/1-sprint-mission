@@ -36,4 +36,5 @@ public interface AuthApiDocs {
       ),
   })
   ResponseEntity<UserResponseDto> userLogin(@Parameter(required = true, description = "로그인 정보") LoginDto loginDto);
+
 }

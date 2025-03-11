@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -30,6 +31,7 @@ public class UserStatus extends BaseUpdatableEntity {
 
   public static UserStatus create(User user){
     return new UserStatus(user, Instant.now());
+
   }
 
   @Override
@@ -37,7 +39,9 @@ public class UserStatus extends BaseUpdatableEntity {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     UserStatus status = (UserStatus) o;
+
     return Objects.equals(getId(), status.getId());
+
   }
 
   @Override
@@ -47,5 +51,6 @@ public class UserStatus extends BaseUpdatableEntity {
 
   public void updateLastOnline(Instant now) {
     lastActiveAt = now;
+
   }
 }

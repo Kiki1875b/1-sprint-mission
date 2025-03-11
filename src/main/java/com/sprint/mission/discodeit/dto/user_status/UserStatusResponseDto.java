@@ -4,7 +4,9 @@ import java.time.Instant;
 
 public record UserStatusResponseDto (
     String id,
+
     String userId,
     Instant lastActivityAt
+
 ){
 }

@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
+
 import java.util.List;
 
 @Tag(name = "Message API", description = "Message 작업")
@@ -83,4 +84,5 @@ public interface MessageApiDocs {
   ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(@Parameter(required = true, description = "조회할 Channel UUID") String channelId,
                                                                       Instant cursor,
                                                                       Pageable pageable);
+
 }
