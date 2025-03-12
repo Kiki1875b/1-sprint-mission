@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.channel.ChannelManagementService;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
+import com.sprint.mission.discodeit.util.HibernateUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -144,15 +145,12 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   @Transactional
   public ChannelResponseDto updateChannel(String channelId, ChannelUpdateDto channelUpdateDto) {
     Channel channel = channelService.updateChannel(channelId, channelUpdateDto);
+    List<ReadStatus> statuses = readStatusService.findAllByChannelId(channelId);
+    List<UUID> userIds = statuses.stream().map(status -> status.getUser().getId()).collect(Collectors.toList());
+    List<User> users = userService.findByAllIn(userIds);
 
     Instant lastMessageTime = channelManagementService
         .getLastMessageTimeForChannel(channelId);
-
-
-    List<User> users = channel.getStatuses().stream()
-        .map(status -> status.getUser()).collect(Collectors.toList());
-//    List<User> users = channelManagementService
-//        .getChannelParticipants(channelId);
 
     return channelMapper.toDto(channel, lastMessageTime, users);
   }

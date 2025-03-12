@@ -15,6 +15,8 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
 
   Optional<ReadStatus> findByUserAndChannel(User user, Channel channel);
 
+  List<ReadStatus> findAllByChannel_Id(UUID channelId);
+
   List<ReadStatus> findAllByUser_Id(UUID userId);
   List<ReadStatus> findAllByChannel_IdIn(List<UUID> channelId);
 

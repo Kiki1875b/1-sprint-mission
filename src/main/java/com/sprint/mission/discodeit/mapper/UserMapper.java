@@ -37,7 +37,6 @@ public interface UserMapper {
   @Mapping(target = "username", source = "username")
   @Mapping(target = "email", source = "email")
   @Mapping(target = "profile", source = "profile")
-
   @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
   UserResponseDto toDto(User user);
 

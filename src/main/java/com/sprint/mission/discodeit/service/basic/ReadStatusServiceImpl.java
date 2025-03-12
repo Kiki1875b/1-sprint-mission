@@ -81,7 +81,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   public List<ReadStatus> findAllByChannelId(String channelId){
-    return readStatusRepository.findAllByChannelIdWithUsers(UUID.fromString(channelId));
+    return readStatusRepository.findAllByChannel_Id(UUID.fromString(channelId));
   }
 
   @Override

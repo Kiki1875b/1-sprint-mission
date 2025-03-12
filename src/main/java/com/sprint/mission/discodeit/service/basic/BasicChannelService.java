@@ -63,7 +63,8 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public List<Channel> findAllChannelsInOrPublic(List<UUID> ids){
-    return channelRepository.findByIdInOrType(ids, Channel.ChannelType.PUBLIC);
+    List<Channel> channels = channelRepository.findByIdInOrType(ids, Channel.ChannelType.PUBLIC);
+    return channels;
   }
 
   @Override

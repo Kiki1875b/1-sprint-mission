@@ -11,6 +11,7 @@ public record BinaryContentDto(
     String fileName,
     @NotBlank
     Long size,
+
     @NotBlank
     String contentType
 

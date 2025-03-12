@@ -6,7 +6,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
+import com.sprint.mission.discodeit.util.HibernateUtil;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
+import org.hibernate.proxy.HibernateProxy;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -67,9 +70,11 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
   public List<Channel> findAllChannelsForUser(String userId) {
 
     List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
-    List<UUID> extractedChannelIds = parseStatusToChannelUuid(statuses);
 
+
+    List<UUID> extractedChannelIds = parseStatusToChannelUuid(statuses);
     List<Channel> channels = channelService.findAllChannelsInOrPublic(extractedChannelIds);
+
     List<ReadStatus> secondStatuses = getDifferentReadStatuses(channels, extractedChannelIds);
 
     List<UUID> newChannelIds = secondStatuses.stream().map(status -> status.getChannel().getId()).distinct().collect(Collectors.toList());
