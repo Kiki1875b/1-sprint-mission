@@ -1,71 +1,68 @@
 package com.sprint.mission.discodeit.entity;
 
-import com.sprint.mission.discodeit.util.UuidGenerator;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-
+@Entity
 @Getter
-@Builder(toBuilder = true)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Message implements Serializable {
-  private static final long serialVersionUID = 1L;
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-  private String id;
-  private String authorId;
-  private String channelId;
   private String content;
-  private Boolean isEdited;
-  private Instant createdAt;
-  private Instant updatedAt;
-  private List<String> attachmentIds;
 
-  public static class MessageBuilder{
-    private String id =  UuidGenerator.generateid();
-    private Instant createdAt = Instant.now();
-    private Instant updatedAt = Instant.now();
-    private boolean isEdited = false;
-    public String getId(){
-      return id;
-    }
-  }
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
 
-  public void setContent(String content) {
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", nullable = false)
+  private User author;
+
+
+  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<MessageAttachment> attachments = new ArrayList<>();
+
+  public void addContent(String content) {
     this.content = content;
-    this.isEdited = true;
-    this.updatedAt = Instant.now();
   }
 
-  public void addBinaryContents(List<String> binaryContents){
-    this.attachmentIds = binaryContents;
-    updatedAt = Instant.now();
+  public void addAttachment(BinaryContent attachment) {
+    this.attachments.add(new MessageAttachment(this, attachment));
   }
 
-  public void addBinaryContent(String binaryContent) {
-    this.attachmentIds.add(binaryContent);
-    updatedAt = Instant.now();
+  public void addChannel(Channel channel){
+    this.channel = channel;
   }
 
-  public void removeBinaryContent(String  binaryContent) {
-    this.attachmentIds.remove(binaryContent);
-    updatedAt = Instant.now();
-  }
+  public void addAuthor(User user){
+    this.author = user;
 
-  public void setIsEdited() {
-    this.isEdited = true;
   }
 
   @Override
   public String toString() {
     return "Message{"
-        + "id='" + id + '\''
-        + ", userid='" + authorId + '\''
-        + ", channelid='" + channelId + '\''
+
+        + "id='" + getId() + '\''
+        + ", userid='" + author.getId() + '\''
+        + ", channelid='" + channel.getId() + '\''
+
         + ", content='" + content + '\''
         + '}';
   }
@@ -75,11 +72,15 @@ public class Message implements Serializable {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     Message message = (Message) o;
-    return Objects.equals(id, message.id);
+
+    return Objects.equals(getId(), message.getId());
+
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id);
+
+    return Objects.hash(getId());
+
   }
 }

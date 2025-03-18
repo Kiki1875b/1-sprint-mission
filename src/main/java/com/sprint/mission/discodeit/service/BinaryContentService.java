@@ -1,24 +1,23 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public interface BinaryContentService {
-  BinaryContent create(BinaryContent content);
+  ResponseEntity<Resource> download(String id);
+
+  BinaryContent save(BinaryContent content, byte[] bytes);
   BinaryContent find(String id);
   List<BinaryContent> findByMessageId(String messageId);
   List<BinaryContent> findAllByIdIn(List<String> ids);
-  Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds);
   void delete(String id);
   void deleteByMessageId(String messageId);
-  List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents);
-  List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContent> incomingFiles);
-  BinaryContent updateProfile(String userId, BinaryContent profileImage);
-  Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId);
+  List<BinaryContent> saveBinaryContents(List<BinaryContent> contents, List<MultipartFile> files);
+//  Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId);
 
   List<BinaryContent> findAll();
 }

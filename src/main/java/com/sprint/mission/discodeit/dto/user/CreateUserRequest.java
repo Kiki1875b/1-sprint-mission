@@ -4,7 +4,10 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
-import static com.sprint.mission.discodeit.constant.UserConstant.*;
+import static com.sprint.mission.discodeit.constant.UserConstant.PASSWORD_MIN_LENGTH;
+import static com.sprint.mission.discodeit.constant.UserConstant.USERNAME_MAX_LENGTH;
+import static com.sprint.mission.discodeit.constant.UserConstant.USERNAME_MIN_LENGTH;
+
 
 public record CreateUserRequest(
     @NotBlank

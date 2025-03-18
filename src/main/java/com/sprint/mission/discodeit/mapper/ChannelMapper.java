@@ -1,59 +1,69 @@
 package com.sprint.mission.discodeit.mapper;
 
 
-import com.sprint.mission.discodeit.dto.channel.*;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponseDto;
+import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
+import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import org.mapstruct.Builder;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", builder = @Builder(disableBuilder = false), imports = Objects.class)
+@Mapper(uses = UserMapper.class, imports = Objects.class)
 public interface ChannelMapper {
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "channelName", source = "name")
-  @Mapping(target = "channelType", constant = "PUBLIC")
-  @Mapping(target = "participatingUsers", expression = "java(new java.util.ArrayList<>())")
-  @Mapping(target = "createdAt", expression = "java(Instant.now())")
-  @Mapping(target = "updatedAt", expression = "java(Instant.now())")
+  @Mapping(target = "name", source = "name")
+  @Mapping(target = "type", constant = "PUBLIC")
   Channel toEntity(CreateChannelDto dto);
 
   @Mapping(target = "id", ignore = true)
-  @Mapping(target = "channelType", constant = "PRIVATE")
-  @Mapping(source = "participantIds", target = "participatingUsers")
-  @Mapping(target = "createdAt", expression = "java(Instant.now())")
-  @Mapping(target = "updatedAt", expression = "java(Instant.now())")
+  @Mapping(target = "type", constant = "PRIVATE")
   Channel toEntity(CreatePrivateChannelDto dto);
 
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "channelType", target = "type")
-  @Mapping(source = "channelName", target = "name")
-  @Mapping(source = "createdAt", target = "createdAt")
-  @Mapping(source = "updatedAt", target = "updatedAt")
-  @Mapping(source = "description", target = "description")
-  PublicChannelResponseDto toPublicDto(Channel channel);
-
-  @Mapping(source = "id", target = "id")
-  @Mapping(source = "channelType", target = "type")
-  @Mapping(source = "participatingUsers", target = "participantIds")
-  PrivateChannelResponseDto toPrivateDto(Channel channel);
-
   @Mapping(source = "channel.id", target = "id")
-  @Mapping(source = "channel.channelType", target = "type")
-  @Mapping(target = "name", expression = "java(Objects.equals(channel.getChannelType(), Channel.ChannelType.PRIVATE) ? null : channel.getChannelName())")
-  @Mapping(target = "description", source = "channel.description")
-  @Mapping(target = "participantIds", source = "channel.participatingUsers")
-  @Mapping(target = "lastMessagedAt", source = "lastMessagedAt")
-  FindChannelResponseDto toFindChannelDto(Channel channel, Instant lastMessagedAt);
+  @Mapping(source = "channel.type", target = "type")
+  @Mapping(target = "name", source = "channel.name", defaultExpression = "java(\"\")")
+  @Mapping(target = "description", source = "channel.description", defaultExpression = "java(\"\")")
+  @Mapping(target = "lastMessageAt", source = "lastMessageAt", defaultExpression = "java(Instant.EPOCH)")
+  @Mapping(target = "participants", source = "participants", defaultExpression = "java(new ArrayList<>())")
+  ChannelResponseDto toDto(Channel channel, Instant lastMessageAt, List<User> participants);
 
+  default List<ChannelResponseDto> toListResponse(
+      List<Channel> channels,
+      Map<UUID, Instant> latestMessageByChannel,
+      Map<UUID, List<User>> channelParticipants
+  ){
+    return channels.stream()
+        .map(channel -> toDto(
+            channel,
+            latestMessageByChannel.getOrDefault(channel.getId(), Instant.EPOCH),
+            channelParticipants.getOrDefault(channel.getId(), Collections.emptyList())
+        )).collect(Collectors.toList());
+  }
 
-  @Mapping(target = "id", source = "id")
-  @Mapping(target = "type", source = "channelType")
-  @Mapping(target = "name", source = "channelName")
-  UpdateChannelResponseDto toUpdateResponse(Channel channel);
+  default Map<UUID, List<User>> channelToParticipants(List<Channel> channels) {
+    Map<UUID, List<User>> channelParticipants = new HashMap<>();
 
+    for (Channel channel : channels) {
+      channelParticipants.put(channel.getId(), new ArrayList<>());
+      for (ReadStatus status : channel.getStatuses()) {
+        channelParticipants.get(channel.getId()).add(status.getUser());
+      }
+    }
+
+    return channelParticipants;
+  }
 }
 
 

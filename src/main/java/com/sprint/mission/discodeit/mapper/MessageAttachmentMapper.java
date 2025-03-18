@@ -1,0 +1,17 @@
+package com.sprint.mission.discodeit.mapper;
+
+
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
+import com.sprint.mission.discodeit.entity.MessageAttachment;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+
+@Mapper( uses = {BinaryContentMapper.class})
+public interface MessageAttachmentMapper {
+
+  @Mapping(target = "id", source = "attachment.id")
+  @Mapping(target = "fileName", source = "attachment.fileName")
+  @Mapping(target = "size", source = "attachment.size")
+  @Mapping(target = "contentType", source = "attachment.contentType")
+  BinaryContentDto toBinaryContentDto(MessageAttachment attachment);
+}

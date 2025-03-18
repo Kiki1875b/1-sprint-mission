@@ -1,17 +1,24 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.validator.EntityValidator;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
-import java.util.*;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 
@@ -20,119 +27,108 @@ import java.util.stream.Collectors;
 public class BinaryContentServiceImpl implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
-  private final EntityValidator validator;
+  private final MessageAttachmentRepository messageAttachmentRepository;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Override
-  public BinaryContent create(BinaryContent content) {
-
-    validator.findOrThrow(User.class, content.getUserId(), new CustomException(ErrorCode.USER_NOT_FOUND));
-
-    // 기존에 존재하던 프로필 삭제. 그냥 교채로 바꿀수도?
-    if (content.isProfilePicture()) {
-      BinaryContent originalProfile = binaryContentRepository.findByUserId(content.getUserId()).stream().filter(BinaryContent::isProfilePicture).findFirst().orElse(null);
-      if (originalProfile != null) {
-        binaryContentRepository.deleteById(originalProfile.getId());
-      }
+  public ResponseEntity<Resource> download(String id) {
+    ResponseEntity<?> response = null;
+    try {
+      response = binaryContentStorage.download(UUID.fromString(id));
+    } catch (IOException e) {
+      throw new IllegalArgumentException();
+    }
+    if (response.getBody() instanceof Resource resource) {
+      return ResponseEntity.status(response.getStatusCode())
+          .headers(response.getHeaders())
+          .body(resource);
     }
 
-    return binaryContentRepository.save(content);
+    throw new CustomException(ErrorCode.FILE_ERROR);
   }
 
   @Override
+  public BinaryContent save(BinaryContent content, byte[] bytes) {
+    BinaryContent savedContent = binaryContentRepository.save(content);
+
+    binaryContentRepository.flush();
+    binaryContentStorage.put(savedContent.getId(), bytes);
+
+    return savedContent;
+  }
+
+  @Override
+  public List<BinaryContent> saveBinaryContents(List<BinaryContent> contents, List<MultipartFile> files) {
+    if (contents == null || contents.isEmpty()) {
+      return Collections.emptyList();
+    }
+    List<BinaryContent> savedContents = binaryContentRepository.saveAll(contents);
+    binaryContentRepository.flush();
+
+    for (MultipartFile file : files) {
+      try {
+        BinaryContent content = contents.stream().filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst().orElseThrow();
+        binaryContentStorage.put(content.getId(), file.getBytes());
+      } catch (IOException e) {
+        throw new CustomException(ErrorCode.FILE_ERROR);
+      }
+    }
+    return savedContents;
+  }
+
+
+  @Override
   public BinaryContent find(String id) {
-    return binaryContentRepository.findById(id).orElseThrow(
-        () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE)
-    );
+    return binaryContentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new CustomException(ErrorCode.IMAGE_NOT_FOUND));
+
   }
 
   @Override
   public List<BinaryContent> findByMessageId(String messageId) {
-    return binaryContentRepository.findByMessageId(messageId);
+
+    List<MessageAttachment> attachments = messageAttachmentRepository.findByMessageIdWithAttachments(UUID.fromString(messageId));
+    List<BinaryContent> contents = attachments.stream()
+        .map(attachment -> attachment.getAttachment()).collect(Collectors.toList());
+
+    return (contents == null || contents.isEmpty())
+        ? Collections.emptyList()
+        : Collections.unmodifiableList(contents);
+
   }
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<String> ids) {
-    return ids.stream().map(
-        id -> binaryContentRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE))
-    ).toList();
-  }
-
-  @Override
-  public Map<String, BinaryContent> mapUserToBinaryContent(Set<String> userIds) {
-
-    if (userIds == null || userIds.isEmpty()) return Collections.emptyMap();
-
-    List<BinaryContent> profiles = binaryContentRepository.findProfilesOf(userIds);
-
-    return profiles.stream()
-        .collect(Collectors.toMap(BinaryContent::getUserId, content -> content));
+    List<UUID> uuids = ids.stream().map(UUID::fromString).toList();
+    return Collections.unmodifiableList(binaryContentRepository.findAllById(uuids));
   }
 
   @Override
   public void delete(String id) {
-    binaryContentRepository.deleteById(id);
+
+    binaryContentRepository.deleteById(UUID.fromString(id));
+
   }
 
   @Override
   public void deleteByMessageId(String messageId) {
-    binaryContentRepository.deleteByMessageId(messageId);
+
+    List<UUID> contents = messageAttachmentRepository.findByMessageId(UUID.fromString(messageId));
+    binaryContentRepository.deleteAllById(contents);
   }
 
-  @Override
-  public List<BinaryContent> saveBinaryContentsForMessage(String messageId, List<BinaryContent> contents) {
 
-    validator.findOrThrow(Message.class, messageId, new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
-
-    if (contents == null || contents.isEmpty()) {
-      return Collections.emptyList();
-    }
-
-    return binaryContentRepository.saveMultipleBinaryContent(contents);
-  }
-
-  // TODO : 메시지 업데이트시 이미지는 없을 수도
-  @Override
-  public List<BinaryContent> updateBinaryContentForMessage(Message message, String userId, List<BinaryContent> newFiles) {
-
-    List<BinaryContent> originalFiles = binaryContentRepository.findByMessageId(message.getId());
-
-    Set<String> newFileNames = newFiles.stream()
-        .map(BinaryContent::getFileName)
-        .collect(Collectors.toSet());
-
-    List<BinaryContent> filesToDelete = originalFiles.stream()
-        .filter(file -> !newFileNames.contains(file.getFileName()))
-        .toList();
-
-    // 기존 파일 삭제
-    filesToDelete.forEach(file -> binaryContentRepository.deleteById(file.getId()));
-
-    return binaryContentRepository.saveMultipleBinaryContent(newFiles);
-  }
+//  @Override
+//  public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {
+//    return binaryContentRepository.findByChannel(channelId).stream()
+//        .collect(Collectors.groupingBy( content ->
+//            content.getMessageId() != null ? content.getMessageId() : "",
+//            Collectors.toList()
+//        ));
+//  }
 
   @Override
-  public BinaryContent updateProfile(String userId, BinaryContent profileImage) {
-    BinaryContent originalProfile = binaryContentRepository.findByUserIdAndIsProfilePictureTrue(userId);
+  public List<BinaryContent> findAll() {
 
-    return Optional.ofNullable(originalProfile)
-        .map(profile -> {
-          binaryContentRepository.deleteById(profile.getId());
-          return binaryContentRepository.save(profileImage);
-        })
-        .orElseGet(() -> binaryContentRepository.save(profileImage));
-  }
-
-  @Override
-  public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {
-    return binaryContentRepository.findByChannel(channelId).stream()
-        .collect(Collectors.groupingBy( content ->
-            content.getMessageId() != null ? content.getMessageId() : "",
-            Collectors.toList()
-        ));
-  }
-
-  @Override
-  public List<BinaryContent> findAll(){
     return binaryContentRepository.findAll();
   }
 }

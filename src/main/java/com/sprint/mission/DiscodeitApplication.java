@@ -11,9 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 public class DiscodeitApplication {
 
   public static void main(String[] args) {
-    ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
-
-
+    SpringApplication.run(DiscodeitApplication.class, args);
   }
 
 }

@@ -9,7 +9,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.core.io.Resource;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
@@ -41,4 +43,10 @@ public interface BinaryContentApiDocs {
       )
   })
   ResponseEntity<List<BinaryContentDto>> getAllBinaryContent(@Parameter(required = true, description = "조회할 첨부파일 UUID List") List<String> binaryContentIds);
+
+
+
+  @GetMapping("/{binaryContentId}/download")
+  ResponseEntity<Resource> downloadBinaryContent(@PathVariable String binaryContentId);
+
 }

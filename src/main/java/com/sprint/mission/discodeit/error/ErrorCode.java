@@ -7,10 +7,16 @@ import org.springframework.http.HttpStatus;
 @Getter
 @RequiredArgsConstructor
 public enum ErrorCode {
-  FILE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 오류"),
+
+
+  NO_ACCESS_TO_CHANNEL(HttpStatus.UNAUTHORIZED, "접근 권한이 없는 채널입니다."),
+  DUPLICATE_READ_STATUS(HttpStatus.BAD_REQUEST, "중복된 읽기 상태입니다."),
+  FILE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "파일 오류 입니다."),
   REQUIRED_FIELD_EMPTY(HttpStatus.BAD_REQUEST, "필수 입력 필드가 비어있습니다."),
   DEFAULT_ERROR_MESSAGE(HttpStatus.BAD_REQUEST, "허용되지 않은 작업입니다."),
   PASSWORD_MATCH_ERROR(HttpStatus.UNAUTHORIZED, "비밀번호가 일치하지 않습니다."),
+  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "읽기 상태를 찾을 수 없습니다."),
+
   IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "이미지를 찾을 수 없습니다."),
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "채널을 찾지 못했습니다."),
   MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "메시지를 찾을 수 없습니다."),

@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller.openapi;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.user.CreateUserResponse;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.error.ErrorResponse;
@@ -50,7 +49,8 @@ public interface UserApiDocs {
           )
       )
   })
-  public ResponseEntity<CreateUserResponse> createUser(
+  ResponseEntity<UserResponseDto> createUser(
+
       @Parameter(
           description = "User 생성 정보 (JSON)",
           required = true
@@ -82,7 +82,8 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "400", description = "중복된 email / username", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class))),
       @ApiResponse(responseCode = "404", description = "유저를 찾지 못함", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
   })
-  public ResponseEntity<CreateUserResponse> updateUser(
+  ResponseEntity<UserResponseDto> updateUser(
+
       @Parameter(description = "User UUID", required = true) String id,
       @Parameter(description = "User 프로필 이미지") MultipartFile profile,
       @Parameter(description = "User 업데이트 정보 (JSON)") UserUpdateDto updateDto
@@ -93,5 +94,7 @@ public interface UserApiDocs {
       @ApiResponse(responseCode = "204", description = "User 삭제 성공"),
       @ApiResponse(responseCode = "404", description = "User를 찾을 수 없음", content = @Content(mediaType = "application/json", schema = @Schema(implementation = ErrorResponse.class)))
   })
-  public ResponseEntity<Void> deleteUser(@Parameter(description = "삭제할 User UUID") String id);
+
+  ResponseEntity<Void> deleteUser(@Parameter(description = "삭제할 User UUID") String id);
+
 }
