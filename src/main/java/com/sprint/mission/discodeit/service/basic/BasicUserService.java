@@ -5,15 +5,14 @@ import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
+import java.util.List;
+import java.util.Objects;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
 
 
 @Slf4j
@@ -32,7 +31,7 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional
-  public User update(User user){
+  public User update(User user) {
     return userRepository.save(user);
   }
 
@@ -40,7 +39,10 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public User findUserById(String id) {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
-        () -> new CustomException(ErrorCode.USER_NOT_FOUND)
+        () -> {
+          log.info("[USER NOT FOUND] [ID: {}]", id);
+          return new CustomException(ErrorCode.USER_NOT_FOUND);
+        }
     );
   }
 

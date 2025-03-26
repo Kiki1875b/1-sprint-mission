@@ -8,20 +8,21 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.io.Resource;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BinaryContentServiceImpl implements BinaryContentService {
@@ -49,16 +50,20 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public BinaryContent save(BinaryContent content, byte[] bytes) {
-    BinaryContent savedContent = binaryContentRepository.save(content);
 
+    BinaryContent savedContent = binaryContentRepository.save(content);
     binaryContentRepository.flush();
+
+    log.info("[SAVED BINARY METADATA] : [ID: {}]", savedContent.getId());
     binaryContentStorage.put(savedContent.getId(), bytes);
+    log.info("[SAVED IMAGE TO STORAGE] : [ID: {}]", savedContent.getId());
 
     return savedContent;
   }
 
   @Override
-  public List<BinaryContent> saveBinaryContents(List<BinaryContent> contents, List<MultipartFile> files) {
+  public List<BinaryContent> saveBinaryContents(List<BinaryContent> contents,
+      List<MultipartFile> files) {
     if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();
     }
@@ -67,7 +72,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     for (MultipartFile file : files) {
       try {
-        BinaryContent content = contents.stream().filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst().orElseThrow();
+        BinaryContent content = contents.stream()
+            .filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst()
+            .orElseThrow();
         binaryContentStorage.put(content.getId(), file.getBytes());
       } catch (IOException e) {
         throw new CustomException(ErrorCode.FILE_ERROR);
@@ -79,14 +86,16 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public BinaryContent find(String id) {
-    return binaryContentRepository.findById(UUID.fromString(id)).orElseThrow(() -> new CustomException(ErrorCode.IMAGE_NOT_FOUND));
+    return binaryContentRepository.findById(UUID.fromString(id))
+        .orElseThrow(() -> new CustomException(ErrorCode.IMAGE_NOT_FOUND));
 
   }
 
   @Override
   public List<BinaryContent> findByMessageId(String messageId) {
 
-    List<MessageAttachment> attachments = messageAttachmentRepository.findByMessageIdWithAttachments(UUID.fromString(messageId));
+    List<MessageAttachment> attachments = messageAttachmentRepository.findByMessageIdWithAttachments(
+        UUID.fromString(messageId));
     List<BinaryContent> contents = attachments.stream()
         .map(attachment -> attachment.getAttachment()).collect(Collectors.toList());
 
@@ -106,7 +115,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public void delete(String id) {
 
     binaryContentRepository.deleteById(UUID.fromString(id));
-
+    log.info("[DELETED BINARY CONTENT METADATA]: [ID: {}]", id);
   }
 
   @Override
@@ -115,7 +124,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     List<UUID> contents = messageAttachmentRepository.findByMessageId(UUID.fromString(messageId));
     binaryContentRepository.deleteAllById(contents);
   }
-
 
 //  @Override
 //  public Map<String, List<BinaryContent>> getBinaryContentsFilteredByChannelAndGroupedByMessage(String channelId) {

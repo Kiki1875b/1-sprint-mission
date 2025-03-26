@@ -3,6 +3,12 @@ package com.sprint.mission.discodeit.storage;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import jakarta.annotation.PostConstruct;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
@@ -13,12 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.UUID;
-
+@Slf4j
 @Component
 @ConditionalOnProperty(value = "discodeit.storage.type", havingValue = "local")
 public class LocalBinaryContentStorage implements BinaryContentStorage {
@@ -39,9 +40,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public UUID put(UUID id, byte[] bytes) {
     Path filePath = resolvePath(id);
     try {
+      log.info("[WRITING BINARY FILE] : [ID: {}]", id);
       Files.write(filePath, bytes);
       return id;
     } catch (IOException e) {
+      log.warn("[ERROR WHILE WRITING FILE] : [ID: {}]", id);
       throw new CustomException(ErrorCode.FILE_ERROR);
     }
   }
