@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -19,8 +20,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -45,14 +44,12 @@ public class UserController implements UserApiDocs {
   )
   public ResponseEntity<UserResponseDto> createUser(
 
-
       @RequestPart("userCreateRequest")
       CreateUserRequest createUserRequest,
 
       @RequestPart(value = "profile", required = false)
-      MultipartFile profile)
-  {
-
+      MultipartFile profile) {
+    log.info("CREATE USER CALLED : {}", createUserRequest);
     UserResponseDto user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
 

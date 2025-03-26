@@ -14,17 +14,13 @@ decorator:
       enable-logging: true
 
 spring:
-  datasource:
-    url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
   jpa:
     hibernate:
       ddl-auto: none
     show-sql: false
     properties:
       hibernate:
-        generate_statistics: true
+        generate_statistics: false
         default_batch_fetch_size: 100
     open-in-view: false
 
@@ -32,6 +28,7 @@ spring:
 logging:
   level:
     p6spy: DEBUG
+    root: INFO
 
 
 springdoc:
