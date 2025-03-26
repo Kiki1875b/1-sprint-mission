@@ -19,9 +19,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class AuthController implements AuthApiDocs {
 
   private final AuthService authService;
+
   @Override
   @PostMapping("/login")
-  public ResponseEntity<UserResponseDto> userLogin(@RequestBody LoginDto loginDto){
+  public ResponseEntity<UserResponseDto> userLogin(@RequestBody LoginDto loginDto) {
+    log.info("[LOGIN REQUEST] : [USERNAME:{}]", loginDto.username());
     UserResponseDto user = authService.login(loginDto.username(), loginDto.password());
     return ResponseEntity.ok(user);
   }
