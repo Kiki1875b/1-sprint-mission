@@ -47,5 +47,4 @@ public class BinaryContentController implements BinaryContentApiDocs {
     log.debug("[DOWNLOAD FILE REQUEST] : [ID : {}]", binaryContentId);
     return binaryContentService.download(binaryContentId);
   }
-
 }

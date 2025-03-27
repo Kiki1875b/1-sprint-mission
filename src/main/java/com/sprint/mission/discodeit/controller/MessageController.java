@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.facade.message.MessageFacade;
+import jakarta.validation.Valid;
 import java.time.Instant;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,6 +31,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
@@ -43,7 +46,7 @@ public class MessageController implements MessageApiDocs {
       produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<MessageResponseDto> sendMessage(
-      @RequestPart(value = "messageCreateRequest") CreateMessageDto messageDto,
+      @Valid @RequestPart(value = "messageCreateRequest") CreateMessageDto messageDto,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
 
     log.debug("[SEND MESSAGE REQUEST] : [CHANNEL_ID: {}][AUTHOR_ID: {}]", messageDto.channelId(),
@@ -57,7 +60,7 @@ public class MessageController implements MessageApiDocs {
   @Override
   @PatchMapping("/messages/{messageId}")
   public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId,
-      @RequestBody MessageUpdateDto messageDto) {
+      @Valid @RequestBody MessageUpdateDto messageDto) {
 
     log.debug("[MESSAGE UPDATE REQUEST] : [ID : {}]", messageId);
     MessageResponseDto message = messageFacade.updateMessage(messageId, messageDto);

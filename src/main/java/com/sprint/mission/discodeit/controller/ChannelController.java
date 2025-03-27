@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.dto.channel.CreateChannelDto;
 import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.service.facade.channel.ChannelMasterFacade;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +33,7 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   @PostMapping("/private")
   public ResponseEntity<ChannelResponseDto> createPrivateChannel(
-      @RequestBody CreatePrivateChannelDto channelDto) {
+      @Valid @RequestBody CreatePrivateChannelDto channelDto) {
     log.debug("[CREATE PRIVATE CHANNEL REQUEST] : [IDS: {}]", channelDto.participantIds());
     ChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(channel);
@@ -42,7 +43,7 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   @PostMapping("/public")
   public ResponseEntity<ChannelResponseDto> createPublicChannel(
-      @RequestBody CreateChannelDto channelDto) {
+      @Valid @RequestBody CreateChannelDto channelDto) {
     log.debug("[CREATE PUBLIC CHANNEL REQUEST] : [NAME: {}][DESCRIPTION: {}]", channelDto.name(),
         channelDto.description());
     ChannelResponseDto channel = channelMasterFacade.createPublicChannel(channelDto);
@@ -52,7 +53,7 @@ public class ChannelController implements ChannelApiDocs {
   @Override
   @PatchMapping("/{channelId}")
   public ResponseEntity<ChannelResponseDto> updateChannel(@PathVariable String channelId,
-      @RequestBody ChannelUpdateDto channelDto) {
+      @Valid @RequestBody ChannelUpdateDto channelDto) {
     log.debug("[UPDATE CHANNEL REQUEST] : [ID: {}]", channelId);
     ChannelResponseDto channel = channelMasterFacade.updateChannel(channelId, channelDto);
     log.debug("[CHANNEL UPDATE SUCCESSFUL] : [ID: {}]", channelId);

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
+import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,7 +44,7 @@ public class UserController implements UserApiDocs {
   )
   public ResponseEntity<UserResponseDto> createUser(
 
-      @RequestPart("userCreateRequest")
+      @Valid @RequestPart("userCreateRequest")
       CreateUserRequest createUserRequest,
 
       @RequestPart(value = "profile", required = false)
@@ -69,11 +70,9 @@ public class UserController implements UserApiDocs {
       produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<UserResponseDto> updateUser(
-
       @PathVariable String id,
       @RequestPart(value = "profile", required = false) MultipartFile profile,
-      @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto
-
+      @Valid @RequestPart(value = "userUpdateRequest") UserUpdateDto updateDto
   ) {
 
     UserResponseDto user = userFacade.updateUser(id, profile, updateDto);

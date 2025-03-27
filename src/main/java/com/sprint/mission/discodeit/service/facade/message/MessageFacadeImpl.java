@@ -5,10 +5,13 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.message.MessageManagementService;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -45,6 +48,11 @@ public class MessageFacadeImpl implements MessageFacade {
   @Transactional(readOnly = true)
   public PageResponse<MessageResponseDto> findMessagesByChannel(String channelId,
       Instant nextCursor, Pageable pageable) {
+
+    if (channelId.isBlank()) {
+      throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT, Map.of("channelId", channelId));
+    }
+
     Page<Message> messagePage = messageManagementService.findMessagesByChannel(channelId,
         nextCursor, pageable);
     List<MessageResponseDto> dtoList = messageMapper.fromEntityList(messagePage.getContent());

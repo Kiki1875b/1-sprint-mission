@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.dto.channel.CreatePrivateChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.error.ErrorCode;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import com.sprint.mission.discodeit.service.channel.ChannelManagementService;
@@ -181,6 +183,9 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   @Override
   @Transactional
   public void deleteChannel(String channelId) {
+    if (channelId.isBlank()) {
+      throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT, Map.of("channelId", channelId));
+    }
     channelService.deleteChannel(channelId);
   }
 
