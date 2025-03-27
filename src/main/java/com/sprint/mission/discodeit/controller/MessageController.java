@@ -6,6 +6,8 @@ import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.facade.message.MessageFacade;
+import java.time.Instant;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -26,9 +28,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
-import java.util.List;
-
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -45,8 +44,10 @@ public class MessageController implements MessageApiDocs {
   )
   public ResponseEntity<MessageResponseDto> sendMessage(
       @RequestPart(value = "messageCreateRequest") CreateMessageDto messageDto,
-      @RequestPart(value = "attachments", required = false) List<MultipartFile> files){
+      @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
 
+    log.debug("[SEND MESSAGE REQUEST] : [CHANNEL_ID: {}][AUTHOR_ID: {}]", messageDto.channelId(),
+        messageDto.authorId());
     MessageResponseDto message = messageFacade.createMessage(messageDto, files);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
 
@@ -55,16 +56,21 @@ public class MessageController implements MessageApiDocs {
 
   @Override
   @PatchMapping("/messages/{messageId}")
-  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId, @RequestBody MessageUpdateDto messageDto){
+  public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId,
+      @RequestBody MessageUpdateDto messageDto) {
 
+    log.debug("[MESSAGE UPDATE REQUEST] : [ID : {}]", messageId);
     MessageResponseDto message = messageFacade.updateMessage(messageId, messageDto);
     return ResponseEntity.ok(message);
   }
 
   @Override
   @DeleteMapping("/messages/{messageId}")
-  public ResponseEntity<Void> deleteMessage(@PathVariable String messageId){
+  public ResponseEntity<Void> deleteMessage(@PathVariable String messageId) {
+
+    log.debug("[DELETE MESSAGE REQUEST] : [ID : {}]", messageId);
     messageFacade.deleteMessage(messageId);
+    log.debug("[DELETED MESSAGE] : [ID : {}]", messageId);
     return ResponseEntity.noContent().build();
   }
 
@@ -73,9 +79,10 @@ public class MessageController implements MessageApiDocs {
   public ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(
       @RequestParam String channelId,
       @RequestParam(required = false) Instant cursor,
-      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
-    PageResponse<MessageResponseDto> messages = messageFacade.findMessagesByChannel(channelId, cursor, pageable);
+    PageResponse<MessageResponseDto> messages = messageFacade.findMessagesByChannel(channelId,
+        cursor, pageable);
     return ResponseEntity.ok(messages);
   }
 }

@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.CustomException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.message.MessageService;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -38,6 +39,7 @@ public class BasicMessageService implements MessageService {
   @Override
   public Message updateMessage(Message message, String content) {
     if (content != null && !content.isEmpty()) {
+      log.debug("[UPDATING CONTENT] : [ID: {}]", message.getId());
       message.addContent(content);
     }
     return messageRepository.save(message);
@@ -46,8 +48,16 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message getMessageById(String messageId) {
-    return messageRepository.findById(UUID.fromString(messageId))
-        .orElseThrow(() -> new CustomException(ErrorCode.MESSAGE_NOT_FOUND));
+    Optional<Message> message =  messageRepository.findById(UUID.fromString(messageId));
+
+    if(message.isEmpty()){
+      log.info("[MESSAGE NOT FOUND] : [ID : {}]", messageId);
+      throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND)
+    }
+
+    log.debug("[FOUND MESSAGE] : [ID : {}]", messageId);
+
+    return message.get();
   }
 
   @Override

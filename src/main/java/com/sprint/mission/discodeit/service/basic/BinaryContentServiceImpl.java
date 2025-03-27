@@ -35,16 +35,20 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public ResponseEntity<Resource> download(String id) {
     ResponseEntity<?> response = null;
     try {
+      log.debug("[DOWNLOAD START] : [ID : {}]", id);
       response = binaryContentStorage.download(UUID.fromString(id));
     } catch (IOException e) {
       throw new IllegalArgumentException();
     }
+
     if (response.getBody() instanceof Resource resource) {
+      log.debug("[SUCCESSFULLY FETCHED RESOURCE] : [ID : {}]", id);
       return ResponseEntity.status(response.getStatusCode())
           .headers(response.getHeaders())
           .body(resource);
     }
 
+    log.warn("[FAILED TO RETURN RESOURCE] : [ID : {}]", id);
     throw new CustomException(ErrorCode.FILE_ERROR);
   }
 
@@ -69,14 +73,17 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
     List<BinaryContent> savedContents = binaryContentRepository.saveAll(contents);
     binaryContentRepository.flush();
-
+    log.debug("[SAVED METADATA FOR FILES]");
+    log.debug("[WRITING FILE...]");
     for (MultipartFile file : files) {
       try {
+
         BinaryContent content = contents.stream()
             .filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst()
             .orElseThrow();
         binaryContentStorage.put(content.getId(), file.getBytes());
       } catch (IOException e) {
+        log.warn("[ERROR WHILE WRITING FILE] : [FILE_NAME : {}]", file.getOriginalFilename());
         throw new CustomException(ErrorCode.FILE_ERROR);
       }
     }

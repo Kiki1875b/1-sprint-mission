@@ -46,9 +46,13 @@ public class BasicChannelService implements ChannelService {
 
   @Override
   public void validateUserAccess(Channel channel, User user) {
+    log.debug("[VALIDATING USER ACCESS] : [CHANNEL_ID : {}] , [USER_ID : {}]", channel.getId(),
+        user.getId());
     if (Objects.equals(channel.getType(), Channel.ChannelType.PRIVATE)) {
       Optional<ReadStatus> status = readStatusRepository.findByUserAndChannel(user, channel);
       if (status.isEmpty()) {
+        log.warn("[ATTEMPT TO ACCESS UNAUTHORIZED CHANNEL] : [CHANNEL_ID : {}] , [USER_ID : {}]",
+            channel.getId(), user.getId());
         throw new CustomException(ErrorCode.NO_ACCESS_TO_CHANNEL);
       }
     }
