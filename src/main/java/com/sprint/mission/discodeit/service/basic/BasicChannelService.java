@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -91,7 +92,8 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElseThrow(
         () -> {
           log.warn("[FAILED TO FIND CHANNEL] : [ID: {}]", channelId);
-          return new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
+          return new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND,
+              Map.of("channelId", channelId));
         }
     );
 
@@ -99,7 +101,8 @@ public class BasicChannelService implements ChannelService {
 
     if (Objects.equals(channel.getType(), Channel.ChannelType.PRIVATE)) {
       log.warn("[ATTEMPT TO UPDATE PRIVATE CHANNEL]: [ID: {}]", channelId);
-      throw new PrivateChannelUpdateException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
+      throw new PrivateChannelUpdateException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED,
+          Map.of("channelId", channelId));
     }
 
     channel.updateChannelName(dto.newName());

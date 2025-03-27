@@ -38,7 +38,7 @@ public class AuthServiceImpl implements AuthService {
 
     if (!PasswordEncryptor.checkPassword(password, targetUser.getPassword())) {
       log.debug("[LOGIN FAILED] : [PASSWORD DOES NOT MATCH FOR USER: {}]", username);
-      throw new UserException(ErrorCode.PASSWORD_MATCH_ERROR);
+      throw new UserException(ErrorCode.PASSWORD_MATCH_ERROR, Map.of("username", username));
     }
 
     targetUser.getStatus().updateLastOnline(Instant.now());

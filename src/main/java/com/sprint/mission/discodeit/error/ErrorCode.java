@@ -8,7 +8,9 @@ import org.springframework.http.HttpStatus;
 @RequiredArgsConstructor
 public enum ErrorCode {
 
-  DEFAULT_ERROR_MESSAGE(HttpStatus.BAD_REQUEST, "DEFAULT-001", "허용되지 않은 작업입니다."),
+  UNHANDLED_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "SERVER-001", "알 수 없는 오류입니다."),
+  DEFAULT_ERROR_MESSAGE(HttpStatus.BAD_REQUEST, "GENERAL-001", "허용되지 않은 작업입니다."),
+  INVALID_UUID_FORMAT(HttpStatus.BAD_REQUEST, "GENERAL-002", "UUID 형식이 올바르지 않습니다."),
 
   CHANNEL_NOT_FOUND(HttpStatus.NOT_FOUND, "CHANNEL-001", "채널을 찾지 못했습니다."),
   NO_ACCESS_TO_CHANNEL(HttpStatus.UNAUTHORIZED, "CHANNEL-002", "접근 권한이 없는 채널입니다."),
@@ -21,7 +23,11 @@ public enum ErrorCode {
   ERROR_WHILE_DOWNLOADING(HttpStatus.INTERNAL_SERVER_ERROR, "FILE-002", "파일 다운로드에 실패했습니다."),
   IMAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "FILE-003", "이미지를 찾을 수 없습니다."),
 
-  MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MESSAGE-001", "메시지를 찾을 수 없습니다.");
+  MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MESSAGE-001", "메시지를 찾을 수 없습니다."),
+
+  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "읽음 상태를 찾을 수 없습니다."),
+
+  USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-STATUS-001", "사용자 상태를 찾을 수 없습니다.");
 
 
   private final HttpStatus status;

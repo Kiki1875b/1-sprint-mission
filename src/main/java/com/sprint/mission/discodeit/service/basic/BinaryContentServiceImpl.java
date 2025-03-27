@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
       log.debug("[DOWNLOAD START] : [ID : {}]", id);
       response = binaryContentStorage.download(UUID.fromString(id));
     } catch (IOException e) {
-      throw new FileException(ErrorCode.ERROR_WHILE_DOWNLOADING);
+      throw new FileException(ErrorCode.ERROR_WHILE_DOWNLOADING, Map.of("fileId", id));
     }
 
     if (response.getBody() instanceof Resource resource) {
@@ -50,7 +51,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     log.warn("[FAILED TO RETURN RESOURCE] : [ID : {}]", id);
-    throw new FileException(ErrorCode.FILE_ERROR);
+    throw new FileException(ErrorCode.FILE_ERROR, Map.of("fildId", id));
   }
 
   @Override
@@ -78,14 +79,14 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     log.debug("[WRITING FILE...]");
     for (MultipartFile file : files) {
       try {
-
         BinaryContent content = contents.stream()
             .filter(c -> Objects.equals(c.getFileName(), file.getOriginalFilename())).findFirst()
             .orElseThrow();
         binaryContentStorage.put(content.getId(), file.getBytes());
       } catch (IOException e) {
         log.warn("[ERROR WHILE WRITING FILE] : [FILE_NAME : {}]", file.getOriginalFilename());
-        throw new FileException(ErrorCode.FILE_ERROR);
+        throw new FileException(ErrorCode.FILE_ERROR,
+            Map.of("fileName", file.getOriginalFilename()));
       }
     }
     return savedContents;
@@ -95,7 +96,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent find(String id) {
     return binaryContentRepository.findById(UUID.fromString(id))
-        .orElseThrow(() -> new DiscodeitException(ErrorCode.IMAGE_NOT_FOUND));
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.IMAGE_NOT_FOUND, Map.of("fileId", id)));
 
   }
 

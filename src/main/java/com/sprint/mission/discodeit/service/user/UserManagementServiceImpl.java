@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -91,7 +92,8 @@ public class UserManagementServiceImpl implements UserManagementService {
     } catch (IOException e) {
       // TODO : 저장된 파일 삭제
       log.warn("[ERROR DURING PROFILE SAVE] : [USERNAME: {}]", user.getUsername());
-      throw new FileException(ErrorCode.FILE_ERROR);
+      throw new FileException(ErrorCode.FILE_ERROR,
+          Map.of("username", user.getUsername(), "fileName", file.getOriginalFilename()));
     }
   }
 }

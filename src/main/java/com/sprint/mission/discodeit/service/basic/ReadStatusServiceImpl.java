@@ -44,7 +44,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     );
 
     User user = userRepository.findById(UUID.fromString(dto.userId())).orElseThrow(
-        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", dto.userId()))
     );
 
     ReadStatus status = new ReadStatus(channel, user);
@@ -56,7 +56,11 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   @Override
   public ReadStatus find(String id) {
     return readStatusRepository.findById(UUID.fromString(id)).orElseThrow(
-        () -> new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE)
+        () -> {
+          log.debug("[READ_STATUS NOT FOUND] : [ID: {}]", id);
+          return new DiscodeitException(ErrorCode.READ_STATUS_NOT_FOUND,
+              Map.of("readStatusId", id));
+        }
     );
   }
 
@@ -92,7 +96,11 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id) {
 
     ReadStatus status = readStatusRepository.findById(UUID.fromString(id)).orElseThrow(
-        () -> new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE)
+        () -> {
+          log.info("[READ_STATUS NOT FOUND] : [ID: {}]", id);
+          return new DiscodeitException(ErrorCode.READ_STATUS_NOT_FOUND,
+              Map.of("readStatusId", id));
+        }
     );
 
     status.updateLastReadAt(readStatusDto.newLastReadAt());

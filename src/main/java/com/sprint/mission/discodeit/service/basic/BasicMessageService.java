@@ -51,7 +51,8 @@ public class BasicMessageService implements MessageService {
 
     if (message.isEmpty()) {
       log.info("[MESSAGE NOT FOUND] : [ID : {}]", messageId);
-      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
+      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND,
+          Map.of("messageId", messageId));
     }
 
     log.debug("[FOUND MESSAGE] : [ID : {}]", messageId);

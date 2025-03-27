@@ -6,8 +6,9 @@ import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -42,7 +43,7 @@ public class BasicUserService implements UserService {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
         () -> {
           log.debug("[USER NOT FOUND] [ID: {}]", id);
-          return new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
+          return new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("userId", id));
         }
     );
   }
@@ -57,17 +58,18 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public List<User> validateAndFindAllUsersIn(List<String> userIds) {
     log.debug("[VALIDATING USERS] : [ID: {}]", userIds);
-    List<UUID> userUuids = userIds.stream()
-        .map(id -> {
-          try {
-            return UUID.fromString(id);
-          } catch (IllegalArgumentException e) {
-            // TODO : 예외를 던질지, 로그를 찍을지 고민
-            log.debug("[USER ID NOT IN CORRECT FORMAT] : [ID: {}]", id);
-            return null;
-          }
-        }).filter(Objects::nonNull)
-        .toList();
+
+    List<UUID> userUuids = new ArrayList<>();
+
+    for (String userId : userIds) {
+      try {
+        userUuids.add(UUID.fromString(userId));
+      } catch (IllegalArgumentException e) {
+        log.warn("[INVALID UUID FORMAT] : [ID: {}]", userId);
+        throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT,
+            Map.of("invalidUserId", userId));
+      }
+    }
 
     // TODO : 상세 exception message 작성
     if (userUuids.isEmpty()) {
