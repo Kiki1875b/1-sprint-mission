@@ -4,12 +4,14 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.user.UserException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.util.PasswordEncryptor;
 import java.time.Instant;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -30,13 +32,13 @@ public class AuthServiceImpl implements AuthService {
     User targetUser = userRepository.findByUsernameWithProfileAndStatus(username)
         .orElseThrow(() -> {
               log.debug("[LOGIN FAILED] : [USER WITH USERNAME {} NOT FOUND]", username);
-              return new DiscodeitException(ErrorCode.USER_NOT_FOUND);
+              return new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("username", username));
             }
         );
 
     if (!PasswordEncryptor.checkPassword(password, targetUser.getPassword())) {
       log.debug("[LOGIN FAILED] : [PASSWORD DOES NOT MATCH FOR USER: {}]", username);
-      throw new DiscodeitException(ErrorCode.PASSWORD_MATCH_ERROR);
+      throw new UserException(ErrorCode.PASSWORD_MATCH_ERROR);
     }
 
     targetUser.getStatus().updateLastOnline(Instant.now());

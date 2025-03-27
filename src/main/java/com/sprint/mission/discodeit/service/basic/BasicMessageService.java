@@ -3,10 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.message.MessageService;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -14,12 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Slf4j
@@ -48,11 +47,11 @@ public class BasicMessageService implements MessageService {
 
   @Override
   public Message getMessageById(String messageId) {
-    Optional<Message> message =  messageRepository.findById(UUID.fromString(messageId));
+    Optional<Message> message = messageRepository.findById(UUID.fromString(messageId));
 
-    if(message.isEmpty()){
+    if (message.isEmpty()) {
       log.info("[MESSAGE NOT FOUND] : [ID : {}]", messageId);
-      throw new DiscodeitException(ErrorCode.MESSAGE_NOT_FOUND)
+      throw new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND);
     }
 
     log.debug("[FOUND MESSAGE] : [ID : {}]", messageId);
@@ -66,11 +65,13 @@ public class BasicMessageService implements MessageService {
   }
 
   @Override
-  public Page<Message> getMessagesByChannelWithCursor(String channelId, Instant nextCursor, Pageable pageable)  {
-    if(nextCursor == null){
+  public Page<Message> getMessagesByChannelWithCursor(String channelId, Instant nextCursor,
+      Pageable pageable) {
+    if (nextCursor == null) {
       nextCursor = Instant.now();
     }
-    return messageRepository.findByChannel_IdAndCreatedAtLessThan(UUID.fromString(channelId), nextCursor, pageable);
+    return messageRepository.findByChannel_IdAndCreatedAtLessThan(UUID.fromString(channelId),
+        nextCursor, pageable);
 
   }
 

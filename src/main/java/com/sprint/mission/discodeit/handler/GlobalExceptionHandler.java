@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.handler;
 
-import com.sprint.mission.discodeit.error.ErrorDetail;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import org.springframework.http.ResponseEntity;
@@ -12,7 +11,17 @@ public class GlobalExceptionHandler {
 
   @ExceptionHandler(DiscodeitException.class)
   public ResponseEntity<ErrorResponse> handleDiscodeitException(DiscodeitException ex) {
-    ErrorResponse er = new ErrorResponse(new ErrorDetail(ex.getStatusCode(), ex.getMessage()));
+
+    ErrorResponse er = new ErrorResponse(
+        ex.getTimestamp(),
+        ex.getErrorCode().getCode(),
+        ex.getMessage(),
+        ex.getDetails(),
+        ex.getClass().getSimpleName(),
+        ex.getStatusCode()
+    );
+
     return ResponseEntity.status(ex.getStatusCode()).body(er);
   }
+
 }

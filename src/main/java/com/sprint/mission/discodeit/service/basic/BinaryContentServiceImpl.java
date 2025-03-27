@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.file.FileException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -38,7 +39,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
       log.debug("[DOWNLOAD START] : [ID : {}]", id);
       response = binaryContentStorage.download(UUID.fromString(id));
     } catch (IOException e) {
-      throw new IllegalArgumentException();
+      throw new FileException(ErrorCode.ERROR_WHILE_DOWNLOADING);
     }
 
     if (response.getBody() instanceof Resource resource) {
@@ -49,7 +50,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     log.warn("[FAILED TO RETURN RESOURCE] : [ID : {}]", id);
-    throw new DiscodeitException(ErrorCode.FILE_ERROR);
+    throw new FileException(ErrorCode.FILE_ERROR);
   }
 
   @Override
@@ -84,7 +85,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         binaryContentStorage.put(content.getId(), file.getBytes());
       } catch (IOException e) {
         log.warn("[ERROR WHILE WRITING FILE] : [FILE_NAME : {}]", file.getOriginalFilename());
-        throw new DiscodeitException(ErrorCode.FILE_ERROR);
+        throw new FileException(ErrorCode.FILE_ERROR);
       }
     }
     return savedContents;

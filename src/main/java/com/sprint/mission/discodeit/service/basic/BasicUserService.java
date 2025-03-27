@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
 import java.util.List;
@@ -41,7 +42,7 @@ public class BasicUserService implements UserService {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
         () -> {
           log.debug("[USER NOT FOUND] [ID: {}]", id);
-          return new DiscodeitException(ErrorCode.USER_NOT_FOUND);
+          return new UserNotFoundException(ErrorCode.USER_NOT_FOUND);
         }
     );
   }

@@ -5,7 +5,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.channel.ChannelException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
@@ -53,7 +55,7 @@ public class BasicChannelService implements ChannelService {
       if (status.isEmpty()) {
         log.warn("[ATTEMPT TO ACCESS UNAUTHORIZED CHANNEL] : [CHANNEL_ID : {}] , [USER_ID : {}]",
             channel.getId(), user.getId());
-        throw new DiscodeitException(ErrorCode.NO_ACCESS_TO_CHANNEL);
+        throw new ChannelException(ErrorCode.NO_ACCESS_TO_CHANNEL);
       }
     }
   }
@@ -61,7 +63,7 @@ public class BasicChannelService implements ChannelService {
   @Override
   public Channel findChannelById(String channelId) {
     return channelRepository.findById(UUID.fromString(channelId))
-        .orElseThrow(() -> new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND));
+        .orElseThrow(() -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
   }
 
   @Override
@@ -89,7 +91,7 @@ public class BasicChannelService implements ChannelService {
     Channel channel = channelRepository.findById(UUID.fromString(channelId)).orElseThrow(
         () -> {
           log.warn("[FAILED TO FIND CHANNEL] : [ID: {}]", channelId);
-          return new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND);
+          return new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND);
         }
     );
 
@@ -97,7 +99,7 @@ public class BasicChannelService implements ChannelService {
 
     if (Objects.equals(channel.getType(), Channel.ChannelType.PRIVATE)) {
       log.warn("[ATTEMPT TO UPDATE PRIVATE CHANNEL]: [ID: {}]", channelId);
-      throw new DiscodeitException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
+      throw new PrivateChannelUpdateException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED);
     }
 
     channel.updateChannelName(dto.newName());

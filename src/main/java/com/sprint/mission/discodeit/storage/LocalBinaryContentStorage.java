@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.file.FileException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -32,7 +32,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
     try {
       Files.createDirectories(root);
     } catch (IOException e) {
-      throw new DiscodeitException(ErrorCode.FILE_ERROR);
+      throw new FileException(ErrorCode.FILE_ERROR);
     }
   }
 
@@ -45,7 +45,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       return id;
     } catch (IOException e) {
       log.warn("[ERROR WHILE WRITING FILE] : [ID: {}]", id);
-      throw new DiscodeitException(ErrorCode.FILE_ERROR);
+      throw new FileException(ErrorCode.FILE_ERROR);
     }
   }
 
@@ -57,7 +57,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
       return Files.newInputStream(filePath);
     } catch (IOException e) {
       log.warn("[ERROR WHILE OPENING INPUT_STREAM]");
-      throw new DiscodeitException(ErrorCode.FILE_ERROR);
+      throw new FileException(ErrorCode.FILE_ERROR);
     }
   }
 

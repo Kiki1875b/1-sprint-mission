@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -14,6 +16,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -36,11 +39,12 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   public ReadStatus create(CreateReadStatusDto dto) {
 
     Channel channel = channelRepository.findById(UUID.fromString(dto.channelId())).orElseThrow(
-        () -> new DiscodeitException(ErrorCode.CHANNEL_NOT_FOUND)
+        () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND,
+            Map.of("channelId", dto.channelId()))
     );
 
     User user = userRepository.findById(UUID.fromString(dto.userId())).orElseThrow(
-        () -> new DiscodeitException(ErrorCode.USER_NOT_FOUND)
+        () -> new UserNotFoundException(ErrorCode.USER_NOT_FOUND)
     );
 
     ReadStatus status = new ReadStatus(channel, user);

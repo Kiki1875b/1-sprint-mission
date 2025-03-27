@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.DiscodeitException;
+import com.sprint.mission.discodeit.exception.file.FileException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
@@ -91,7 +91,7 @@ public class UserManagementServiceImpl implements UserManagementService {
     } catch (IOException e) {
       // TODO : 저장된 파일 삭제
       log.warn("[ERROR DURING PROFILE SAVE] : [USERNAME: {}]", user.getUsername());
-      throw new DiscodeitException(ErrorCode.FILE_ERROR);
+      throw new FileException(ErrorCode.FILE_ERROR);
     }
   }
 }
