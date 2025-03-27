@@ -29,20 +29,20 @@ public class AuthServiceImpl implements AuthService {
 
     User targetUser = userRepository.findByUsernameWithProfileAndStatus(username)
         .orElseThrow(() -> {
-              log.info("[LOGIN FAILED] : [USER WITH USERNAME {} NOT FOUND]", username);
+              log.debug("[LOGIN FAILED] : [USER WITH USERNAME {} NOT FOUND]", username);
               return new CustomException(ErrorCode.USER_NOT_FOUND);
             }
         );
 
     if (!PasswordEncryptor.checkPassword(password, targetUser.getPassword())) {
-      log.info("[LOGIN FAILED] : [PASSWORD DOES NOT MATCH FOR USER: {}]", username);
+      log.debug("[LOGIN FAILED] : [PASSWORD DOES NOT MATCH FOR USER: {}]", username);
       throw new CustomException(ErrorCode.PASSWORD_MATCH_ERROR);
     }
 
     targetUser.getStatus().updateLastOnline(Instant.now());
     userRepository.save(targetUser);
 
-    log.info("[LOGIN SUCCESS] [USERNAME : {}]", username);
+    log.debug("[LOGIN SUCCESS] [USERNAME : {}]", username);
     return userMapper.toDto(targetUser);
 
   }

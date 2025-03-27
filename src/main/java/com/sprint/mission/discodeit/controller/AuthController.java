@@ -23,7 +23,7 @@ public class AuthController implements AuthApiDocs {
   @Override
   @PostMapping("/login")
   public ResponseEntity<UserResponseDto> userLogin(@RequestBody LoginDto loginDto) {
-    log.info("[LOGIN REQUEST] : [USERNAME:{}]", loginDto.username());
+    log.debug("[LOGIN REQUEST] : [USERNAME:{}]", loginDto.username());
     UserResponseDto user = authService.login(loginDto.username(), loginDto.password());
     return ResponseEntity.ok(user);
   }

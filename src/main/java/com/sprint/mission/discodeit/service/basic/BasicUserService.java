@@ -40,7 +40,7 @@ public class BasicUserService implements UserService {
   public User findUserById(String id) {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
         () -> {
-          log.info("[USER NOT FOUND] [ID: {}]", id);
+          log.debug("[USER NOT FOUND] [ID: {}]", id);
           return new CustomException(ErrorCode.USER_NOT_FOUND);
         }
     );
@@ -55,13 +55,14 @@ public class BasicUserService implements UserService {
   @Override
   @Transactional(readOnly = true)
   public List<User> validateAndFindAllUsersIn(List<String> userIds) {
+    log.debug("[VALIDATING USERS] : [ID: {}]", userIds);
     List<UUID> userUuids = userIds.stream()
         .map(id -> {
           try {
             return UUID.fromString(id);
           } catch (IllegalArgumentException e) {
             // TODO : 예외를 던질지, 로그를 찍을지 고민
-            log.warn("Invalid UUID: {}", id);
+            log.debug("[USER ID NOT IN CORRECT FORMAT] : [ID: {}]", id);
             return null;
           }
         }).filter(Objects::nonNull)
@@ -69,6 +70,7 @@ public class BasicUserService implements UserService {
 
     // TODO : 상세 exception message 작성
     if (userUuids.isEmpty()) {
+      log.warn("[ATTEMPT TO CREATE PRIVATE CHANNEL WITH NO USER]");
       throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
 

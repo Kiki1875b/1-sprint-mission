@@ -48,7 +48,7 @@ public class UserController implements UserApiDocs {
 
       @RequestPart(value = "profile", required = false)
       MultipartFile profile) {
-    log.info("[CREATE USER REQUEST] : [USERNAME: {}]] , [EMAIL: {}]", createUserRequest.username(),
+    log.debug("[CREATE USER REQUEST] : [USERNAME: {}]] , [EMAIL: {}]", createUserRequest.username(),
         createUserRequest.email());
     UserResponseDto user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -84,11 +84,10 @@ public class UserController implements UserApiDocs {
   @DeleteMapping("/{id}")
   public ResponseEntity<Void> deleteUser(@PathVariable String id) {
 
-    log.info("[DELETE USER REQUEST] : [ID: {}]", id);
+    log.debug("[DELETE USER REQUEST] : [ID: {}]", id);
     userFacade.deleteUser(id);
 
-    log.info("[DELETED USER] : [ID: {}]", id);
+    log.debug("[DELETED USER] : [ID: {}]", id);
     return ResponseEntity.noContent().build();
-
   }
 }

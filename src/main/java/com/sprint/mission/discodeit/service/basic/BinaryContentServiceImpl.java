@@ -54,9 +54,9 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     BinaryContent savedContent = binaryContentRepository.save(content);
     binaryContentRepository.flush();
 
-    log.info("[SAVED BINARY METADATA] : [ID: {}]", savedContent.getId());
+    log.debug("[SAVED BINARY METADATA] : [ID: {}]", savedContent.getId());
     binaryContentStorage.put(savedContent.getId(), bytes);
-    log.info("[SAVED IMAGE TO STORAGE] : [ID: {}]", savedContent.getId());
+    log.debug("[SAVED IMAGE TO STORAGE] : [ID: {}]", savedContent.getId());
 
     return savedContent;
   }
@@ -115,7 +115,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public void delete(String id) {
 
     binaryContentRepository.deleteById(UUID.fromString(id));
-    log.info("[DELETED BINARY CONTENT METADATA]: [ID: {}]", id);
+    log.debug("[DELETED BINARY CONTENT METADATA]: [ID: {}]", id);
   }
 
   @Override

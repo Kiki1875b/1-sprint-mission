@@ -40,7 +40,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public UUID put(UUID id, byte[] bytes) {
     Path filePath = resolvePath(id);
     try {
-      log.info("[WRITING BINARY FILE] : [ID: {}]", id);
+      log.debug("[WRITING BINARY FILE] : [ID: {}]", id);
       Files.write(filePath, bytes);
       return id;
     } catch (IOException e) {

@@ -26,7 +26,7 @@ public class UserFacadeImpl implements UserFacade {
   public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
     User user = userMapper.toEntity(request);
     User createdUser = userManagementService.createUser(user, profile);
-    log.info("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
+    log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
     return userMapper.toDto(createdUser);
   }
 
@@ -40,10 +40,10 @@ public class UserFacadeImpl implements UserFacade {
   @Override
   @Transactional
   public UserResponseDto updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
-    log.info("[UPDATE USER REQUEST] : [ID: {}]", userId);
+    log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
     User tmpUser = userMapper.toEntity(updateDto);
     User updatedUser = userManagementService.updateUser(userId, tmpUser, profile);
-    log.info("[UPDATED USER] : [ID : {}]", userId);
+    log.debug("[UPDATED USER] : [ID : {}]", userId);
     return userMapper.toDto(updatedUser);
   }
 
