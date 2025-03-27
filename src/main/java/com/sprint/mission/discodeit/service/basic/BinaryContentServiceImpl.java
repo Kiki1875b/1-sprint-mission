@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -49,7 +49,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     }
 
     log.warn("[FAILED TO RETURN RESOURCE] : [ID : {}]", id);
-    throw new CustomException(ErrorCode.FILE_ERROR);
+    throw new DiscodeitException(ErrorCode.FILE_ERROR);
   }
 
   @Override
@@ -84,7 +84,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
         binaryContentStorage.put(content.getId(), file.getBytes());
       } catch (IOException e) {
         log.warn("[ERROR WHILE WRITING FILE] : [FILE_NAME : {}]", file.getOriginalFilename());
-        throw new CustomException(ErrorCode.FILE_ERROR);
+        throw new DiscodeitException(ErrorCode.FILE_ERROR);
       }
     }
     return savedContents;
@@ -94,7 +94,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public BinaryContent find(String id) {
     return binaryContentRepository.findById(UUID.fromString(id))
-        .orElseThrow(() -> new CustomException(ErrorCode.IMAGE_NOT_FOUND));
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.IMAGE_NOT_FOUND));
 
   }
 

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import java.util.Optional;
@@ -52,7 +52,7 @@ public class BasicMessageService implements MessageService {
 
     if(message.isEmpty()){
       log.info("[MESSAGE NOT FOUND] : [ID : {}]", messageId);
-      throw new CustomException(ErrorCode.MESSAGE_NOT_FOUND)
+      throw new DiscodeitException(ErrorCode.MESSAGE_NOT_FOUND)
     }
 
     log.debug("[FOUND MESSAGE] : [ID : {}]", messageId);

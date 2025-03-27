@@ -4,15 +4,14 @@ import com.sprint.mission.discodeit.dto.user_status.UpdateUserStatusDto;
 import com.sprint.mission.discodeit.dto.user_status.UserStatusResponseDto;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
+import java.time.Instant;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Instant;
-import java.util.UUID;
 
 
 @Service
@@ -26,9 +25,10 @@ public class UserStatusServiceImpl implements UserStatusService {
   public UserStatusResponseDto updateByUserId(String userId, UpdateUserStatusDto dto) {
 
     UserStatus status = userStatusRepository.findByUser_Id(UUID.fromString(userId)).orElseThrow(
-        () -> new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE)
+        () -> new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE)
     );
-    Instant updateTime = (dto.newLastActivityAt() == null) ? Instant.now() : dto.newLastActivityAt();
+    Instant updateTime =
+        (dto.newLastActivityAt() == null) ? Instant.now() : dto.newLastActivityAt();
     status.updateLastOnline(updateTime);
     userStatusRepository.save(status);
     return new UserStatusResponseDto(

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.CustomException;
+import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
 import java.util.List;
@@ -41,7 +41,7 @@ public class BasicUserService implements UserService {
     return userRepository.findById(UUID.fromString(id)).orElseThrow(
         () -> {
           log.debug("[USER NOT FOUND] [ID: {}]", id);
-          return new CustomException(ErrorCode.USER_NOT_FOUND);
+          return new DiscodeitException(ErrorCode.USER_NOT_FOUND);
         }
     );
   }
@@ -71,7 +71,7 @@ public class BasicUserService implements UserService {
     // TODO : 상세 exception message 작성
     if (userUuids.isEmpty()) {
       log.warn("[ATTEMPT TO CREATE PRIVATE CHANNEL WITH NO USER]");
-      throw new CustomException(ErrorCode.DEFAULT_ERROR_MESSAGE);
+      throw new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE);
     }
 
     return userRepository.findAllByIdIn(userUuids);
