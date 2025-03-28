@@ -1,5 +1,6 @@
 package unit_test;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -34,6 +35,16 @@ public class TestEntityFactory {
     Message message = new Message("content", null, null, null);
     ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
     ReflectionTestUtils.setField(message, "createdAt", Instant.now());
+    return message;
+  }
+
+  public static Message createMessageWithAttachments() {
+    Message message = new Message("content", null, null, null);
+    BinaryContent content = new BinaryContent("name", 1L, "image/jpeg");
+    ReflectionTestUtils.setField(content, "id", UUID.randomUUID());
+    ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
+    message.addAttachment(content);
+
     return message;
   }
 
