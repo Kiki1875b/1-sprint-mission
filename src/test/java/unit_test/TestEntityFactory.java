@@ -3,6 +3,7 @@ package unit_test;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
 import java.util.UUID;
@@ -36,4 +37,9 @@ public class TestEntityFactory {
     return message;
   }
 
+  public static ReadStatus createReadStatus(Channel channel, User user) {
+    ReadStatus status = new ReadStatus(channel, user);
+    ReflectionTestUtils.setField(status, "id", UUID.randomUUID());
+    return status;
+  }
 }
