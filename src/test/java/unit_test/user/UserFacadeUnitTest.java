@@ -1,9 +1,12 @@
 package unit_test.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 import com.sprint.mission.discodeit.dto.user.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponseDto;
@@ -56,6 +59,21 @@ public class UserFacadeUnitTest {
   }
 
   @Test
+  void createUser_shouldHaveNoMoreInteractionsOnMappingFail() {
+    CreateUserRequest request = new CreateUserRequest("testUsername", "pwd", "test@example.com");
+    MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
+        "test".getBytes());
+
+    given(userMapper.toEntity(request)).willThrow(new IllegalArgumentException());
+
+    // when & then
+    assertThatThrownBy(() -> userFacade.createUser(request, mockProfile)).isInstanceOf(
+        IllegalArgumentException.class);
+    then(userManagementService).shouldHaveNoInteractions();
+    then(userMapper).should(times(0)).toDto(any());
+  }
+
+  @Test
   void updateUser_shouldCallMapperAndServiceAndReturnResponse() {
     String userId = UUID.randomUUID().toString();
     MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
@@ -77,6 +95,23 @@ public class UserFacadeUnitTest {
     then(userMapper).should().toEntity(req);
     then(userManagementService).should().updateUser(userId, tmpUser, mockProfile);
     then(userMapper).should().toDto(updatedUser);
+  }
+
+  @Test
+  void updateUser_shouldHaveNoMoreInteractionsOnMappingFail() {
+    //given
+    String userId = UUID.randomUUID().toString();
+    MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
+        "test".getBytes());
+    UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
+
+    given(userMapper.toEntity(req)).willThrow(new IllegalArgumentException());
+
+    //when & then
+    assertThatThrownBy(() -> userFacade.updateUser(userId, mockProfile, req))
+        .isInstanceOf(IllegalArgumentException.class);
+    then(userManagementService).shouldHaveNoInteractions();
+    then(userMapper).should(times(0)).toDto(any(User.class));
   }
 
   @Test

@@ -1,0 +1,39 @@
+package unit_test;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import java.time.Instant;
+import java.util.UUID;
+import org.springframework.test.util.ReflectionTestUtils;
+
+public class TestEntityFactory {
+
+  public static User createUser(String name, String email) {
+    User user = new User(name, email, "password", null, null);
+    ReflectionTestUtils.setField(user, "id", UUID.randomUUID());
+    return user;
+  }
+
+  public static Channel createPublicChannel() {
+    Channel channel = new Channel(ChannelType.PUBLIC, "public", "public channel", null);
+    ReflectionTestUtils.setField(channel, "id", UUID.randomUUID());
+
+    return channel;
+  }
+
+  public static Channel createPrivateChannel() {
+    Channel channel = new Channel(ChannelType.PRIVATE, "private", null, null);
+    ReflectionTestUtils.setField(channel, "id", UUID.randomUUID());
+    return channel;
+  }
+
+  public static Message createMessageWithNoAttachments() {
+    Message message = new Message("content", null, null, null);
+    ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
+    ReflectionTestUtils.setField(message, "createdAt", Instant.now());
+    return message;
+  }
+
+}
