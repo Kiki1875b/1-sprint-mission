@@ -122,7 +122,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public void delete(String id) {
-
     binaryContentRepository.deleteById(UUID.fromString(id));
     log.debug("[DELETED BINARY CONTENT METADATA]: [ID: {}]", id);
   }
