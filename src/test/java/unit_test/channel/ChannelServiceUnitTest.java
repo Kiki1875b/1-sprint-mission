@@ -192,7 +192,5 @@ public class ChannelServiceUnitTest {
 
     //then
     then(channelRepository).should().deleteById(id);
-
-
   }
 }
