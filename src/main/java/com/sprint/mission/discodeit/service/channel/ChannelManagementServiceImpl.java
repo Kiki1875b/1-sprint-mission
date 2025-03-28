@@ -32,7 +32,7 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
   @Transactional(propagation = Propagation.REQUIRED)
   public Channel createPrivateChannel(Channel channel, List<String> userIds) {
 
-    List<User> participants = userService.validateAndFindAllUsersIn(userIds);
+    List<User> participants = userService.findAllUsersIn(userIds);
     log.debug("[FOUND USERS OF IDS] : [{}]", userIds);
     List<ReadStatus> statuses = participants.stream()
         .map(user -> new ReadStatus(channel, user))
@@ -88,7 +88,7 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
 
     List<String> userIds = mergedStatuses.stream()
         .map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
-    List<User> users = userService.validateAndFindAllUsersIn(userIds);
+    List<User> users = userService.findAllUsersIn(userIds);
 
     return mergedChannels;
   }

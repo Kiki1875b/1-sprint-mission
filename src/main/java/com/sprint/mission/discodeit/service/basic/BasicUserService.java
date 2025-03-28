@@ -13,6 +13,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,20 +57,10 @@ public class BasicUserService implements UserService {
 
   @Override
   @Transactional(readOnly = true)
-  public List<User> validateAndFindAllUsersIn(List<String> userIds) {
+  public List<User> findAllUsersIn(List<String> userIds) {
     log.debug("[VALIDATING USERS] : [ID: {}]", userIds);
 
-    List<UUID> userUuids = new ArrayList<>();
-
-    for (String userId : userIds) {
-      try {
-        userUuids.add(UUID.fromString(userId));
-      } catch (IllegalArgumentException e) {
-        log.warn("[INVALID UUID FORMAT] : [ID: {}]", userId);
-        throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT,
-            Map.of("invalidUserId", userId));
-      }
-    }
+    List<UUID> userUuids = parseStringToUuid(userIds);
 
     // TODO : 상세 exception message 작성
     if (userUuids.isEmpty()) {
@@ -84,12 +75,40 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public List<User> findByAllIn(List<UUID> userIds) {
     return userRepository.findAllByIdIn(userIds);
-
   }
 
   @Override
   @Transactional
   public void deleteUser(String id) {
-    userRepository.deleteById(UUID.fromString(id));
+
+    UUID userId = null;
+
+    try {
+      userId = UUID.fromString(id);
+    } catch (IllegalArgumentException e) {
+      throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT);
+    }
+
+    try {
+      userRepository.deleteById(userId);
+    } catch (EmptyResultDataAccessException ignored) {
+      log.warn("[USER DELETE IGNORED] No user found for ID: {}", id);
+    }
+  }
+
+  private List<UUID> parseStringToUuid(List<String> userIds) {
+    List<UUID> userUuids = new ArrayList<>();
+
+    for (String userId : userIds) {
+      try {
+        userUuids.add(UUID.fromString(userId));
+      } catch (IllegalArgumentException e) {
+        log.warn("[INVALID UUID FORMAT] : [ID: {}]", userId);
+        throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT,
+            Map.of("invalidUserId", userId));
+      }
+    }
+
+    return userUuids;
   }
 }

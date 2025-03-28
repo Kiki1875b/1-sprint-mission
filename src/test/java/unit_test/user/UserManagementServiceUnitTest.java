@@ -60,7 +60,6 @@ public class UserManagementServiceUnitTest {
     User savedUser = userManagementService.createUser(user, profile);
 
     // then
-
     assertThat(savedUser).isNotNull();
     assertThat(savedUser.getUsername()).isEqualTo("testUser");
     assertThat(savedUser.getProfile()).isNotNull();

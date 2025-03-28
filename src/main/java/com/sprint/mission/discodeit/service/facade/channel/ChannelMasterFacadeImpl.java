@@ -135,7 +135,7 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
     List<String> userIds = mergedStatuses.stream()
         .map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
 
-    List<User> users = userService.validateAndFindAllUsersIn(userIds);
+    List<User> users = userService.findAllUsersIn(userIds);
 
     Map<UUID, Instant> latestMessageTimeByChannel = messageService.getLatestMessageForChannels(
         mergedChannels);
