@@ -18,6 +18,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -48,143 +49,163 @@ public class MessageServiceUnitTest {
   }
 
 
-  @Test
-  void testCreateMessage_success() {
-    // given
-    given(messageRepository.save(message)).willReturn(message);
+  @Nested
+  class CreateMessage {
 
-    // when
-    Message result = basicMessageService.createMessage(message);
+    @Test
+    void testCreateMessage_success() {
+      // given
+      given(messageRepository.save(message)).willReturn(message);
 
-    // then
-    then(messageRepository).should().save(message);
+      // when
+      Message result = basicMessageService.createMessage(message);
+
+      // then
+      then(messageRepository).should().save(message);
+    }
   }
 
-  @Test
-  void testUpdateMessage_success() {
-    String newContent = "newContent";
-    given(messageRepository.save(any())).willReturn(message);
+  @Nested
+  class UpdateMessage {
 
-    Message result = basicMessageService.updateMessage(message, newContent);
+    @Test
+    void testUpdateMessage_success() {
+      String newContent = "newContent";
+      given(messageRepository.save(any())).willReturn(message);
 
-    then(messageRepository).should().save(message);
+      Message result = basicMessageService.updateMessage(message, newContent);
+
+      then(messageRepository).should().save(message);
+    }
   }
 
-  @Test
-  void getMessageById_success() {
-    String messageId = message.getId().toString();
-    given(messageRepository.findById(UUID.fromString(messageId))).willReturn(
-        Optional.ofNullable(message));
+  @Nested
+  class FindMessage {
 
-    // when
-    Message result = basicMessageService.getMessageById(messageId);
+    @Test
+    void getMessageById_success() {
+      String messageId = message.getId().toString();
+      given(messageRepository.findById(UUID.fromString(messageId))).willReturn(
+          Optional.ofNullable(message));
 
-    // then
-    assertThat(result).isEqualTo(message);
-    then(messageRepository).should().findById(UUID.fromString(messageId));
+      // when
+      Message result = basicMessageService.getMessageById(messageId);
+
+      // then
+      assertThat(result).isEqualTo(message);
+      then(messageRepository).should().findById(UUID.fromString(messageId));
+    }
+
+    @Test
+    void getMessageById_fail_notFound() {
+      String messageId = UUID.randomUUID().toString();
+      given(messageRepository.findById(UUID.fromString(messageId))).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> basicMessageService.getMessageById(messageId))
+          .isInstanceOf(MessageNotFoundException.class)
+          .hasMessageContaining(ErrorCode.MESSAGE_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void getMessagesByChannel_success() {
+      UUID channelId = UUID.randomUUID();
+      Pageable pageable = PageRequest.of(0, 10);
+      Page<Message> page = new PageImpl<>(List.of());
+      given(messageRepository.findByChannel_Id(channelId, pageable)).willReturn(page);
+
+      // when
+      Page<Message> result = basicMessageService.getMessagesByChannel(channelId.toString(),
+          pageable);
+
+      // then
+      assertThat(result).isEqualTo(page);
+      then(messageRepository).should().findByChannel_Id(channelId, pageable);
+    }
+
+    @Test
+    void getMessagesByChannelWithCursor_success() {
+      UUID channelId = UUID.randomUUID();
+      Pageable pageable = PageRequest.of(0, 10);
+      Instant cursor = Instant.now();
+      Page<Message> page = new PageImpl<>(List.of());
+      given(messageRepository.findByChannel_IdAndCreatedAtLessThan(channelId, cursor, pageable))
+          .willReturn(page);
+      // when
+      Page<Message> result =
+          basicMessageService.getMessagesByChannelWithCursor(channelId.toString(), cursor,
+              pageable);
+      // then
+      assertThat(result).isEqualTo(page);
+      then(messageRepository).should()
+          .findByChannel_IdAndCreatedAtLessThan(channelId, cursor, pageable);
+    }
+
+    @Test
+    void getLatestMessageByChannel_success() {
+      //givne
+      UUID channelId = UUID.randomUUID();
+      given(messageRepository.findTopByChannel_IdOrderByCreatedAtDesc(channelId))
+          .willReturn(Optional.of(message));
+
+      // when
+      Message result = basicMessageService.getLatestMessageByChannel(channelId.toString());
+
+      // then
+      assertThat(result).isEqualTo(message);
+      then(messageRepository).should().findTopByChannel_IdOrderByCreatedAtDesc(channelId);
+    }
+
+    @Test
+    void getLatestMessageForChannels() {
+      Channel c1 = TestEntityFactory.createPrivateChannel();
+      Channel c2 = TestEntityFactory.createPublicChannel();
+      message2.addChannel(c2);
+      message.addChannel(c1);
+
+      given(messageRepository.findLatestMessagesForEachChannel(List.of(c1.getId(), c2.getId())))
+          .willReturn(List.of(message, message2));
+
+      //when
+      Map<UUID, Instant> result = basicMessageService.getLatestMessageForChannels(List.of(c1, c2));
+
+      //then
+      assertThat(result).containsKeys(c1.getId(), c2.getId());
+      then(messageRepository).should()
+          .findLatestMessagesForEachChannel(List.of(c1.getId(), c2.getId()));
+
+    }
+
+
   }
 
-  @Test
-  void getMessageById_fail_notFound() {
-    String messageId = UUID.randomUUID().toString();
-    given(messageRepository.findById(UUID.fromString(messageId))).willReturn(Optional.empty());
+  @Nested
+  class DeleteMessage {
 
-    // when & then
-    assertThatThrownBy(() -> basicMessageService.getMessageById(messageId))
-        .isInstanceOf(MessageNotFoundException.class)
-        .hasMessageContaining(ErrorCode.MESSAGE_NOT_FOUND.getMessage());
+    @Test
+    void deleteMessage_success() {
+      // given
+      String messageId = message.getId().toString();
+
+      // when
+      basicMessageService.deleteMessage(messageId);
+
+      //then
+      then(messageRepository).should().deleteById(UUID.fromString(messageId));
+    }
+
+
+    @Test
+    void deleteMessage_fail_whenWrongUuidFormat() {
+      // given
+      String messageId = "invalid id";
+
+      //when & then
+      assertThatThrownBy(() -> basicMessageService.deleteMessage(messageId))
+          .isInstanceOf(IllegalArgumentException.class);
+
+    }
   }
 
-  @Test
-  void getMessagesByChannel_success() {
-    UUID channelId = UUID.randomUUID();
-    Pageable pageable = PageRequest.of(0, 10);
-    Page<Message> page = new PageImpl<>(List.of());
-    given(messageRepository.findByChannel_Id(channelId, pageable)).willReturn(page);
-
-    // when
-    Page<Message> result = basicMessageService.getMessagesByChannel(channelId.toString(), pageable);
-
-    // then
-    assertThat(result).isEqualTo(page);
-    then(messageRepository).should().findByChannel_Id(channelId, pageable);
-  }
-
-  @Test
-  void getMessagesByChannelWithCursor_success() {
-    UUID channelId = UUID.randomUUID();
-    Pageable pageable = PageRequest.of(0, 10);
-    Instant cursor = Instant.now();
-    Page<Message> page = new PageImpl<>(List.of());
-    given(messageRepository.findByChannel_IdAndCreatedAtLessThan(channelId, cursor, pageable))
-        .willReturn(page);
-    // when
-    Page<Message> result =
-        basicMessageService.getMessagesByChannelWithCursor(channelId.toString(), cursor, pageable);
-    // then
-    assertThat(result).isEqualTo(page);
-    then(messageRepository).should()
-        .findByChannel_IdAndCreatedAtLessThan(channelId, cursor, pageable);
-  }
-
-  @Test
-  void getLatestMessageByChannel_success() {
-    //givne
-    UUID channelId = UUID.randomUUID();
-    given(messageRepository.findTopByChannel_IdOrderByCreatedAtDesc(channelId))
-        .willReturn(Optional.of(message));
-
-    // when
-    Message result = basicMessageService.getLatestMessageByChannel(channelId.toString());
-
-    // then
-    assertThat(result).isEqualTo(message);
-    then(messageRepository).should().findTopByChannel_IdOrderByCreatedAtDesc(channelId);
-  }
-
-  @Test
-  void getLatestMessageForChannels() {
-    Channel c1 = TestEntityFactory.createPrivateChannel();
-    Channel c2 = TestEntityFactory.createPublicChannel();
-    message2.addChannel(c2);
-    message.addChannel(c1);
-
-    given(messageRepository.findLatestMessagesForEachChannel(List.of(c1.getId(), c2.getId())))
-        .willReturn(List.of(message, message2));
-
-    //when
-    Map<UUID, Instant> result = basicMessageService.getLatestMessageForChannels(List.of(c1, c2));
-
-    //then
-    assertThat(result).containsKeys(c1.getId(), c2.getId());
-    then(messageRepository).should()
-        .findLatestMessagesForEachChannel(List.of(c1.getId(), c2.getId()));
-
-  }
-
-
-  @Test
-  void deleteMessage_success() {
-    // given
-    String messageId = message.getId().toString();
-
-    // when
-    basicMessageService.deleteMessage(messageId);
-
-    //then
-    then(messageRepository).should().deleteById(UUID.fromString(messageId));
-  }
-
-
-  @Test
-  void deleteMessage_fail_whenWrongUuidFormat() {
-    // given
-    String messageId = "invalid id";
-
-    //when & then
-    assertThatThrownBy(() -> basicMessageService.deleteMessage(messageId))
-        .isInstanceOf(IllegalArgumentException.class);
-
-  }
 }
 

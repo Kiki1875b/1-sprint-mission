@@ -23,6 +23,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -66,164 +67,194 @@ public class MessageManagementServiceUnitTest {
     message = TestEntityFactory.createMessageWithNoAttachments();
   }
 
-  @Test
-  void createMessage_withoutAttachment_success() {
-    //given
-    String content = "content";
-    String channelId = channel.getId().toString();
-    String authorId = author.getId().toString();
+  @Nested
+  class CreateMessage {
 
-    given(channelService.findChannelById(channelId))
-        .willReturn(channel);
-    given(userService.findUserById(authorId))
-        .willReturn(author);
-    given(messageMapper.toEntity(content))
-        .willReturn(message);
-    given(messageService.createMessage(message))
-        .willReturn(message);
+    @Test
+    void createMessage_withoutAttachment_success() {
+      //given
+      String content = "content";
+      String channelId = channel.getId().toString();
+      String authorId = author.getId().toString();
 
-    // when
-    Message result = messageManagementService.createMessage(content, channelId, authorId, null);
+      given(channelService.findChannelById(channelId))
+          .willReturn(channel);
+      given(userService.findUserById(authorId))
+          .willReturn(author);
+      given(messageMapper.toEntity(content))
+          .willReturn(message);
+      given(messageService.createMessage(message))
+          .willReturn(message);
 
-    //then
-    assertThat(result).isEqualTo(message);
-    then(channelService).should().findChannelById(channelId);
-    then(userService).should().findUserById(authorId);
-    then(messageMapper).should().toEntity(content);
-    then(messageService).should().createMessage(message);
-  }
+      // when
+      Message result = messageManagementService.createMessage(content, channelId, authorId, null);
 
-  @Test
-  void createMessage_shouldFail_onChannelNotFound() {
-    //given
-    String content = "content";
-    String channelId = channel.getId().toString();
-    String authorId = author.getId().toString();
+      //then
+      assertThat(result).isEqualTo(message);
+      then(channelService).should().findChannelById(channelId);
+      then(userService).should().findUserById(authorId);
+      then(messageMapper).should().toEntity(content);
+      then(messageService).should().createMessage(message);
+    }
 
-    given(channelService.findChannelById(channelId))
-        .willThrow(new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
+    @Test
+    void createMessage_shouldFail_onChannelNotFound() {
+      //given
+      String content = "content";
+      String channelId = channel.getId().toString();
+      String authorId = author.getId().toString();
 
-    // when & Then
-    assertThatThrownBy(
-        () -> messageManagementService.createMessage(content, channelId, authorId, null))
-        .isInstanceOf(ChannelNotFoundException.class);
-  }
+      given(channelService.findChannelById(channelId))
+          .willThrow(new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND));
 
-  @Test
-  void createMessage_withAttachment_success() {
-    //given
-    String content = message.getContent();
-    String channelId = channel.getId().toString();
-    String authorId = author.getId().toString();
-    MockMultipartFile file1 = new MockMultipartFile("file1", "file1", "file1", "file1".getBytes());
-    List<MultipartFile> files = List.of(file1);
+      // when & Then
+      assertThatThrownBy(
+          () -> messageManagementService.createMessage(content, channelId, authorId, null))
+          .isInstanceOf(ChannelNotFoundException.class);
+    }
 
-    BinaryContent binaryContent = new BinaryContent("file1", 1L, "image/jpeg");
-    List<BinaryContent> binaryContents = List.of(binaryContent);
+    @Test
+    void createMessage_withAttachment_success() {
+      //given
+      String content = message.getContent();
+      String channelId = channel.getId().toString();
+      String authorId = author.getId().toString();
+      MockMultipartFile file1 = new MockMultipartFile("file1", "file1", "file1",
+          "file1".getBytes());
+      List<MultipartFile> files = List.of(file1);
 
-    given(channelService.findChannelById(channelId))
-        .willReturn(channel);
-    given(userService.findUserById(authorId))
-        .willReturn(author);
-    given(messageMapper.toEntity(content))
-        .willReturn(message);
-    given(binaryContentMapper.fromMessageFiles(files))
-        .willReturn(binaryContents);
-    given(messageService.createMessage(message))
-        .willReturn(message);
+      BinaryContent binaryContent = new BinaryContent("file1", 1L, "image/jpeg");
+      List<BinaryContent> binaryContents = List.of(binaryContent);
+
+      given(channelService.findChannelById(channelId))
+          .willReturn(channel);
+      given(userService.findUserById(authorId))
+          .willReturn(author);
+      given(messageMapper.toEntity(content))
+          .willReturn(message);
+      given(binaryContentMapper.fromMessageFiles(files))
+          .willReturn(binaryContents);
+      given(messageService.createMessage(message))
+          .willReturn(message);
 //    given(message.getAttachments())
 //        .willReturn(Collections.emptyList());
-    //when
-    Message result = messageManagementService.createMessage(content, channelId, authorId, files);
+      //when
+      Message result = messageManagementService.createMessage(content, channelId, authorId, files);
 
-    //then
-    assertThat(result).isEqualTo(message);
-    assertThat(result.getAttachments()).hasSize(1);
-    then(channelService).should().findChannelById(channelId);
-    then(userService).should().findUserById(authorId);
-    then(binaryContentService).should().saveBinaryContents(binaryContents, files);
-    then(messageMapper).should().toEntity(content);
-    then(messageService).should().createMessage(message);
+      //then
+      assertThat(result).isEqualTo(message);
+      assertThat(result.getAttachments()).hasSize(1);
+      then(channelService).should().findChannelById(channelId);
+      then(userService).should().findUserById(authorId);
+      then(binaryContentService).should().saveBinaryContents(binaryContents, files);
+      then(messageMapper).should().toEntity(content);
+      then(messageService).should().createMessage(message);
+    }
   }
 
-  @Test
-  void findSingleMessage_shouldCall() {
-    // given
-    String messageId = message.getId().toString();
-    given(messageService.getMessageById(messageId)).willReturn(message);
+  @Nested
+  class FindMessage {
 
-    // when
-    Message result = messageManagementService.findSingleMessage(messageId);
+    @Test
+    void findSingleMessage_shouldCall() {
+      // given
+      String messageId = message.getId().toString();
+      given(messageService.getMessageById(messageId)).willReturn(message);
 
-    // then
-    assertThat(result).isEqualTo(message);
-    then(messageService).should().getMessageById(messageId);
+      // when
+      Message result = messageManagementService.findSingleMessage(messageId);
+
+      // then
+      assertThat(result).isEqualTo(message);
+      then(messageService).should().getMessageById(messageId);
+    }
+
+    @Test
+    void findSingleMessage_shouldThrow_messageNotFound() {
+      //given
+      String messageId = UUID.randomUUID().toString();
+      given(messageService.getMessageById(messageId))
+          .willThrow(new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+
+      //when & then
+      assertThatThrownBy(() -> messageManagementService.findSingleMessage(messageId))
+          .isInstanceOf(MessageNotFoundException.class);
+    }
+
+    @Test
+    void findMessagesByChannel_shouldCall() {
+      // given
+      String channelId = channel.getId().toString();
+      Instant cursor = Instant.now();
+      Pageable pageable = PageRequest.of(0, 10);
+      message.addAuthor(author);
+      message.addChannel(channel);
+
+      List<Message> messages = List.of(message);
+
+      Page<Message> page = new PageImpl<>(messages);
+
+      given(messageService.getMessagesByChannelWithCursor(channelId, cursor, pageable))
+          .willReturn(page);
+
+      // when
+      Page<Message> result = messageManagementService.findMessagesByChannel(channelId, cursor,
+          pageable);
+
+      // then
+      assertThat(result).isEqualTo(page);
+      assertThat(result).containsExactly(message);
+      then(messageService).should().getMessagesByChannelWithCursor(channelId, cursor, pageable);
+      then(userService).should().findByAllIn(List.of(author.getId()));
+    }
+  }
+
+  @Nested
+  class UpdateMessage {
+
+    @Test
+    void updateMessage_shouldCall() {
+      String messageId = message.getId().toString();
+      String newContent = "newContent";
+      given(messageService.getMessageById(messageId)).willReturn(message);
+      given(messageService.updateMessage(message, newContent)).willReturn(message);
+
+      //when
+      Message result = messageManagementService.updateMessage(messageId, newContent);
+
+      //then
+      assertThat(result).isEqualTo(message);
+      then(messageService).should().getMessageById(messageId);
+      then(messageService).should().updateMessage(message, newContent);
+    }
+
+    @Test
+    void updateMessage_shouldFail_wrongMessageId() {
+      // given
+      String messageId = UUID.randomUUID().toString();
+      given(messageService.getMessageById(messageId)).willThrow(
+          new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
+
+      // when & then
+      assertThatThrownBy(() -> messageManagementService.updateMessage(messageId, "content"))
+          .isInstanceOf(MessageNotFoundException.class);
+    }
+  }
+
+  @Nested
+  class DeleteMessage {
+
+    @Test
+    void deleteMessage_shouldCall() {
+      String messageId = message.getId().toString();
+
+      //when
+      messageManagementService.deleteMessage(messageId);
+
+      // then
+      then(messageService).should().deleteMessage(messageId);
+    }
   }
 
 
-  @Test
-  void findMessagesByChannel_shouldCall() {
-    // given
-    String channelId = channel.getId().toString();
-    Instant cursor = Instant.now();
-    Pageable pageable = PageRequest.of(0, 10);
-    message.addAuthor(author);
-    message.addChannel(channel);
-
-    List<Message> messages = List.of(message);
-
-    Page<Message> page = new PageImpl<>(messages);
-
-    given(messageService.getMessagesByChannelWithCursor(channelId, cursor, pageable))
-        .willReturn(page);
-
-    // when
-    Page<Message> result = messageManagementService.findMessagesByChannel(channelId, cursor,
-        pageable);
-
-    // then
-    assertThat(result).isEqualTo(page);
-    assertThat(result).containsExactly(message);
-    then(messageService).should().getMessagesByChannelWithCursor(channelId, cursor, pageable);
-    then(userService).should().findByAllIn(List.of(author.getId()));
-  }
-
-  @Test
-  void updateMessage_shouldCall() {
-    String messageId = message.getId().toString();
-    String newContent = "newContent";
-    given(messageService.getMessageById(messageId)).willReturn(message);
-    given(messageService.updateMessage(message, newContent)).willReturn(message);
-
-    //when
-    Message result = messageManagementService.updateMessage(messageId, newContent);
-
-    //then
-    assertThat(result).isEqualTo(message);
-    then(messageService).should().getMessageById(messageId);
-    then(messageService).should().updateMessage(message, newContent);
-  }
-
-  @Test
-  void updateMessage_shouldFail_wrongMessageId() {
-    // given
-    String messageId = UUID.randomUUID().toString();
-    given(messageService.getMessageById(messageId)).willThrow(
-        new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
-
-    // when & then
-    assertThatThrownBy(() -> messageManagementService.updateMessage(messageId, "content"))
-        .isInstanceOf(MessageNotFoundException.class);
-  }
-
-  @Test
-  void deleteMessage_shouldCall() {
-    String messageId = message.getId().toString();
-
-    //when
-    messageManagementService.deleteMessage(messageId);
-
-    // then
-    then(messageService).should().deleteMessage(messageId);
-  }
 }

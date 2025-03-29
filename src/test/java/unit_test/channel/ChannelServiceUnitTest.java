@@ -22,11 +22,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataIntegrityViolationException;
 import unit_test.TestEntityFactory;
 
 @ExtendWith(MockitoExtension.class)
@@ -50,147 +52,193 @@ public class ChannelServiceUnitTest {
     privateChannel = TestEntityFactory.createPrivateChannel();
   }
 
+  @Nested
+  class CreateChannel {
 
-  @Test
-  void validateUserAccess_shouldDoNothing_whenPublicChannel() {
-    //when
-    basicChannelService.validateUserAccess(publicChannel, user);
+    @Test
+    void createChannel_shouldCall_Success() {
+      // given
+      given(channelRepository.save(privateChannel)).willReturn(privateChannel);
 
-    //then
-    then(readStatusRepository).shouldHaveNoInteractions();
+      // when
+      Channel result = basicChannelService.createPrivateChannel(privateChannel);
+
+      //then
+      assertThat(result).isEqualTo(privateChannel);
+      then(channelRepository).should().save(privateChannel);
+    }
+
+    @Test
+    void createChannel_shouldCall_fail() {
+      //given
+      given(channelRepository.save(privateChannel))
+          .willThrow(DataIntegrityViolationException.class);
+
+      // then when
+      assertThatThrownBy(() -> basicChannelService.createPrivateChannel(privateChannel))
+          .isInstanceOf(DataIntegrityViolationException.class);
+    }
   }
 
-  @Test
-  void validateUserAccess_shouldThrowException_emptyStatus() {
-    //given
-    given(readStatusRepository.findByUserAndChannel(user, privateChannel))
-        .willReturn(Optional.empty());
+  @Nested
+  class ValidateAccess {
 
-    //when & then
-    assertThatThrownBy(
-        () -> basicChannelService.validateUserAccess(privateChannel, user))
-        .isInstanceOf(ChannelException.class)
-        .hasMessageContaining(ErrorCode.NO_ACCESS_TO_CHANNEL.getMessage());
+    @Test
+    void validateUserAccess_shouldDoNothing_whenPublicChannel() {
+      //when
+      basicChannelService.validateUserAccess(publicChannel, user);
+
+      //then
+      then(readStatusRepository).shouldHaveNoInteractions();
+    }
+
+    @Test
+    void validateUserAccess_shouldThrowException_emptyStatus() {
+      //given
+      given(readStatusRepository.findByUserAndChannel(user, privateChannel))
+          .willReturn(Optional.empty());
+
+      //when & then
+      assertThatThrownBy(
+          () -> basicChannelService.validateUserAccess(privateChannel, user))
+          .isInstanceOf(ChannelException.class)
+          .hasMessageContaining(ErrorCode.NO_ACCESS_TO_CHANNEL.getMessage());
+    }
+
+    @Test
+    void validateUserAccess_shouldDoNothing_whenPrivateChannelWithAccess() {
+      //given
+      ReadStatus status = TestEntityFactory.createReadStatus(privateChannel, user);
+      given(readStatusRepository.findByUserAndChannel(user, privateChannel))
+          .willReturn(Optional.of(status));
+
+      //when
+      basicChannelService.validateUserAccess(privateChannel, user);
+
+      // then
+      then(readStatusRepository).should().findByUserAndChannel(user, privateChannel);
+    }
   }
 
-  @Test
-  void validateUserAccess_shouldDoNothing_whenPrivateChannelWithAccess() {
-    //given
-    ReadStatus status = TestEntityFactory.createReadStatus(privateChannel, user);
-    given(readStatusRepository.findByUserAndChannel(user, privateChannel))
-        .willReturn(Optional.of(status));
+  @Nested
+  class FindChannel {
 
-    //when
-    basicChannelService.validateUserAccess(privateChannel, user);
+    @Test
+    void testFindChannelById_success() {
+      // given
+      String channelId = privateChannel.getId().toString();
+      given(channelRepository.findById(UUID.fromString(channelId))).willReturn(
+          Optional.ofNullable(privateChannel));
 
-    // then
-    then(readStatusRepository).should().findByUserAndChannel(user, privateChannel);
+      // when
+      Channel result = basicChannelService.findChannelById(channelId);
+
+      // then
+
+      assertThat(result).isEqualTo(privateChannel);
+      then(channelRepository).should().findById(UUID.fromString(channelId));
+    }
+
+    @Test
+    void testFindChannelById_notFound() {
+      //given
+      String channelId = privateChannel.getId().toString();
+      given(channelRepository.findById(UUID.fromString(channelId)))
+          .willReturn(Optional.empty());
+
+      //when & then
+      assertThatThrownBy(() -> basicChannelService.findChannelById(channelId))
+          .isInstanceOf(ChannelNotFoundException.class)
+          .hasMessageContaining(ErrorCode.CHANNEL_NOT_FOUND.getMessage());
+    }
+
+    @Test
+    void testFindAllChannelsInOrPublic_shouldReturnList() {
+      // given
+      List<UUID> ids = List.of(privateChannel.getId(), publicChannel.getId());
+      given(channelRepository.findByIdInOrType(ids, ChannelType.PUBLIC))
+          .willReturn(List.of(privateChannel, publicChannel));
+
+      // when
+      List<Channel> result = basicChannelService.findAllChannelsInOrPublic(ids);
+
+      // then
+      assertThat(result).containsExactlyInAnyOrder(privateChannel, publicChannel);
+      then(channelRepository).should().findByIdInOrType(ids, ChannelType.PUBLIC);
+    }
+
   }
 
-  @Test
-  void testFindChannelById_success() {
-    // given
-    String channelId = privateChannel.getId().toString();
-    given(channelRepository.findById(UUID.fromString(channelId))).willReturn(
-        Optional.ofNullable(privateChannel));
+  @Nested
+  class UpdateChannel {
 
-    // when
-    Channel result = basicChannelService.findChannelById(channelId);
+    @Test
+    void testUpdateChannel_success() {
+      // given
+      ChannelUpdateDto updateDto = new ChannelUpdateDto("updated", "updated description");
+      Channel updatedChannel = TestEntityFactory.createPublicChannel();
 
-    // then
+      updatedChannel.updateChannelName(updateDto.newName());
+      updatedChannel.updateDescription(updateDto.newDescription());
 
-    assertThat(result).isEqualTo(privateChannel);
-    then(channelRepository).should().findById(UUID.fromString(channelId));
+      given(channelRepository.findById(publicChannel.getId()))
+          .willReturn(Optional.ofNullable(publicChannel));
+      given(channelRepository.save(any(Channel.class)))
+          .willReturn(updatedChannel);
+
+      // when
+      Channel result = basicChannelService.updateChannel(publicChannel.getId().toString(),
+          updateDto);
+
+      // then
+      assertThat(result.getName()).isEqualTo("updated");
+      then(channelRepository).should().findById(publicChannel.getId());
+      then(channelRepository).should().save(publicChannel);
+    }
+
+    @Test
+    void testUpdateChannel_shouldThrow_whenPrivateChannel() {
+      // given
+      ChannelUpdateDto dto = new ChannelUpdateDto("n", "n");
+      given(channelRepository.findById(privateChannel.getId()))
+          .willReturn(Optional.ofNullable(privateChannel));
+
+      // when & then
+      assertThatThrownBy(() ->
+          basicChannelService.updateChannel(privateChannel.getId().toString(), dto))
+          .isInstanceOf(PrivateChannelUpdateException.class)
+          .hasMessageContaining(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED.getMessage());
+      then(channelRepository).should().findById(privateChannel.getId());
+    }
+
+    @Test
+    void testUpdateChannel_shouldThrow_whenNotFound() {
+      // given
+      UUID id = UUID.randomUUID();
+      ChannelUpdateDto dto = new ChannelUpdateDto("n", "n");
+      given(channelRepository.findById(id)).willReturn(Optional.empty());
+
+      // when & then
+      assertThatThrownBy(() -> basicChannelService.updateChannel(id.toString(), dto))
+          .isInstanceOf(ChannelNotFoundException.class)
+          .hasMessageContaining(ErrorCode.CHANNEL_NOT_FOUND.getMessage());
+    }
   }
 
-  @Test
-  void testFindChannelById_notFound() {
-    //given
-    String channelId = privateChannel.getId().toString();
-    given(channelRepository.findById(UUID.fromString(channelId)))
-        .willReturn(Optional.empty());
+  @Nested
+  class DeleteChannel {
 
-    //when & then
-    assertThatThrownBy(() -> basicChannelService.findChannelById(channelId))
-        .isInstanceOf(ChannelNotFoundException.class)
-        .hasMessageContaining(ErrorCode.CHANNEL_NOT_FOUND.getMessage());
+    @Test
+    void testDeleteChannel() {
+      //given
+      UUID id = UUID.randomUUID();
+
+      //when
+      basicChannelService.deleteChannel(id.toString());
+
+      //then
+      then(channelRepository).should().deleteById(id);
+    }
   }
 
-  @Test
-  void testFindAllChannelsInOrPublic_shouldReturnList() {
-    // given
-    List<UUID> ids = List.of(privateChannel.getId(), publicChannel.getId());
-    given(channelRepository.findByIdInOrType(ids, ChannelType.PUBLIC))
-        .willReturn(List.of(privateChannel, publicChannel));
-
-    // when
-    List<Channel> result = basicChannelService.findAllChannelsInOrPublic(ids);
-
-    // then
-    assertThat(result).containsExactlyInAnyOrder(privateChannel, publicChannel);
-    then(channelRepository).should().findByIdInOrType(ids, ChannelType.PUBLIC);
-  }
-
-  @Test
-  void testUpdateChannel_success() {
-    // given
-    ChannelUpdateDto updateDto = new ChannelUpdateDto("updated", "updated description");
-    Channel updatedChannel = TestEntityFactory.createPublicChannel();
-
-    updatedChannel.updateChannelName(updateDto.newName());
-    updatedChannel.updateDescription(updateDto.newDescription());
-
-    given(channelRepository.findById(publicChannel.getId()))
-        .willReturn(Optional.ofNullable(publicChannel));
-    given(channelRepository.save(any(Channel.class)))
-        .willReturn(updatedChannel);
-
-    // when
-    Channel result = basicChannelService.updateChannel(publicChannel.getId().toString(), updateDto);
-
-    // then
-    assertThat(result.getName()).isEqualTo("updated");
-    then(channelRepository).should().findById(publicChannel.getId());
-    then(channelRepository).should().save(publicChannel);
-  }
-
-  @Test
-  void testUpdateChannel_shouldThrow_whenPrivateChannel() {
-    // given
-    ChannelUpdateDto dto = new ChannelUpdateDto("n", "n");
-    given(channelRepository.findById(privateChannel.getId()))
-        .willReturn(Optional.ofNullable(privateChannel));
-
-    // when & then
-    assertThatThrownBy(() ->
-        basicChannelService.updateChannel(privateChannel.getId().toString(), dto))
-        .isInstanceOf(PrivateChannelUpdateException.class)
-        .hasMessageContaining(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED.getMessage());
-    then(channelRepository).should().findById(privateChannel.getId());
-  }
-
-  @Test
-  void testUpdateChannel_shouldThrow_whenNotFound() {
-    // given
-    UUID id = UUID.randomUUID();
-    ChannelUpdateDto dto = new ChannelUpdateDto("n", "n");
-    given(channelRepository.findById(id)).willReturn(Optional.empty());
-
-    // when & then
-    assertThatThrownBy(() -> basicChannelService.updateChannel(id.toString(), dto))
-        .isInstanceOf(ChannelNotFoundException.class)
-        .hasMessageContaining(ErrorCode.CHANNEL_NOT_FOUND.getMessage());
-  }
-
-  @Test
-  void testDeleteChannel() {
-    //given
-    UUID id = UUID.randomUUID();
-
-    //when
-    basicChannelService.deleteChannel(id.toString());
-
-    //then
-    then(channelRepository).should().deleteById(id);
-  }
 }
