@@ -1,12 +1,12 @@
 package unit_test;
 
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.UUID;
 import org.springframework.test.util.ReflectionTestUtils;
 
@@ -32,21 +32,12 @@ public class TestEntityFactory {
   }
 
   public static Message createMessageWithNoAttachments() {
-    Message message = new Message("content", null, null, null);
+    Message message = new Message("content", null, null, new ArrayList<>());
     ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
     ReflectionTestUtils.setField(message, "createdAt", Instant.now());
     return message;
   }
 
-  public static Message createMessageWithAttachments() {
-    Message message = new Message("content", null, null, null);
-    BinaryContent content = new BinaryContent("name", 1L, "image/jpeg");
-    ReflectionTestUtils.setField(content, "id", UUID.randomUUID());
-    ReflectionTestUtils.setField(message, "id", UUID.randomUUID());
-    message.addAttachment(content);
-
-    return message;
-  }
 
   public static ReadStatus createReadStatus(Channel channel, User user) {
     ReadStatus status = new ReadStatus(channel, user);
