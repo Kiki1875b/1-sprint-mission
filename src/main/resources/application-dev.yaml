@@ -8,6 +8,6 @@ spring:
 logging:
   level:
     p6spy: INFO
-    root: DEBUG
+    root: INFO
 server:
   port: 8080

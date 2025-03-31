@@ -73,7 +73,6 @@ public class ChannelManagementServiceImpl implements ChannelManagementService {
     List<Channel> channels = channelService.findAllChannelsInOrPublic(extractedChannelIds);
 
     List<ReadStatus> secondStatuses = getDifferentReadStatuses(channels, extractedChannelIds);
-
     List<UUID> newChannelIds = secondStatuses.stream().map(status -> status.getChannel().getId())
         .distinct().collect(Collectors.toList());
 

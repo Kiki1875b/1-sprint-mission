@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -83,68 +82,6 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
     return channelMapper.toDto(channel, lastMessageTime, participants);
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<ChannelResponseDto> findAllChannelsByUserId(String userId) {
-
-    List<Channel> channels = channelService.findAllChannelsByUserId(userId);
-    Map<UUID, Instant> latestMessageTimeByChannel = messageService.getLatestMessageForChannels(
-        channels);
-    Map<UUID, List<User>> channelParticipants = channelMapper.channelToParticipants(channels);
-
-    return channelMapper.toListResponse(channels, latestMessageTimeByChannel, channelParticipants);
-  }
-
-  @Override
-  // userId 가 주어졌을때, 해당 user 가 참여중인 체널은 readstatus에 정보가 있다. 하지만, 해당 user가 참여중이지 않은 채널은 첫 쿼리에서 불러오지 못한다 -> 불러오려면 join
-  @Transactional(readOnly = true)
-  public List<ChannelResponseDto> findAllChannelsByUserIdV2(String userId) {
-
-    // 쿼리 2번 -> userId 로 user 의 read status + 불러온 read status 에 포함된 모든 channel 의 다른 user 의 read status
-    List<ReadStatus> statuses = readStatusService.findAllByUserId(userId);
-    List<UUID> channelIds = statuses.stream().map(status -> status.getChannel().getId()).distinct()
-        .collect(Collectors.toList());
-    // 쿼리 1번 -> 불러온 read_status 들의 channel 로 channel 쿼리
-    List<Channel> channels = channelService.findAllChannelsInOrPublic(channelIds);
-
-    // 불러온 channelId -> channelIds 랑 다른점 : public 포함
-    List<UUID> fetchedChannelIds = channels.stream().map(c -> c.getId())
-        .collect(Collectors.toList());
-    // 기존 channelIds 와 fetchedChannelIds 의 다른 id 목록
-    List<UUID> difference = fetchedChannelIds.stream()
-        .filter(id -> !channelIds.contains(id))
-        .collect(Collectors.toList());
-
-    // 쿼리 1번 -> 기존에 없던 channelIds 에 대한 read_status 쿼리
-    List<ReadStatus> newReadStatus = readStatusService.findAllInChannel(difference);
-
-    List<UUID> newChannelIds = newReadStatus.stream().map(status -> status.getChannel().getId())
-        .distinct().collect(Collectors.toList());
-    // 쿼리 1번 -> 기존에 없던 channel 쿼리
-    List<Channel> newChannels = channelService.findAllChannelsInOrPublic(newChannelIds);
-
-    // 체널 목록 중복 제거
-    List<Channel> mergedChannels = Stream.concat(channels.stream(), newChannels.stream())
-        .distinct()
-        .collect(Collectors.toList());
-
-    List<ReadStatus> mergedStatuses = Stream.concat(newReadStatus.stream(), statuses.stream())
-        .distinct()
-        .collect(Collectors.toList());
-
-    List<String> userIds = mergedStatuses.stream()
-        .map(status -> status.getUser().getId().toString()).collect(Collectors.toList());
-
-    List<User> users = userService.findAllUsersIn(userIds);
-
-    Map<UUID, Instant> latestMessageTimeByChannel = messageService.getLatestMessageForChannels(
-        mergedChannels);
-
-    Map<UUID, List<User>> channelParticipants = channelMapper.channelToParticipants(mergedChannels);
-
-    return channelMapper.toListResponse(mergedChannels, latestMessageTimeByChannel,
-        channelParticipants);
-  }
 
   @Override
   @Transactional(readOnly = true)

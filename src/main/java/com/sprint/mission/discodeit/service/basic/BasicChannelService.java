@@ -78,12 +78,12 @@ public class BasicChannelService implements ChannelService {
     return channelRepository.findAllByType(type);
   }
 
-  @Override
-  @Transactional
-  public List<Channel> findAllChannelsByUserId(String userId) {
-    List<Channel> privateChannel = channelRepository.findPrivateChannels(UUID.fromString(userId));
-    return privateChannel;
-  }
+//  @Override
+//  @Transactional
+//  public List<Channel> findAllChannelsByUserId(String userId) {
+//    List<Channel> privateChannel = channelRepository.findPrivateChannels(UUID.fromString(userId));
+//    return privateChannel;
+//  }
 
   @Override
   @Transactional
