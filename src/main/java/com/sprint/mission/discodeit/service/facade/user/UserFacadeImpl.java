@@ -9,12 +9,12 @@ import com.sprint.mission.discodeit.service.user.UserManagementService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
-@Component
+@Service
 @RequiredArgsConstructor
 public class UserFacadeImpl implements UserFacade {
 
