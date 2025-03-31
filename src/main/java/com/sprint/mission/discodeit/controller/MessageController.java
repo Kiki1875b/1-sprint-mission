@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.controller.openapi.MessageApiDocs;
 import com.sprint.mission.discodeit.dto.message.CreateMessageDto;
 import com.sprint.mission.discodeit.dto.message.MessageResponseDto;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateDto;
@@ -35,29 +34,30 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")
-public class MessageController implements MessageApiDocs {
+public class MessageController {
 
   private final MessageFacade messageFacade;
 
-  @Override
+  //  @Override
   @PostMapping(
       value = "/messages",
       consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
       produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<MessageResponseDto> sendMessage(
-      @Valid @RequestPart(value = "messageCreateRequest") CreateMessageDto messageDto,
+      @Valid @RequestPart(value = "messageCreateRequest") CreateMessageDto messageCreateRequest,
       @RequestPart(value = "attachments", required = false) List<MultipartFile> files) {
 
-    log.debug("[SEND MESSAGE REQUEST] : [CHANNEL_ID: {}][AUTHOR_ID: {}]", messageDto.channelId(),
-        messageDto.authorId());
-    MessageResponseDto message = messageFacade.createMessage(messageDto, files);
+    log.debug("[SEND MESSAGE REQUEST] : [CHANNEL_ID: {}][AUTHOR_ID: {}]",
+        messageCreateRequest.channelId(),
+        messageCreateRequest.authorId());
+    MessageResponseDto message = messageFacade.createMessage(messageCreateRequest, files);
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
 
   }
 
 
-  @Override
+  //  @Override
   @PatchMapping("/messages/{messageId}")
   public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId,
       @Valid @RequestBody MessageUpdateDto messageDto) {
@@ -67,7 +67,7 @@ public class MessageController implements MessageApiDocs {
     return ResponseEntity.ok(message);
   }
 
-  @Override
+  //  @Override
   @DeleteMapping("/messages/{messageId}")
   public ResponseEntity<Void> deleteMessage(@PathVariable String messageId) {
 
@@ -77,7 +77,7 @@ public class MessageController implements MessageApiDocs {
     return ResponseEntity.noContent().build();
   }
 
-  @Override
+  //  @Override
   @GetMapping("/messages")
   public ResponseEntity<PageResponse<MessageResponseDto>> getChannelMessages(
       @RequestParam String channelId,
