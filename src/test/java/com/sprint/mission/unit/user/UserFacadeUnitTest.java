@@ -1,4 +1,4 @@
-package unit_test.user;
+package com.sprint.mission.unit.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -16,6 +16,7 @@ import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.service.facade.user.UserFacadeImpl;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
+import com.sprint.mission.unit.TestEntityFactory;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
-import unit_test.TestEntityFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class UserFacadeUnitTest {

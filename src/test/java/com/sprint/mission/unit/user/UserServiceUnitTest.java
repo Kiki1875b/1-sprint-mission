@@ -1,4 +1,4 @@
-package unit_test.user;
+package com.sprint.mission.unit.user;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

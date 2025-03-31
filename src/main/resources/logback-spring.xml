@@ -23,7 +23,7 @@
   </appender>
 
   <springProfile name="dev">
-    <root level="INFO"> <!-- DEBUG 로 바꾸기 -->
+    <root level="INFO">
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
     </root>
@@ -33,6 +33,12 @@
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="test">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
     </root>
   </springProfile>
 </configuration>

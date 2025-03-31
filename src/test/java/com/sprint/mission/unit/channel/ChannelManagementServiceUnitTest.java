@@ -1,4 +1,4 @@
-package unit_test.channel;
+package com.sprint.mission.unit.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.service.channel.ChannelManagementServiceImpl
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.message.MessageService;
 import com.sprint.mission.discodeit.service.user.UserService;
+import com.sprint.mission.unit.TestEntityFactory;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +29,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-import unit_test.TestEntityFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class ChannelManagementServiceUnitTest {
@@ -67,9 +67,16 @@ public class ChannelManagementServiceUnitTest {
     void createPrivateChannel_success() {
       // given
       List<User> users = List.of(user1, user2);
-      List<String> userIds = List.of(user1.getId().toString(), user2.getId().toString());
+
+      List<String> userIds = List.of(
+          user1.getId().toString(),
+          user2.getId().toString()
+      );
+
       given(userService.findAllUsersIn(userIds)).willReturn(users);
-      given(channelService.createPrivateChannel(any(Channel.class))).willReturn(privateChannel);
+
+      given(channelService.createPrivateChannel(any(Channel.class)))
+          .willReturn(privateChannel);
 
       //when
       Channel result = channelManagementService.createPrivateChannel(privateChannel, userIds);
@@ -77,6 +84,7 @@ public class ChannelManagementServiceUnitTest {
       //then
       assertThat(result).isEqualTo(privateChannel);
       assertThat(privateChannel.getStatuses()).hasSize(2);
+      
       then(userService).should().findAllUsersIn(userIds);
       then(channelService).should().createPrivateChannel(privateChannel);
     }

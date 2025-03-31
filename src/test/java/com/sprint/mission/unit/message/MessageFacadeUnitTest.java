@@ -1,4 +1,4 @@
-package unit_test.message;
+package com.sprint.mission.unit.message;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -19,6 +19,7 @@ import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.facade.message.MessageFacadeImpl;
 import com.sprint.mission.discodeit.service.message.MessageManagementService;
+import com.sprint.mission.unit.TestEntityFactory;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -33,7 +34,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import unit_test.TestEntityFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class MessageFacadeUnitTest {

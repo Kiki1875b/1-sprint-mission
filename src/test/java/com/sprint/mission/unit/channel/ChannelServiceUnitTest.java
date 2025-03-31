@@ -1,4 +1,4 @@
-package unit_test.channel;
+package com.sprint.mission.unit.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateExcept
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.unit.TestEntityFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +30,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.DataIntegrityViolationException;
-import unit_test.TestEntityFactory;
 
 @ExtendWith(MockitoExtension.class)
 public class ChannelServiceUnitTest {

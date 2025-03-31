@@ -54,7 +54,7 @@ info:
 
 logging:
   level:
-    p6spy: DEBUG
+    p6spy: INFO
     root: INFO
 
 

@@ -1,4 +1,4 @@
-package unit_test.channel;
+package com.sprint.mission.unit.channel;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

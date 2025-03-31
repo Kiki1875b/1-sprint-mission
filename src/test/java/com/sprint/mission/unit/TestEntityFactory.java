@@ -1,4 +1,4 @@
-package unit_test;
+package com.sprint.mission.unit;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
