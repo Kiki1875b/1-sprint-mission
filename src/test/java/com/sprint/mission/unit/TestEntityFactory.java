@@ -1,5 +1,6 @@
 package com.sprint.mission.unit;
 
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -43,5 +44,11 @@ public class TestEntityFactory {
     ReadStatus status = new ReadStatus(channel, user);
     ReflectionTestUtils.setField(status, "id", UUID.randomUUID());
     return status;
+  }
+
+  public static BinaryContent createBinaryContent() {
+    BinaryContent content = new BinaryContent("testFile", 100L, "image/jpeg");
+    ReflectionTestUtils.setField(content, "id", UUID.randomUUID());
+    return content;
   }
 }
