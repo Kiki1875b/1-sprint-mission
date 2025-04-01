@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -81,10 +82,10 @@ public class UserController implements UserApiDocs {
 
   @Override
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteUser(@PathVariable String id) {
+  public ResponseEntity<Void> deleteUser(@PathVariable UUID id) {
 
     log.debug("[DELETE USER REQUEST] : [ID: {}]", id);
-    userFacade.deleteUser(id);
+    userFacade.deleteUser(id.toString());
 
     log.debug("[DELETED USER] : [ID: {}]", id);
     return ResponseEntity.noContent().build();

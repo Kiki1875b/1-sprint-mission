@@ -46,6 +46,7 @@ public class ChannelControllerTest {
     String channelId = UUID.randomUUID().toString();
     List<String> participantIds = List.of(UUID.randomUUID().toString(),
         UUID.randomUUID().toString());
+
     CreatePrivateChannelDto dto = new CreatePrivateChannelDto(participantIds);
     ChannelResponseDto response = new ChannelResponseDto(
         channelId,
@@ -73,6 +74,7 @@ public class ChannelControllerTest {
   @Test
   @DisplayName("POST /api/channels/private - 비공개 채널 생성 실패 (빈 dto)")
   void createPrivateChannel_fail() throws Exception {
+
     //given
     CreatePrivateChannelDto dto = new CreatePrivateChannelDto(null);
 
@@ -117,6 +119,8 @@ public class ChannelControllerTest {
         .andExpect(jsonPath("$.type").value("PUBLIC"));
   }
 
+  // TODO : 공개 채널 생성 실패
+
   @Test
   @DisplayName("PATCH /api/channels/{channelId}")
   void updateChannel_success() throws Exception {
@@ -145,5 +149,7 @@ public class ChannelControllerTest {
         .andExpect(jsonPath("$.name").value("newName"));
   }
 
-  // TODO : 나머지 메서드
+  // TODO : 채널 업데이트 실패 (파라미터 오류, private channel)
+  // TODO : deleteChannel 성공, 실패
+  // TODO : findChannelVisibleToUser 성공 실패
 }

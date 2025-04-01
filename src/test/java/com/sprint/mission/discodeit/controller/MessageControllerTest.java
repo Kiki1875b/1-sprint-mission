@@ -130,6 +130,8 @@ public class MessageControllerTest {
         .andExpect(jsonPath("$.id").value(id));
   }
 
+  // TODO : updateMessage 실패 케이스
+
 
   @Test
   @DisplayName("DELETE /api/messages/{id} - 성공")
@@ -138,6 +140,7 @@ public class MessageControllerTest {
         .andExpect(status().isNoContent());
   }
 
+  // TODO : DeleteMessage 실패 케이스
 
   @Test
   @DisplayName("GET /api/messages - 성공")
@@ -152,6 +155,7 @@ public class MessageControllerTest {
     mockMvc.perform(get("/api/messages").param("channelId", channelId))
         .andExpect(status().isOk());
   }
+  // TODO : getChannelMessages 실패 케이스
 
   // TODO : 성공 실패 예외 및 나머지 메서드 테스트
 }

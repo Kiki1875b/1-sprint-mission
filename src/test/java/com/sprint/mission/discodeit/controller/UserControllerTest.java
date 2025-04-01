@@ -138,6 +138,8 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.[1].username").value("u2"));
   }
 
+  // TODO : getUsers 실패
+
   @Test
   @DisplayName("PATCH /api/users/{id} - 성공")
   void updateUsers_success() throws Exception {
@@ -175,6 +177,7 @@ public class UserControllerTest {
         .andExpect(jsonPath("$.username").value("updated"));
   }
 
+  // TODO : updateUser 실패
 
   @Test
   @DisplayName("DELETE /api/users/{id} - success")

@@ -9,10 +9,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 @Slf4j
 @RestControllerAdvice
@@ -78,6 +81,41 @@ public class GlobalExceptionHandler {
     return ResponseEntity.status(er.getStatus()).body(er);
   }
 
+  @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+  public ResponseEntity<ErrorResponse> handleMethodArgumentMismatchException(
+      MethodArgumentTypeMismatchException ex) {
+    Map<String, Object> details = new HashMap<>();
+
+    details.put(ex.getParameter().getParameterName(), ex.getValue());
+    ErrorResponse er = new ErrorResponse(
+        Instant.now(),
+        "INVALID FORMAT",
+        "잘못된 형식의 입력입니다.",
+        details,
+        ex.getClass().getSimpleName(),
+        HttpStatus.BAD_REQUEST.value()
+    );
+
+    return ResponseEntity.status(er.getStatus()).body(er);
+  }
+
+  @ExceptionHandler(DataIntegrityViolationException.class)
+  public ResponseEntity<ErrorResponse> handleDataIntegrityViolationException(
+      DataIntegrityViolationException ex) {
+    Map<String, Object> details = new HashMap<>();
+    details.put("error", ex.getMostSpecificCause().getMessage());
+
+    ErrorResponse er = new ErrorResponse(
+        Instant.now(),
+        "DUPLICATE_ERROR",
+        "중복된 데이터로 인한 오류가 발생했습니다.",
+        details,
+        ex.getClass().getSimpleName(),
+        HttpStatus.CONFLICT.value()
+    );
+
+    return ResponseEntity.status(HttpStatus.CONFLICT).body(er);
+  }
 
   @ExceptionHandler(Exception.class)
   public ResponseEntity<ErrorResponse> handleException(Exception ex) {
