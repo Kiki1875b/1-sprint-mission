@@ -55,6 +55,7 @@ public class MessageFacadeImpl implements MessageFacade {
 
     Page<Message> messagePage = messageManagementService.findMessagesByChannel(channelId,
         nextCursor, pageable);
+
     List<MessageResponseDto> dtoList = messageMapper.fromEntityList(messagePage.getContent());
 
     Instant newCursor = dtoList.isEmpty() ? null : dtoList.get(dtoList.size() - 1).createdAt();

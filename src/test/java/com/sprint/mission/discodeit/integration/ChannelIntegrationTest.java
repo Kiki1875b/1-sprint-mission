@@ -99,7 +99,7 @@ public class ChannelIntegrationTest {
 
     assertThat(response.getStatusCode().is4xxClientError()).isTrue();
     assertThat(response.getBody().getExceptionType()).isEqualTo(
-        "MethodArgumentTypeMismatchException");
+        "MethodArgumentNotValidException");
   }
 
   @Test
