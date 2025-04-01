@@ -6,12 +6,15 @@ import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.user.UserService;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import javax.sql.DataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
@@ -25,6 +28,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
+
+  @Autowired
+  private DataSource dataSource;
+
 
   @Override
   @Transactional
@@ -59,7 +66,13 @@ public class BasicUserService implements UserService {
   @Transactional(readOnly = true)
   public List<User> findAllUsersIn(List<String> userIds) {
     log.debug("[VALIDATING USERS] : [ID: {}]", userIds);
-
+    try {
+      System.out.println(dataSource.getConnection().getMetaData().getURL());
+    } catch (SQLException e) {
+      throw new RuntimeException(e);
+    }
+    System.out.println("HASH:" + userRepository.hashCode());
+    System.out.println(userRepository.getClass());
     List<UUID> userUuids = parseStringToUuid(userIds);
 
     // TODO : 상세 exception message 작성

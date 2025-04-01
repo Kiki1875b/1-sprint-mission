@@ -24,6 +24,9 @@ spring:
     properties:
       hibernate:
         show_sql: false
+  sql:
+    init:
+      mode: never
 
 
 
