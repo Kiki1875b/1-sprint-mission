@@ -70,11 +70,15 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   @Override
   public List<BinaryContent> saveBinaryContents(List<BinaryContent> contents,
       List<MultipartFile> files) {
+
     if (contents == null || contents.isEmpty()) {
       return Collections.emptyList();
     }
+
     List<BinaryContent> savedContents = binaryContentRepository.saveAll(contents);
+
     binaryContentRepository.flush();
+    
     log.debug("[SAVED METADATA FOR FILES]");
     log.debug("[WRITING FILE...]");
     for (MultipartFile file : files) {

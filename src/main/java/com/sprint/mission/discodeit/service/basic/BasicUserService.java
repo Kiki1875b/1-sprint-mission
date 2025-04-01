@@ -31,7 +31,6 @@ public class BasicUserService implements UserService {
   @Autowired
   private DataSource dataSource;
 
-
   @Override
   @Transactional
   public User saveUser(User user) {
