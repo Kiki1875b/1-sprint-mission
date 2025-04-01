@@ -219,7 +219,7 @@ public class ChannelIntegrationTest {
 
   @Test
   @DisplayName("존재하지 않는 채널 삭제 시도시 예외가 발생하지 않는다")
-  void deleteChannelthatDoesNotExists_success() throws Exception {
+  void deleteChannelThatDoesNotExists_success() throws Exception {
     // when
     String channelId = "00000000-0000-0000-0000-000000000003";
 

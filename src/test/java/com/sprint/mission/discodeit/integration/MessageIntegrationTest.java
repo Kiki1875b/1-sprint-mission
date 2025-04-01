@@ -71,6 +71,7 @@ public class MessageIntegrationTest {
   @Sql(scripts = "/cleanup.sql", executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
   @DisplayName("첨부파일 있는 메세지를 생성할 수 있다")
   void sendMessage_success() throws Exception {
+    
     //given
     String channelId = "00000000-0000-0000-0000-000000000001";
     String authorId = "00000000-0000-0000-0000-000000000002";
