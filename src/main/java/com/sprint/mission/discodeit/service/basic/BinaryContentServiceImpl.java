@@ -37,6 +37,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public ResponseEntity<Resource> download(String id) {
     ResponseEntity<?> response = null;
     try {
+
       log.debug("[DOWNLOAD START] : [ID : {}]", id);
       response = binaryContentStorage.download(UUID.fromString(id));
     } catch (IOException e) {
@@ -52,6 +53,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     log.warn("[FAILED TO RETURN RESOURCE] : [ID : {}]", id);
     throw new FileException(ErrorCode.FILE_ERROR, Map.of("fildId", id));
+
   }
 
   @Override
@@ -78,7 +80,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
     List<BinaryContent> savedContents = binaryContentRepository.saveAll(contents);
 
     binaryContentRepository.flush();
-    
+
     log.debug("[SAVED METADATA FOR FILES]");
     log.debug("[WRITING FILE...]");
     for (MultipartFile file : files) {
@@ -148,7 +150,6 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
   @Override
   public List<BinaryContent> findAll() {
-
     return binaryContentRepository.findAll();
   }
 }

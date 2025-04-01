@@ -27,6 +27,7 @@ public class UserFacadeImpl implements UserFacade {
     User user = userMapper.toEntity(request);
     User createdUser = userManagementService.createUser(user, profile);
     log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
+
     return userMapper.toDto(createdUser);
   }
 
@@ -44,6 +45,7 @@ public class UserFacadeImpl implements UserFacade {
     User tmpUser = userMapper.toEntity(updateDto);
     User updatedUser = userManagementService.updateUser(userId, tmpUser, profile);
     log.debug("[UPDATED USER] : [ID : {}]", userId);
+
     return userMapper.toDto(updatedUser);
   }
 

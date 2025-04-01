@@ -37,6 +37,5 @@ public class UserStatusServiceImpl implements UserStatusService {
         userId,
         updateTime
     );
-
   }
 }

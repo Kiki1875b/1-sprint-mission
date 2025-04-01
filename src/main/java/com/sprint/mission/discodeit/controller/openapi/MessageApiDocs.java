@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Tag(name = "Message API", description = "Message 작업")
 public interface MessageApiDocs {
 
@@ -84,5 +85,6 @@ public interface MessageApiDocs {
       @Parameter(required = true, description = "조회할 Channel UUID") String channelId,
       Instant cursor,
       Pageable pageable);
+
 
 }

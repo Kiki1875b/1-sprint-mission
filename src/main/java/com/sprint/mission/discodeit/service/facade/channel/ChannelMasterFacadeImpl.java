@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -62,9 +63,11 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   @Override
   @Transactional
   public ChannelResponseDto createPublicChannel(CreateChannelDto channelDto) {
+
     Channel channel = channelManagementService.createPublicChannel(
         channelMapper.toEntity(channelDto));
     log.debug("[CREATED PUBLIC CHANNEL] : [ID: {}][NAME: {}]", channel.getId(), channel.getName());
+
     return channelMapper.toDto(channel, Instant.EPOCH, Collections.emptyList());
   }
 
@@ -81,7 +84,6 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
 
     return channelMapper.toDto(channel, lastMessageTime, participants);
   }
-
 
   @Override
   @Transactional(readOnly = true)
@@ -120,9 +122,11 @@ public class ChannelMasterFacadeImpl implements ChannelMasterFacade {
   @Override
   @Transactional
   public void deleteChannel(String channelId) {
+
     if (channelId.isBlank()) {
       throw new DiscodeitException(ErrorCode.INVALID_UUID_FORMAT, Map.of("channelId", channelId));
     }
+
     channelService.deleteChannel(channelId);
   }
 

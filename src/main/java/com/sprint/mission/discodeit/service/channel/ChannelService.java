@@ -12,6 +12,7 @@ public interface ChannelService {
 
   Channel createPublicChannel(Channel channel);
 
+
   Channel findChannelById(String channelId);
 
   List<Channel> findAllChannelsInOrPublic(List<UUID> ids);
@@ -22,6 +23,7 @@ public interface ChannelService {
   Channel updateChannel(String channelId, ChannelUpdateDto dto);
 
   void deleteChannel(String channelId);
+
 
   void validateUserAccess(Channel channel, User user);
 

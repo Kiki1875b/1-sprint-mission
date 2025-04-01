@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+
 @Slf4j
 @Controller
 @RequiredArgsConstructor
@@ -35,6 +36,7 @@ public class ChannelController implements ChannelApiDocs {
   public ResponseEntity<ChannelResponseDto> createPrivateChannel(
       @Valid @RequestBody CreatePrivateChannelDto channelDto) {
     log.debug("[CREATE PRIVATE CHANNEL REQUEST] : [IDS: {}]", channelDto.participantIds());
+
     ChannelResponseDto channel = channelMasterFacade.createPrivateChannel(channelDto);
     return ResponseEntity.status(HttpStatus.CREATED).body(channel);
   }
@@ -66,7 +68,9 @@ public class ChannelController implements ChannelApiDocs {
   public ResponseEntity<Void> deleteChannel(@PathVariable String channelId) {
     log.debug("[DELETE CHANNEL REQUEST] : [ID : {}]", channelId);
     channelMasterFacade.deleteChannel(channelId);
+
     log.debug("[DELETED CHANNEL] : [ID : {}]", channelId);
+
     return ResponseEntity.noContent().build();
   }
 
@@ -75,6 +79,7 @@ public class ChannelController implements ChannelApiDocs {
   @GetMapping
   public ResponseEntity<List<ChannelResponseDto>> findChannelVisibleToUser(
       @RequestParam String userId) {
+
     List<ChannelResponseDto> channels = channelMasterFacade.findAllChannelsByUserIdV3(userId);
     return ResponseEntity.ok(channels);
   }

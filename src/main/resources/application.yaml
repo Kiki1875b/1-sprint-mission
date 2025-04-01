@@ -59,10 +59,12 @@ info:
     version: 3.4.0
 
 
+
 logging:
   level:
     p6spy: INFO
     root: INFO
+
 
 
 springdoc:
@@ -71,5 +73,7 @@ springdoc:
     path: /api-docs  # OpenAPI 문서 접근 경로
   swagger-ui:
     path: /swagger-ui.html  # Swagger UI 경로 (기본값)
+
 #    url: /apiV2.json
+
 

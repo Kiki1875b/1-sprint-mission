@@ -96,4 +96,5 @@ public interface UserApiDocs {
   })
   ResponseEntity<Void> deleteUser(@Parameter(description = "삭제할 User UUID") UUID id);
 
+
 }

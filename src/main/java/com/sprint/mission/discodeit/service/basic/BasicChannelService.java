@@ -57,6 +57,7 @@ public class BasicChannelService implements ChannelService {
         log.warn("[ATTEMPT TO ACCESS UNAUTHORIZED CHANNEL] : [CHANNEL_ID : {}] , [USER_ID : {}]",
             channel.getId(), user.getId());
         throw new ChannelException(ErrorCode.NO_ACCESS_TO_CHANNEL);
+
       }
     }
   }
@@ -103,6 +104,7 @@ public class BasicChannelService implements ChannelService {
       log.warn("[ATTEMPT TO UPDATE PRIVATE CHANNEL]: [ID: {}]", channelId);
       throw new PrivateChannelUpdateException(ErrorCode.PRIVATE_CHANNEL_CANNOT_BE_UPDATED,
           Map.of("channelId", channelId));
+
     }
 
     channel.updateChannelName(dto.newName());

@@ -42,10 +42,12 @@ public class BasicMessageService implements MessageService {
       message.addContent(content);
     }
     return messageRepository.save(message);
+
   }
 
   @Override
   public Message getMessageById(String messageId) {
+
     Optional<Message> message = messageRepository.findById(UUID.fromString(messageId));
 
     if (message.isEmpty()) {
@@ -57,6 +59,7 @@ public class BasicMessageService implements MessageService {
     log.debug("[FOUND MESSAGE] : [ID : {}]", messageId);
 
     return message.get();
+
   }
 
   @Override
@@ -72,6 +75,7 @@ public class BasicMessageService implements MessageService {
     }
     return messageRepository.findByChannel_IdAndCreatedAtLessThan(UUID.fromString(channelId),
         nextCursor, pageable);
+
 
   }
 

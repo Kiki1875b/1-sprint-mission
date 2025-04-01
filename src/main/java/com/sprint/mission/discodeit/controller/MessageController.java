@@ -29,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Slf4j
 @Validated
 @RestController
@@ -52,6 +53,7 @@ public class MessageController {
         messageCreateRequest.channelId(),
         messageCreateRequest.authorId());
     MessageResponseDto message = messageFacade.createMessage(messageCreateRequest, files);
+
     return ResponseEntity.status(HttpStatus.CREATED).body(message);
 
   }
@@ -59,10 +61,12 @@ public class MessageController {
 
   //  @Override
   @PatchMapping("/messages/{messageId}")
+
   public ResponseEntity<MessageResponseDto> updateMessage(@PathVariable String messageId,
       @Valid @RequestBody MessageUpdateDto messageDto) {
 
     log.debug("[MESSAGE UPDATE REQUEST] : [ID : {}]", messageId);
+
     MessageResponseDto message = messageFacade.updateMessage(messageId, messageDto);
     return ResponseEntity.ok(message);
   }
@@ -86,6 +90,7 @@ public class MessageController {
 
     PageResponse<MessageResponseDto> messages = messageFacade.findMessagesByChannel(channelId,
         cursor, pageable);
+
     return ResponseEntity.ok(messages);
   }
 }

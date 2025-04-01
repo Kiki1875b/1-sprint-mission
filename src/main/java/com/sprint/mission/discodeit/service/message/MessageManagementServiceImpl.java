@@ -68,7 +68,6 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
   @Override
   public Page<Message> findMessagesByChannel(String channelId, Instant cursor, Pageable pageable) {
-
     Page<Message> channelMessages =
         messageService.getMessagesByChannelWithCursor(channelId, cursor,
             pageable);
@@ -88,7 +87,9 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   public Message updateMessage(String messageId, String newContent) {
     Message message = messageService.getMessageById(messageId);
     messageService.updateMessage(message, newContent);
+
     log.debug("[UPDATED MESSAGE] : [ID : {}]", messageId);
+
     return message;
   }
 
@@ -108,6 +109,8 @@ public class MessageManagementServiceImpl implements MessageManagementService {
         .toList();
 
     message.getAttachments().addAll(attachments);
+
     log.debug("[ATTACHMENTS SAVED]");
+
   }
 }

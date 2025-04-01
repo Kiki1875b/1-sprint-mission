@@ -40,6 +40,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public UUID put(UUID id, byte[] bytes) {
     Path filePath = resolvePath(id);
     try {
+
       log.debug("[WRITING BINARY FILE] : [ID: {}]", id);
       Files.write(filePath, bytes);
       return id;
@@ -51,13 +52,17 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
   @Override
   public InputStream get(UUID id) {
+
     log.debug("[OPENING INPUT_STREAM]");
+
     Path filePath = resolvePath(id);
     try {
       return Files.newInputStream(filePath);
     } catch (IOException e) {
+
       log.warn("[ERROR WHILE OPENING INPUT_STREAM]");
       throw new FileException(ErrorCode.FILE_ERROR);
+
     }
   }
 
@@ -71,6 +76,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
     if (!Files.exists(filePath)) {
       log.error("[FILE NOT FOUND] : [PATH: {}]", filePath);
+
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 

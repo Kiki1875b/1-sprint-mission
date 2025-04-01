@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -28,12 +29,10 @@ public class UserManagementServiceImpl implements UserManagementService {
   @Override
   @Transactional
   public User createUser(User user, MultipartFile profile) {
-
     setStatusToUser(user);
     if (profile != null && !profile.isEmpty()) {
       withProfile(user, profile);
     }
-
     return userService.saveUser(user);
   }
 

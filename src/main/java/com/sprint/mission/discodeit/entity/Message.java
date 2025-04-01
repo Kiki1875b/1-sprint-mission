@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -28,6 +29,7 @@ public class Message extends BaseUpdatableEntity {
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "channel_id", nullable = false)
   private Channel channel;
+
 
   @ManyToOne(fetch = FetchType.LAZY)
   @JoinColumn(name = "author_id", nullable = false)
@@ -45,13 +47,13 @@ public class Message extends BaseUpdatableEntity {
     this.attachments.add(new MessageAttachment(this, attachment));
   }
 
+
   public void addChannel(Channel channel) {
     this.channel = channel;
   }
 
   public void addAuthor(User user) {
     this.author = user;
-
   }
 
   @Override

@@ -31,6 +31,7 @@ public class UserController implements UserApiDocs {
 
   private final UserFacade userFacade;
 
+
   @GetMapping("/{id}")
   @Override
   public ResponseEntity<UserResponseDto> getUser(@PathVariable String id) {
@@ -44,14 +45,13 @@ public class UserController implements UserApiDocs {
       produces = MediaType.APPLICATION_JSON_VALUE
   )
   public ResponseEntity<UserResponseDto> createUser(
-
       @Valid @RequestPart("userCreateRequest")
       CreateUserRequest createUserRequest,
-
       @RequestPart(value = "profile", required = false)
       MultipartFile profile) {
     log.debug("[CREATE USER REQUEST] : [USERNAME: {}]] , [EMAIL: {}]", createUserRequest.username(),
         createUserRequest.email());
+
     UserResponseDto user = userFacade.createUser(createUserRequest, profile);
     return ResponseEntity.status(HttpStatus.CREATED).body(user);
 

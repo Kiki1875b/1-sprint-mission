@@ -29,7 +29,6 @@ import org.springframework.test.web.servlet.ResultActions;
 @WebMvcTest(ChannelController.class)
 public class ChannelControllerTest {
 
-
   @Autowired
   private ObjectMapper objectMapper;
 

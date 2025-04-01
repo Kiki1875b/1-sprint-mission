@@ -40,9 +40,11 @@ public class Channel extends BaseUpdatableEntity {
   }
 
   public void updateChannelName(String channelName) {
+
     if (channelName.isBlank()) {
       return;
     }
+
     this.name = channelName;
   }
 
@@ -50,6 +52,7 @@ public class Channel extends BaseUpdatableEntity {
     if (description.isBlank()) {
       return;
     }
+
     this.description = description;
   }
 

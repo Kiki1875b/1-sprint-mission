@@ -25,6 +25,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -73,6 +74,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     List<ReadStatus> userStatuses = readStatusRepository.findAllByUser_Id(UUID.fromString(userId));
     List<UUID> channelIds = userStatuses.stream().map(status -> status.getChannel().getId())
         .collect(Collectors.toList());
+
     List<ReadStatus> userStatuses2 = readStatusRepository.findAllByChannel_IdIn(channelIds);
 
     Set<ReadStatus> merged = new HashSet<>();
@@ -89,6 +91,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
   @Override
   public List<ReadStatus> findAllByChannelId(String channelId) {
+
     return readStatusRepository.findAllByChannel_Id(UUID.fromString(channelId));
   }
 
@@ -108,6 +111,4 @@ public class ReadStatusServiceImpl implements ReadStatusService {
 
     return status;
   }
-
-
 }

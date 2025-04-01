@@ -20,6 +20,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(uses = UserMapper.class, imports = {Objects.class, ArrayList.class})
+
 public interface ChannelMapper {
 
   @Mapping(target = "id", ignore = true)
@@ -45,6 +46,7 @@ public interface ChannelMapper {
       Map<UUID, Instant> latestMessageByChannel,
       Map<UUID, List<User>> channelParticipants
   ) {
+
     return channels.stream()
         .map(channel -> toDto(
             channel,

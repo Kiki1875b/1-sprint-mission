@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 @Slf4j
 @RequiredArgsConstructor
@@ -34,6 +35,7 @@ public class AuthServiceImpl implements AuthService {
               log.debug("[LOGIN FAILED] : [USER WITH USERNAME {} NOT FOUND]", username);
               return new UserNotFoundException(ErrorCode.USER_NOT_FOUND, Map.of("username", username));
             }
+
         );
 
     if (!PasswordEncryptor.checkPassword(password, targetUser.getPassword())) {
@@ -45,6 +47,7 @@ public class AuthServiceImpl implements AuthService {
     userRepository.save(targetUser);
 
     log.debug("[LOGIN SUCCESS] [USERNAME : {}]", username);
+
     return userMapper.toDto(targetUser);
 
   }

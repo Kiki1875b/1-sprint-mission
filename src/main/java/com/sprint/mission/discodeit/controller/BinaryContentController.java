@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+
 @Slf4j
 @RestController
 @RequiredArgsConstructor
@@ -47,4 +48,5 @@ public class BinaryContentController implements BinaryContentApiDocs {
     log.debug("[DOWNLOAD FILE REQUEST] : [ID : {}]", binaryContentId);
     return binaryContentService.download(binaryContentId);
   }
+
 }

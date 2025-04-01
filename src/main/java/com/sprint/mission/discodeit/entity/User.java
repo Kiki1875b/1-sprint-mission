@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
+
 import static com.sprint.mission.discodeit.constant.UserConstant.EMAIL_REGEX;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
@@ -38,6 +39,7 @@ public class User extends BaseUpdatableEntity {
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
   // nullable 고려
+
   private UserStatus status;
 
 
@@ -55,7 +57,6 @@ public class User extends BaseUpdatableEntity {
     if (password != null) {
       this.password = password;
     }
-
 
   }
 
