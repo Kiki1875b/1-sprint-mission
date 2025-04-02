@@ -7,6 +7,7 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.BDDMockito.then;
 
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusDto;
+import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -205,4 +206,20 @@ public class ReadStatusServiceUnitTest {
     then(readStatusRepository).should().findAllByChannel_Id(UUID.fromString(channelId));
   }
 
+  @Test
+  void updateById_success_shouldCall() {
+    // given
+    Instant initialTime = readStatus.getLastReadAt();
+    UpdateReadStatusDto updateDto = new UpdateReadStatusDto(Instant.now());
+    String readStatusId = readStatus.getId().toString();
+    given(readStatusRepository.findById(UUID.fromString(readStatusId)))
+        .willReturn(Optional.ofNullable(readStatus));
+    // when
+    ReadStatus result = readStatusService.updateById(updateDto, readStatusId);
+
+    // then
+    assertThat(initialTime.isBefore(result.getLastReadAt())).isTrue();
+    then(readStatusRepository).should().findById(UUID.fromString(readStatusId));
+    then(readStatusRepository).should().save(readStatus);
+  }
 }

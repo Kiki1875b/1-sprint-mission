@@ -43,6 +43,7 @@ public class TestEntityFactory {
   public static ReadStatus createReadStatus(Channel channel, User user) {
     ReadStatus status = new ReadStatus(channel, user);
     ReflectionTestUtils.setField(status, "id", UUID.randomUUID());
+    ReflectionTestUtils.setField(status, "lastReadAt", Instant.now().minusSeconds(10));
     return status;
   }
 
