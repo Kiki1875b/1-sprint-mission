@@ -41,7 +41,6 @@ import org.springframework.test.context.jdbc.SqlConfig;
 @ActiveProfiles("test")
 @Transactional
 @DirtiesContext(classMode = ClassMode.AFTER_EACH_TEST_METHOD)
-
 public class ChannelIntegrationTest {
 
   @LocalServerPort
