@@ -60,7 +60,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public BinaryContent save(BinaryContent content, byte[] bytes) {
 
     BinaryContent savedContent = binaryContentRepository.save(content);
-    binaryContentRepository.flush();
+    //binaryContentRepository.flush();
 
     log.debug("[SAVED BINARY METADATA] : [ID: {}]", savedContent.getId());
     binaryContentStorage.put(savedContent.getId(), bytes);
@@ -79,7 +79,7 @@ public class BinaryContentServiceImpl implements BinaryContentService {
 
     List<BinaryContent> savedContents = binaryContentRepository.saveAll(contents);
 
-    binaryContentRepository.flush();
+    //binaryContentRepository.flush();
 
     log.debug("[SAVED METADATA FOR FILES]");
     log.debug("[WRITING FILE...]");
