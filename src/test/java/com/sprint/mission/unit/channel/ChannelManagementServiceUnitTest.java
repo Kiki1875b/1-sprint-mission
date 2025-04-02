@@ -84,7 +84,7 @@ public class ChannelManagementServiceUnitTest {
       //then
       assertThat(result).isEqualTo(privateChannel);
       assertThat(privateChannel.getStatuses()).hasSize(2);
-      
+
       then(userService).should().findAllUsersIn(userIds);
       then(channelService).should().createPrivateChannel(privateChannel);
     }
@@ -250,6 +250,17 @@ public class ChannelManagementServiceUnitTest {
       then(channelService).should(times(2)).findAllChannelsInOrPublic(List.of());
       then(readStatusService).should().findAllInChannel(List.of());
       then(userService).should().findAllUsersIn(List.of());
+    }
+
+    @Test
+    void findAllChannelsForUser_fail_whenUserIdIsInvalid() {
+      // given
+      String invalidId = "invalid-id";
+      given(readStatusService.findAllByUserId(invalidId)).willThrow(IllegalArgumentException.class);
+
+      assertThatThrownBy(() -> channelManagementService.findAllChannelsForUser(invalidId))
+          .isInstanceOf(IllegalArgumentException.class);
+      then(channelService).shouldHaveNoInteractions();
     }
   }
 
