@@ -17,4 +17,4 @@ logging:
     p6spy: ERROR
     root: INFO
 server:
-  port: 8082
+  port: 8081
