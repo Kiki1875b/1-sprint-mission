@@ -1,56 +1,90 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
-import java.util.UUID;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public class Message {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
 
-    private String text;
-    private final UUID authorId;
-    private final UUID channelId;
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name = "messages")
+public class Message extends BaseUpdatableEntity {
 
-    public void updateText(String text) {
-        this.text = text;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
+  private String content;
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "author_id", nullable = false)
+  private User author;
+
+
+  @OneToMany(mappedBy = "message", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+  private List<MessageAttachment> attachments = new ArrayList<>();
+
+  public void addContent(String content) {
+    this.content = content;
+  }
+
+  public void addAttachment(BinaryContent attachment) {
+    this.attachments.add(new MessageAttachment(this, attachment));
+  }
+
+
+  public void addChannel(Channel channel) {
+    this.channel = channel;
+  }
+
+  public void addAuthor(User user) {
+    this.author = user;
+  }
+
+  @Override
+  public String toString() {
+    return "Message{"
+        + "id='" + getId() + '\''
+        + ", userid='" + author.getId() + '\''
+        + ", channelid='" + channel.getId() + '\''
+        + ", content='" + content + '\''
+        + '}';
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Message message = (Message) o;
 
-    public UUID getId() {
-        return id;
-    }
+    return Objects.equals(getId(), message.getId());
 
-    public Long getCreatedAt() {
-        return createdAt;
-    }
+  }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
+  @Override
+  public int hashCode() {
 
-    public String getText() {
-        return text;
-    }
-    public String toString(){
-        return "\nuuid: "+ id + " text: " + text + " authorId: " + authorId;
-    }
+    return Objects.hash(getId());
 
-    public Message(String text, UUID authorId, UUID channelId){
-        this.authorId = authorId;
-        this.channelId = channelId;
-        this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        this.updatedAt = createdAt;
-        this.text = text;
-    }
+  }
 
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
 }

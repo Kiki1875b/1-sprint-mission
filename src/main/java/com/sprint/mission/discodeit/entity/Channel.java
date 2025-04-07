@@ -1,57 +1,96 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+import java.util.Objects;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public class Channel {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
-    private String channelName;
-    private List<UUID> messageList;
+@Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
+@Table(name = "channels")
+public class Channel extends BaseUpdatableEntity {
 
-    public UUID getId() {
-        return id;
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private ChannelType type;
+  private String name;
+  private String description;
+
+  @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.PERSIST, mappedBy = "channel")
+  private List<ReadStatus> statuses = new ArrayList<>();
+
+
+  public enum ChannelType {
+    PRIVATE, PUBLIC
+  }
+
+  public void updateChannelName(String channelName) {
+
+    if (channelName.isBlank()) {
+      return;
     }
 
-    public Long getCreatedAt() {
-        return createdAt;
+    this.name = channelName;
+  }
+
+  public void updateDescription(String description) {
+    if (description.isBlank()) {
+      return;
     }
 
-    public Long getUpdatedAt() {
-        return updatedAt;
-    }
+    this.description = description;
+  }
 
-    public String getChannelName() {
-        return channelName;
+  public void addReadStatus(ReadStatus readStatus) {
+    if (statuses == null) {
+      statuses = new ArrayList<>();
     }
+    statuses.add(readStatus);
+    readStatus.addChannel(this);
+  }
 
-    public List<UUID> getMessageList() {
-        return messageList;
-    }
 
-    public UUID addMessageToChannel(UUID messageUUID) {
-        messageList.add(messageUUID);
-        return messageUUID;
-    }
+  @Override
+  public String toString() {
+    return "Channel{" +
+        "id='" + getId() + '\'' +
+        ", channelType=" + type +
+        ", channelName='" + name + '\'' +
+        ", createdAt=" + getCreatedAt() +
+        ", updatedAt=" + getUpdatedAt() +
+        '}';
+  }
 
-    public String toString(){
-        return "\nuuid: "+ id + " channelName: " + channelName;
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) {
+      return true;
     }
+    if (o == null || getClass() != o.getClass()) {
+      return false;
+    }
+    Channel channel = (Channel) o;
 
-    public void updateChannelName(String channelName) {
-        this.channelName = channelName;
-        this.updatedAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-    }
+    return Objects.equals(getId(), channel.getId());
+  }
 
-    public Channel(String channelName){
-        this.id = UUID.randomUUID();
-        this.createdAt = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
-        this.updatedAt = createdAt;
-        this.channelName = channelName;
-        this.messageList = new ArrayList<>();
-    }
+  @Override
+  public int hashCode() {
+    return Objects.hash(getId());
+  }
 }

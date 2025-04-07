@@ -1,2 +1,4 @@
-rootProject.name = '1-sprint-misson'
+rootProject.name = '1-sprint-mission'
+
+include("admin")
 

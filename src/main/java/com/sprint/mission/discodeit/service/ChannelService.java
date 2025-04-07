@@ -1,20 +1,26 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelUpdateDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.List;
 
 public interface ChannelService {
-    Channel createChannel(String channelName);
 
-    Map<UUID, Channel> getChannels();
+  Channel createPrivateChannel(Channel channel);
 
-    Optional<Channel> getChannel(UUID uuid);
+  Channel createPublicChannel(Channel channel);
 
-    Optional<Channel> addMessageToChannel(UUID channelUUID, UUID messageUUID);
+  void validateUserAccess(Channel channel, String userId);
 
-    Optional<Channel> updateChannel(UUID uuid, String channelName);
+  Channel getChannelById(String channelId);
 
-    Optional<Channel> deleteChannel(UUID uuid);
+  List<Channel> findAllChannelsByUserId(String userId);
+
+  Channel updateChannel(String channelId, ChannelUpdateDto dto);
+
+  void deleteChannel(String channelId);
+
+  String generateInviteCode(Channel channel);
+
+
 }
