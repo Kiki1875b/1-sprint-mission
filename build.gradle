@@ -9,7 +9,7 @@ plugins {
 
 
 group = 'com.sprint.mission'
-version = '1.2.-M8'
+version = '1.2-M8'
 
 java {
     toolchain {
@@ -100,8 +100,8 @@ tasks.withType(JavaCompile) {
 
 checkstyle {
     ignoreFailures = true
-    //toolVersion = '10.12.1'
-    //configFile = rootProject.file('checkstyle.xml')
-    //configFile = file("${rootProject.projectDir}/checkstyle.xml")
+    toolVersion = '10.12.1'
+    configFile = rootProject.file('checkstyle.xml')
+    configFile = file("${rootProject.projectDir}/checkstyle.xml")
 }
 

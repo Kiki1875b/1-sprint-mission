@@ -1,0 +1,37 @@
+version: "3"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE}
+      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL}
+      - PROJECT_NAME=${PROJECT_NAME}
+      - PROJECT_VERSION=${PROJECT_VERSION}
+      - JVM_OPTS=${JVM_OPTS}
+    volumes:
+      - app-storage:/app/storage
+    container_name: discodeit-app
+    depends_on:
+      - db
+
+  db:
+    image: postgres:latest
+    container_name: discodeit_postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/schema.sql
+      - discodeit_postgres:/var/lib/postgresql/data
+
+volumes:
+  app-storage:
+  discodeit_postgres:

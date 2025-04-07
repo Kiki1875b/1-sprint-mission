@@ -63,10 +63,10 @@ public class BasicUserService implements UserService {
     List<UUID> userUuids = parseStringToUuid(userIds);
 
     // TODO : 상세 exception message 작성
-    if (userUuids.isEmpty()) {
-      log.warn("[ATTEMPT TO CREATE PRIVATE CHANNEL WITH NO USER]");
-      throw new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE);
-    }
+//    if (userUuids.isEmpty()) {
+//      log.warn("[ATTEMPT TO CREATE PRIVATE CHANNEL WITH NO USER]");
+//      throw new DiscodeitException(ErrorCode.DEFAULT_ERROR_MESSAGE);
+//    }
 
     return userRepository.findAllByIdIn(userUuids);
   }
