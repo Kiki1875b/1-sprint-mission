@@ -31,6 +31,8 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
   public void init() {
     try {
       Files.createDirectories(root);
+      log.info("[CREATED STORAGE] : {}", root.toAbsolutePath());
+
     } catch (IOException e) {
       throw new FileException(ErrorCode.FILE_ERROR);
     }

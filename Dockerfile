@@ -1,5 +1,5 @@
 
-FROM amazoncorretto:17 as builder
+FROM amazoncorretto:17-alpine as builder
 WORKDIR /app
 
 COPY gradlew .
@@ -10,7 +10,7 @@ COPY src/ src/
 RUN ./gradlew clean build -x checkstyleMain -x checkstyleTest -x test --no-daemon
 
 
-FROM amazoncorretto:17
+FROM amazoncorretto:17-alpine
 WORKDIR /app
 
 ENV PROJECT_NAME=discodeit

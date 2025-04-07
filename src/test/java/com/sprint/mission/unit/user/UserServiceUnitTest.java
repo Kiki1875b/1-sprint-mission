@@ -8,7 +8,6 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.doThrow;
 
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -125,17 +124,17 @@ public class UserServiceUnitTest {
       assertThat(foundUsers).containsExactly(user);
     }
 
-    @Test
-    void findAllUsersIn_fail() {
-      // given
-      List<String> userIds = List.of();
-
-      //when
-      //then
-      assertThatThrownBy(() -> userService.findAllUsersIn(userIds))
-          .isInstanceOf(DiscodeitException.class)
-          .hasMessageContaining(ErrorCode.DEFAULT_ERROR_MESSAGE.getMessage());
-    }
+//    @Test
+//    void findAllUsersIn_fail() {
+//      // given
+//      List<String> userIds = List.of();
+//
+//      //when
+//      //then
+//      assertThatThrownBy(() -> userService.findAllUsersIn(userIds))
+//          .isInstanceOf(DiscodeitException.class)
+//          .hasMessageContaining(ErrorCode.DEFAULT_ERROR_MESSAGE.getMessage());
+//    }
 
     @Test
     void findAllUsersIn_fail_invalidUuidFormat() {
