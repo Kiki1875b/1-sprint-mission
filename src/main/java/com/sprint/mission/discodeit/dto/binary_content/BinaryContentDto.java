@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.dto.binary_content;
 
 import jakarta.validation.constraints.NotBlank;
-
 import java.util.UUID;
 
 public record BinaryContentDto(
@@ -15,6 +14,6 @@ public record BinaryContentDto(
     @NotBlank
     String contentType
 
-
 ) {
+
 }

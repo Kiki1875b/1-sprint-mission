@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.file.FileException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -32,13 +34,19 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   private final BinaryContentRepository binaryContentRepository;
   private final MessageAttachmentRepository messageAttachmentRepository;
   private final BinaryContentStorage binaryContentStorage;
+  private final BinaryContentMapper binaryContentMapper;
 
   @Override
   public ResponseEntity<Resource> download(String id) {
     ResponseEntity<?> response = null;
+    BinaryContent targetContent = binaryContentRepository.findById(UUID.fromString(id))
+        .orElseThrow(() -> new DiscodeitException(ErrorCode.IMAGE_NOT_FOUND));
+
+    BinaryContentDto dto = binaryContentMapper.toDto(targetContent);
+
     try {
       log.info("[DOWNLOAD START] : [ID : {}]", id);
-      response = binaryContentStorage.download(UUID.fromString(id));
+      response = binaryContentStorage.download(dto);
     } catch (IOException e) {
       throw new FileException(ErrorCode.ERROR_WHILE_DOWNLOADING, Map.of("fileId", id));
     }

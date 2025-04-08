@@ -3,6 +3,7 @@ package com.sprint.mission.unit.binary_content;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -51,7 +52,7 @@ public class BinaryContentServiceUnitTest {
     // given
     UUID id = content.getId();
     ByteArrayResource resource = new ByteArrayResource("test".getBytes());
-    given(binaryContentStorage.download(id)).willAnswer(invocation -> {
+    given(binaryContentStorage.download(any())).willAnswer(invocation -> {
       return ResponseEntity.ok().body(resource);
     });
 
@@ -66,7 +67,7 @@ public class BinaryContentServiceUnitTest {
   void download_shouldThrow_whenIOException() throws Exception {
     // given
     UUID id = content.getId();
-    given(binaryContentStorage.download(id)).willThrow(IOException.class);
+    given(binaryContentStorage.download(any())).willThrow(IOException.class);
 
     // when & then
     assertThatThrownBy(() -> binaryContentService.download(id.toString()))
@@ -77,7 +78,7 @@ public class BinaryContentServiceUnitTest {
   @Test
   void download_shouldThrow_ifNoResource() throws Exception {
     UUID id = content.getId();
-    given(binaryContentStorage.download(id)).willAnswer(invocation -> {
+    given(binaryContentStorage.download(any())).willAnswer(invocation -> {
       return ResponseEntity.ok().body("NOT A RESOURCE");
     });
 

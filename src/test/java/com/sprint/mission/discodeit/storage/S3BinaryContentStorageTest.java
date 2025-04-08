@@ -1,17 +1,20 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.s3.S3BinaryContentStorage;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.time.Duration;
-import java.util.Properties;
 import java.util.UUID;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.ResponseEntity;
+import org.testcontainers.containers.localstack.LocalStackContainer;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
@@ -22,38 +25,33 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedGetObjectRequest;
 
-/**
- * localstack/localstack 이미지로 컨테이너를 띄우거나 s3localstack.sh 를 실행해야 합니다.
- */
+@Testcontainers
 public class S3BinaryContentStorageTest {
 
-  private static String accessKey;
-  private static String secretKey;
-  private static String region;
-  private static String bucket;
-  private static Integer expirationTime;
+  private static final String BUCKET = "test-bucket";
+  private static final Region REGION = Region.AP_NORTHEAST_2;
+  private static final int EXPIRATION = 60;
+  @Container
+  static LocalStackContainer localstack = new LocalStackContainer(
+      DockerImageName.parse("localstack/localstack")
+  ).withServices(LocalStackContainer.Service.S3);
 
   private static S3BinaryContentStorage storage;
-  private static UUID id;
-  private static byte[] content;
+  private static UUID id = UUID.randomUUID();
+  private static byte[] content = "test content".getBytes();
 
   @BeforeAll
   static void init() throws Exception {
-    Properties properties = new Properties();
-    properties.load(new FileInputStream(".env.s3test"));
+    String accessKey = localstack.getAccessKey();
+    String secretKey = localstack.getSecretKey();
+    URI endpoint = localstack.getEndpointOverride(LocalStackContainer.Service.S3);
 
-    accessKey = properties.getProperty("AWS_S3_ACCESS_KEY");
-    secretKey = properties.getProperty("AWS_S3_SECRET_KEY");
-    bucket = properties.getProperty("AWS_S3_BUCKET");
-    region = properties.getProperty("AWS_S3_REGION");
-    expirationTime = Integer.parseInt(properties.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION"));
-
-    storage = new S3BinaryContentStorage(accessKey, secretKey, region, bucket, expirationTime) {
+    storage = new S3BinaryContentStorage(accessKey, secretKey, REGION.id(), BUCKET, EXPIRATION) {
       @Override
       public S3Client getS3Client() {
         return S3Client.builder()
-            .endpointOverride(URI.create("http://localhost:4566")) // LocalStack 주소
-            .region(Region.of(region))
+            .endpointOverride(endpoint) // 동적 LocalStack 주소
+            .region(REGION)
             .credentialsProvider(StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(accessKey, secretKey)))
             .forcePathStyle(true)
@@ -63,19 +61,19 @@ public class S3BinaryContentStorageTest {
       @Override
       public String generatePresignedUrl(String key, String contentType) {
         try (S3Presigner presigner = S3Presigner.builder()
-            .endpointOverride(URI.create("http://localhost:4566")) // LocalStack 주소
-            .region(Region.of(region))
+            .endpointOverride(endpoint) // LocalStack 주소
+            .region(REGION)
             .credentialsProvider(StaticCredentialsProvider.create(
                 AwsBasicCredentials.create(accessKey, secretKey)))
             .build()) {
 
           GetObjectRequest getObjectRequest = GetObjectRequest.builder()
-              .bucket(bucket)
+              .bucket(BUCKET)
               .key(key)
               .build();
 
           GetObjectPresignRequest presignRequest = GetObjectPresignRequest.builder()
-              .signatureDuration(Duration.ofSeconds(expirationTime))
+              .signatureDuration(Duration.ofSeconds(EXPIRATION))
               .getObjectRequest(getObjectRequest)
               .build();
 
@@ -86,7 +84,7 @@ public class S3BinaryContentStorageTest {
       }
     };
 
-    storage.getS3Client().createBucket(CreateBucketRequest.builder().bucket(bucket).build());
+    storage.getS3Client().createBucket(CreateBucketRequest.builder().bucket(BUCKET).build());
 
     id = UUID.randomUUID();
     content = "test content".getBytes();
@@ -106,7 +104,9 @@ public class S3BinaryContentStorageTest {
 
   @Test
   void testDownloadPresignedUrl() throws Exception {
-    ResponseEntity<?> response = storage.download(id);
+
+    BinaryContentDto dto = new BinaryContentDto(id, "test", 1L, "image/plain");
+    ResponseEntity<?> response = storage.download(dto);
 
     Assertions.assertThat(response.getStatusCode().is3xxRedirection()).isTrue();
 

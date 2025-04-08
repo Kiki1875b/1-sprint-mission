@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage.s3;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -96,15 +97,18 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
   }
 
   @Override
-  public ResponseEntity<?> download(UUID id) throws IOException {
+  public ResponseEntity<?> download(BinaryContentDto dto) throws IOException {
 
     try {
-      String url = generatePresignedUrl(id.toString(), null);
+      String url = generatePresignedUrl(dto.id().toString(), null);
       return ResponseEntity.status(HttpStatus.FOUND)
           .header(HttpHeaders.LOCATION, url)
+          .header("X-File-Name", dto.fileName())
+          .header(HttpHeaders.CONTENT_TYPE, dto.contentType())
+          .header("X-File-Size", String.valueOf(dto.size()))
           .build();
     } catch (Exception e) {
-      log.info("[DOWNLOAD ERROR]:{}, {}", id.toString(), e.getMessage());
+      log.info("[DOWNLOAD ERROR]:{}, {}", dto.id().toString(), e.getMessage());
       return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(null);
     }
   }

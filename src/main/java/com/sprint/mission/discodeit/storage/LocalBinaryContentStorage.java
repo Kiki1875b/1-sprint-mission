@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.storage;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.file.FileException;
 import jakarta.annotation.PostConstruct;
@@ -70,15 +71,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
 
 
   @Override
-  public ResponseEntity<Resource> download(UUID id) {
+  public ResponseEntity<Resource> download(BinaryContentDto dto) {
 
+    UUID id = dto.id();
     Path filePath = resolvePath(id);
 
     log.debug("[DOWNLOADING FILE] : [PATH: {}]", filePath);
 
     if (!Files.exists(filePath)) {
       log.error("[FILE NOT FOUND] : [PATH: {}]", filePath);
-
       return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
