@@ -37,11 +37,17 @@ public class BinaryContentServiceImpl implements BinaryContentService {
   public ResponseEntity<Resource> download(String id) {
     ResponseEntity<?> response = null;
     try {
-
-      log.debug("[DOWNLOAD START] : [ID : {}]", id);
+      log.info("[DOWNLOAD START] : [ID : {}]", id);
       response = binaryContentStorage.download(UUID.fromString(id));
     } catch (IOException e) {
       throw new FileException(ErrorCode.ERROR_WHILE_DOWNLOADING, Map.of("fileId", id));
+    }
+
+    if (response.getStatusCode().is3xxRedirection()) {
+      log.info("[REDICRECTION] : {}", response.getHeaders().getLocation());
+      return ResponseEntity.status(response.getStatusCode())
+          .headers(response.getHeaders())
+          .build();
     }
 
     if (response.getBody() instanceof Resource resource) {
