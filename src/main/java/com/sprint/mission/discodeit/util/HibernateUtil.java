@@ -24,8 +24,6 @@ public class HibernateUtil {
   public static void printPersistenceContext() {
     SessionImplementor sessionImplementor = em.unwrap(SessionImplementor.class);
     org.hibernate.engine.spi.PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
-//    Collection<?> managedEntities = persistenceContext.getEntitiesByKey().values();
-//    Map<EntityKey, Object> m = persistenceContext.getEntitiesByKey();
 
     StatefulPersistenceContext spc = (StatefulPersistenceContext) persistenceContext;
     Map<EntityKey, EntityHolder> m2 = spc.getEntityHoldersByKey();
