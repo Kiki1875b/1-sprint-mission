@@ -56,6 +56,16 @@ jobs:
           docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
           docker push $ECR_REPOSITORY_URI:latest
 
+      - name: Clear AWS credentials
+        run: |
+          echo "Before clearing:"
+          env | grep AWS
+          unset AWS_ACCESS_KEY_ID
+          unset AWS_SECRET_ACCESS_KEY
+          unset AWS_SESSION_TOKEN
+          echo "After clearing:"
+          env | grep AWS || echo "No AWS credentials found"
+
       - name: Configure AWS Credentials (ECS Region)
         uses: aws-actions/configure-aws-credentials@v4
         with:
