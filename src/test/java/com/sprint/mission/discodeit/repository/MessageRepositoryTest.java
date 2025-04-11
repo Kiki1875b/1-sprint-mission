@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import com.sprint.mission.discodeit.config.JpaConfig;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.p6spy.P6spyConfig;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -28,7 +27,7 @@ import org.springframework.test.context.jdbc.Sql;
 
 @Sql("/data.sql")
 @DataJpaTest
-@Import({JpaConfig.class, P6spyConfig.class})
+@Import({JpaConfig.class})
 @ActiveProfiles("test")
 public class MessageRepositoryTest {
 

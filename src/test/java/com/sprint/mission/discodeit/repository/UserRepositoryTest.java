@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.config.JpaConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.p6spy.P6spyConfig;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,7 +20,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-@Import({JpaConfig.class, P6spyConfig.class})
+@Import({JpaConfig.class})
 @ActiveProfiles("test")
 public class UserRepositoryTest {
 

@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.discodeit.config.JpaConfig;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Channel.ChannelType;
-import com.sprint.mission.discodeit.p6spy.P6spyConfig;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -18,7 +17,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-@Import({JpaConfig.class, P6spyConfig.class})
+@Import({JpaConfig.class})
 @ActiveProfiles("test")
 public class ChannelRepositoryTest {
 
