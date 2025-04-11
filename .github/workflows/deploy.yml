@@ -70,7 +70,7 @@ jobs:
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::061039791550:role/GithubActionsRole
-          region: ${{ env.AWS_REGION }}
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Render upated ECS Task Definition
         id: render-task-def
