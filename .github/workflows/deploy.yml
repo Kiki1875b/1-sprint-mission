@@ -91,6 +91,10 @@ jobs:
           # 다음 step에 넘기기 위해 환경 변수로 저장
           echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
 
+      - name: Register new ECS Task Definition
+        run: |
+          echo "Registering new task definition..."
+          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN"
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
