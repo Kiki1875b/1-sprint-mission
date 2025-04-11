@@ -66,11 +66,11 @@ jobs:
       - name: ECS 태스크 정의 업데이트
         run: |
           TASK_DEFINITION=$(
-          aws ecs describe-task-definition \--task-definition ${{ vars.ECS_TASK_DEFINITION }})
+          aws ecs describe-task-definition \--task-definition ${{ env.ECS_TASK_DEFINITION }})
           
           NEW_TASK_DEFINITION=$(
           echo $TASK_DEFINITION | jq \
-          --arg IMAGE "${{ vars.ECR_REPOSITORY_URI }}:latest" \
+          --arg IMAGE "${{ env.ECR_REPOSITORY_URI }}:latest" \
           '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)'
           )
 
