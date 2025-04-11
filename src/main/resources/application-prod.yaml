@@ -12,6 +12,6 @@ spring:
 logging:
   level:
     p6spy: ERROR
-    root: INFO
+    root: ERROR
 server:
   port: 8081

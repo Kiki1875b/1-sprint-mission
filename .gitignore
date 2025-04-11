@@ -46,6 +46,9 @@ bin/
 .env
 *.jar
 
+discodeit.env
+discodeit.env.encrypted
+
 /sprint-mission
 /sprint-mission/**
 

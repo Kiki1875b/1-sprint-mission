@@ -13,9 +13,12 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import java.io.FileInputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Properties;
 import java.util.UUID;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -56,6 +59,17 @@ public class UserIntegrationTest {
 
   private String getBaseUrl() {
     return "http://localhost:" + port + "/api/users";
+  }
+
+  @BeforeAll
+  static void setup() throws Exception {
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(".env"));
+
+    System.setProperty("AWS_S3_REGION", properties.getProperty("AWS_S3_REGION"));
+    System.setProperty("AWS_S3_BUCKET", properties.getProperty("AWS_S3_BUCKET"));
+    System.setProperty("AWS_S3_PRESIGNED_URL_EXPIRATION",
+        properties.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION"));
   }
 
   @Test

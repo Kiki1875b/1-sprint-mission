@@ -16,10 +16,13 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
+import java.io.FileInputStream;
 import java.util.List;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,10 +67,21 @@ public class ChannelIntegrationTest {
     return "http://localhost:" + port + "/api/channels";
   }
 
+  @BeforeAll
+  static void setup() throws Exception {
+    Properties properties = new Properties();
+    properties.load(new FileInputStream(".env"));
+
+    System.setProperty("AWS_S3_REGION", properties.getProperty("AWS_S3_REGION"));
+    System.setProperty("AWS_S3_BUCKET", properties.getProperty("AWS_S3_BUCKET"));
+    System.setProperty("AWS_S3_PRESIGNED_URL_EXPIRATION",
+        properties.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION"));
+  }
 
   @Test
   @DisplayName("공개 채널을 생성할 수 있다")
   void createPublicChannel_success() throws Exception {
+
     CreateChannelDto requestDto = new CreateChannelDto("channel", "channel description");
     HttpHeaders headers = new HttpHeaders();
     headers.setContentType(MediaType.APPLICATION_JSON);

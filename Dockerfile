@@ -1,5 +1,5 @@
 
-FROM amazoncorretto:17-alpine as builder
+FROM amazoncorretto:17-alpine AS builder
 WORKDIR /app
 
 COPY gradlew .
@@ -18,7 +18,11 @@ ENV PROJECT_VERSION=1.2-M8
 ENV JVM_OPTS=""
 
 COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
+COPY decrypt.sh ./decrypt.sh
+
+RUN chmod +x ./decrypt.sh
+RUN apk add --no-cache aws-cli
 
 EXPOSE 80
 
-CMD ["sh", "-c", "java $JVM_OPTS -jar app.jar"]
+ENTRYPOINT ["sh", "./decrypt.sh"]

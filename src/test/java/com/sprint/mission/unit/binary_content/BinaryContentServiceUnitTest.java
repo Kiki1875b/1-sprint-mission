@@ -5,11 +5,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
+import com.sprint.mission.discodeit.dto.binary_content.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.file.FileException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageAttachmentRepository;
 import com.sprint.mission.discodeit.service.basic.BinaryContentServiceImpl;
@@ -37,6 +40,9 @@ public class BinaryContentServiceUnitTest {
   private MessageAttachmentRepository messageAttachmentRepository;
   @Mock
   private BinaryContentRepository binaryContentRepository;
+
+  @Mock
+  private BinaryContentMapper mapper;
   @InjectMocks
   private BinaryContentServiceImpl binaryContentService;
 
@@ -55,6 +61,10 @@ public class BinaryContentServiceUnitTest {
     given(binaryContentStorage.download(any())).willAnswer(invocation -> {
       return ResponseEntity.ok().body(resource);
     });
+    given(binaryContentRepository.findById(any()))
+        .willReturn(Optional.ofNullable(content));
+    given(mapper.toDto(any()))
+        .willReturn(mock(BinaryContentDto.class));
 
     // when
     ResponseEntity<Resource> result = binaryContentService.download(id.toString());
@@ -68,7 +78,10 @@ public class BinaryContentServiceUnitTest {
     // given
     UUID id = content.getId();
     given(binaryContentStorage.download(any())).willThrow(IOException.class);
-
+    given(binaryContentRepository.findById(any()))
+        .willReturn(Optional.ofNullable(content));
+    given(mapper.toDto(any()))
+        .willReturn(mock(BinaryContentDto.class));
     // when & then
     assertThatThrownBy(() -> binaryContentService.download(id.toString()))
         .isInstanceOf(FileException.class)
@@ -81,7 +94,11 @@ public class BinaryContentServiceUnitTest {
     given(binaryContentStorage.download(any())).willAnswer(invocation -> {
       return ResponseEntity.ok().body("NOT A RESOURCE");
     });
-
+    given(binaryContentRepository.findById(any()))
+        .willReturn(Optional.ofNullable(content));
+    given(mapper.toDto(any()))
+        .willReturn(mock(BinaryContentDto.class));
+    
     assertThatThrownBy(() -> binaryContentService.download(id.toString()))
         .isInstanceOf(FileException.class)
         .hasMessageContaining(ErrorCode.FILE_ERROR.getMessage());

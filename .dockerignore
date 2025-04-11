@@ -1,5 +1,7 @@
 .gradle
-build
+build/
+out/
+.gradle/
 .idea
 *.iml
 *.log
@@ -7,3 +9,5 @@ build
 /logs/**
 /fileDir/**
 /sprint-mission/**
+*.env
+*.env.encrypted
