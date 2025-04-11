@@ -1,5 +1,6 @@
 # Test Coverage CodeCov
-[![codecov](https://app.codecov.io/github/Kiki1875b/1-sprint-mission/commit/a3bb983566576093789b0228a253561bb749a59e)
+[![codecov](https://codecov.io/gh/Kiki1875b/1-sprint-mission/branch/main/graph/badge.svg)](https://codecov.io/gh/Kiki1875b/1-sprint-mission)
+
 
 # 기본 요구사항
 
