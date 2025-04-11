@@ -56,14 +56,11 @@ jobs:
           docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
           docker push $ECR_REPOSITORY_URI:latest
 
-
-      - name: Configure AWS Credentials (ECS Region)
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          role-to-assume: arn:aws:iam::061039791550:role/GitHubActionsRole
-          aws-region: ap-northeast-2
-          mask-aws-account-id: false
-          unset-current-credentials: true
+      - name: tmp
+        run: |
+          aws configure set region ap-northeast-2
+          echo "AWS_REGION=ap-northeast-2" >> $GITHUB_ENV
+          echo "AWS_DEFAULT_REGION=ap-northeast-2" >> $GITHUB_ENV
 
       - name: ECS Task Definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
