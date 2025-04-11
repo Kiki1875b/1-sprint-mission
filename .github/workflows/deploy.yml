@@ -56,17 +56,14 @@ jobs:
           docker push $ECR_REPOSITORY_URI:$IMAGE_TAG
           docker push $ECR_REPOSITORY_URI:latest
 
-      - name: Unset Current Credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          mask-aws-account-id: false
-          unset-current-credentials: false
 
       - name: Configure AWS Credentials (ECS Region)
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::061039791550:role/GitHubActionsRole
           aws-region: ap-northeast-2
+          mask-aws-account-id: false
+          unset-current-credentials: true
 
       - name: ECS Task Definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
