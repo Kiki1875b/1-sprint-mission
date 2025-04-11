@@ -17,6 +17,7 @@ env:
   ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
   IMAGE_TAG: ${{ github.sha }}
 
+
 jobs:
   build-and-push:
     name: Build and Push Docker Image
@@ -65,7 +66,7 @@ jobs:
       - name: ECS Task Definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ecs/task-definition.json
+          task-definition: ${{ env.ECS_TASK_DEFINITION }}
           container-name: discodeit-app
           image: ${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
 
