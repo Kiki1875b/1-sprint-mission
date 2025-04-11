@@ -67,6 +67,7 @@ jobs:
         run: |
           TASK_DEFINITION=$(
           aws ecs describe-task-definition \--task-definition ${{ vars.ECS_TASK_DEFINITION }})
+          
           NEW_TASK_DEFINITION=$(
           echo $TASK_DEFINITION | jq \
           --arg IMAGE "${{ vars.ECR_REPOSITORY_URI }}:latest" \
