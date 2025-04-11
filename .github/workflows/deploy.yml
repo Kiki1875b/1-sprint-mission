@@ -65,23 +65,30 @@ jobs:
 
       - name: ECS 태스크 정의 업데이트
         run: |
-          TASK_DEFINITION=$(
-          aws ecs describe-task-definition \--task-definition ${{ vars.ECS_TASK_DEFINITION }})
+          # ECS Task Definition Family 이름
+          FAMILY_NAME=discodeit-task
           
-            NEW_TASK_DEFINITION=$(
-            echo $TASK_DEFINITION | jq \
-              --arg IMAGE "${{ vars.ECR_REPOSITORY_URI }}:latest" \
-              '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)'
-            )
+          # 기존 태스크 정의 불러오기
+          TASK_DEFINITION=$(
+          aws ecs describe-task-definition \
+          --task-definition $FAMILY_NAME
+          )
+          
+          # 태스크 정의 수정
+          NEW_TASK_DEFINITION=$(
+          echo "$TASK_DEFINITION" | jq \
+          --arg IMAGE "public.ecr.aws/j9e1k2j8/discodeit:latest" \
+          '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)'
+          )
           
           # 새로운 태스크 정의 등록
           NEW_TASK_DEF_ARN=$(
-            aws ecs register-task-definition \
-              --cli-input-json "$NEW_TASK_DEFINITION" | \
-            jq -r '.taskDefinition.taskDefinitionArn'
+          aws ecs register-task-definition \
+          --cli-input-json "$NEW_TASK_DEFINITION" | \
+          jq -r '.taskDefinition.taskDefinitionArn'
           )
           
-          #  환경 파일에 변수 저장 (다음 단계에서 사용 가능)
+          # 다음 step에 넘기기 위해 환경 변수로 저장
           echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
 
 
