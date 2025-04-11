@@ -1,3 +1,6 @@
+# Test Coverage CodeCov
+[![codecov](https://app.codecov.io/github/Kiki1875b/1-sprint-mission/commit/a3bb983566576093789b0228a253561bb749a59e)
+
 # 기본 요구사항
 
 - [x] DiscodeitApplication의 테스트 로직은 삭제하세요.
