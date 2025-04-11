@@ -72,7 +72,7 @@ public class ChannelIntegrationTest {
     Properties properties = new Properties();
     properties.load(new FileInputStream(".env"));
 
-    System.setProperty("AWS_S3_REGION", properties.getProperty("AWS_S3_REGION"));
+    System.setProperty("AWS_REGION", properties.getProperty("AWS_REGION"));
     System.setProperty("AWS_S3_BUCKET", properties.getProperty("AWS_S3_BUCKET"));
     System.setProperty("AWS_S3_PRESIGNED_URL_EXPIRATION",
         properties.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION"));

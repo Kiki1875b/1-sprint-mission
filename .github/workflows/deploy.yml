@@ -1,0 +1,80 @@
+name: CD - Deploy to ECS
+
+on:
+  push:
+    branches:
+      - part3-허지웅-sprint8
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: ${{ vars.AWS_REGION }}
+  ECR_REPOSITORY_URI: ${{ vars.ECR_REPOSITORY_URI }}
+  ECS_CLUSTER: ${{ vars.ECS_CLUSTER }}
+  ECS_SERVICE: ${{ vars.ECS_SERVICE }}
+  ECS_TASK_DEFINITION: ${{ vars.ECS_TASK_DEFINITION }}
+  IMAGE_TAG: ${{ github.sha }}
+
+jobs:
+  build-and-push:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build JAR (skip test)
+        run: ./gradlew clean build -x checkstyleMain -x checkstyleTest -x test
+
+      - name: Configure AWS Credentials (OIDC)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::061039791550:role/GithubActionsRole
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR(Public)
+        run: |
+          aws ecr-public get-login-password --region us-east-1 | \
+          docker login --username AWS --password-stdin public.ecr.aws
+
+      - name: Build and Push Docker Image
+        run: |
+          docker build -t $ECR_REGISTRY:$IMAGE_TAG -t $ECR_REGISTRY:latest . --platform linux/amd64
+          docker push $ECR_REGISTRY:$IMAGE_TAG
+          docker push $ECR_REGISTRY:latest
+
+      - name: Configure AWS Credentials (ECS Region)
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::061039791550:role/GitHubActionsRole
+          aws-region: ap-northeast-2
+
+      - name: ECS Task Definition
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: ecs/task-definition.json
+          container-name: discodeit-app
+          image: ${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
+
+      - name: Deploy to ECS
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          service: ${{ env.ECS_SERVICE }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          wait-for-service-stability: true
+
+

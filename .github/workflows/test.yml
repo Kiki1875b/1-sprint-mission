@@ -20,7 +20,7 @@ jobs:
           cache: gradle
       - name: Create .env file
         run: |
-          echo "AWS_S3_REGION=${{ vars.AWS_S3_REGION }}" >> .env
+          echo "AWS_REGION=${{ vars.AWS_REGION }}" >> .env
           echo "AWS_S3_BUCKET=${{ vars.AWS_S3_BUCKET }}" >> .env
           echo "AWS_S3_PRESIGNED_URL_EXPIRATION=${{ vars.AWS_S3_PRESIGNED_URL_EXPIRATION }}" >> .env
       - name: Grand execute permission for gradlew
