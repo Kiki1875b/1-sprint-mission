@@ -61,6 +61,7 @@ jobs:
         with:
           role-to-assume: arn:aws:iam::061039791550:role/GitHubActionsRole
           aws-region: ap-northeast-2
+          debug-logging: true
 
       - name: ECS Task Definition
         uses: aws-actions/amazon-ecs-render-task-definition@v1
