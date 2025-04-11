@@ -95,8 +95,7 @@ jobs:
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
 
-      - name:
-          ECS 서비스 다시 시작 (desired-count: 1)
+      - name: ECS 서비스 다시 시작
         run: |
           aws ecs update-service \
             --cluster ${{ vars.ECS_CLUSTER }} \
