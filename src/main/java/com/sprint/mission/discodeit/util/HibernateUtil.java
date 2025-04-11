@@ -22,6 +22,7 @@ public class HibernateUtil {
   }
 
   public static void printPersistenceContext() {
+    // test
     SessionImplementor sessionImplementor = em.unwrap(SessionImplementor.class);
     org.hibernate.engine.spi.PersistenceContext persistenceContext = sessionImplementor.getPersistenceContext();
 
