@@ -63,45 +63,21 @@ jobs:
           echo "AWS_REGION=ap-northeast-2" >> $GITHUB_ENV
           echo "AWS_DEFAULT_REGION=ap-northeast-2" >> $GITHUB_ENV
 
-      - name: ECS 태스크 정의 업데이트
-        run: |
-          # ECS Task Definition Family 이름
-          FAMILY_NAME=discodeit-task
-          
-          # 기존 태스크 정의 불러오기
-          TASK_DEFINITION=$(
-          aws ecs describe-task-definition \
-          --task-definition $FAMILY_NAME
-          )
-          
-          # 태스크 정의 수정
-          NEW_TASK_DEFINITION=$(
-          echo "$TASK_DEFINITION" | jq \
-          --arg IMAGE "public.ecr.aws/j9e1k2j8/discodeit:latest" \
-          '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn, .revision, .status, .requiresAttributes, .compatibilities, .registeredAt, .registeredBy)'
-          )
-          
-          # 새로운 태스크 정의 등록
-          NEW_TASK_DEF_ARN=$(
-          aws ecs register-task-definition \
-          --cli-input-json "$NEW_TASK_DEFINITION" | \
-          jq -r '.taskDefinition.taskDefinitionArn'
-          )
-          
-          # 다음 step에 넘기기 위해 환경 변수로 저장
-          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN" >> $GITHUB_ENV
-
-      - name: Register new ECS Task Definition
-        run: |
-          echo "Registering new task definition..."
-          echo "NEW_TASK_DEF_ARN=$NEW_TASK_DEF_ARN"
+      - name: Render updated ECS Task Definition
+        id: render-task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: .github/workflows/ecs/task-definition.json
+          container-name: discodeit-app
+          image: ${{ env.ECR_REPOSITORY_URI }}:${{ env.IMAGE_TAG }}
 
       - name: Deploy to ECS
         uses: aws-actions/amazon-ecs-deploy-task-definition@v1
         with:
-          task-definition: ${{ env.NEW_TASK_DEF_ARN }}
+          task-definition: ${{ steps.render-task-def.outputs.task-definition }}
           service: ${{ env.ECS_SERVICE }}
           cluster: ${{ env.ECS_CLUSTER }}
           wait-for-service-stability: true
+
 
 
