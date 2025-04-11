@@ -35,16 +35,5 @@ public class HibernateUtil {
 
     log.debug("[SIZE] : {}", m2.size());
 
-//    if (managedEntities.isEmpty()) return;
-//    for (Object entity : managedEntities) {
-//      if (entity instanceof HibernateProxy) {
-//        HibernateProxy proxy = (HibernateProxy) entity;
-//        Object id = proxy.getHibernateLazyInitializer().getIdentifier();
-//        String entityName = proxy.getHibernateLazyInitializer().getEntityName();
-//        log.info("[ENTITY IN PC] : Proxy for [{}] with ID: {}", entityName, id);
-//      } else {
-//        log.info("[ENTITY IN PC] : Actual entity: {}", entity.getClass().getName());
-//      }
-//    }
   }
 }
