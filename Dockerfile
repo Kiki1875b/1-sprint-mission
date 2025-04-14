@@ -7,7 +7,7 @@ COPY gradle/ gradle/
 COPY build.gradle settings.gradle ./
 COPY src/ src/
 
-RUN ./gradlew clean build -x checkstyleMain -x checkstyleTest -x test --no-daemon
+RUN ./gradlew clean build -x checkstyleMain -x checkstyleTest --no-daemon
 
 
 FROM amazoncorretto:17-alpine
