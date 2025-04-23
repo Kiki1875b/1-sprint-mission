@@ -1,0 +1,28 @@
+
+FROM amazoncorretto:17-alpine AS builder
+WORKDIR /app
+
+COPY gradlew .
+COPY gradle/ gradle/
+COPY build.gradle settings.gradle ./
+COPY src/ src/
+
+RUN ./gradlew clean build -x checkstyleMain -x checkstyleTest -x test --no-daemon
+
+
+FROM amazoncorretto:17-alpine
+WORKDIR /app
+
+ENV PROJECT_NAME=discodeit
+ENV PROJECT_VERSION=1.2-M8
+ENV JVM_OPTS=""
+
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar app.jar
+COPY decrypt.sh ./decrypt.sh
+
+RUN chmod +x ./decrypt.sh
+RUN apk add --no-cache aws-cli
+
+EXPOSE 80
+
+ENTRYPOINT ["sh", "./decrypt.sh"]

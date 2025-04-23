@@ -1,0 +1,13 @@
+.gradle
+build/
+out/
+.gradle/
+.idea
+*.iml
+*.log
+*.tmp
+/logs/**
+/fileDir/**
+/sprint-mission/**
+*.env
+*.env.encrypted
