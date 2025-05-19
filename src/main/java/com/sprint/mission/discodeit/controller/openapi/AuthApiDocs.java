@@ -11,30 +11,33 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "Auth API", description = "Auth 작업")
 public interface AuthApiDocs {
 
-  @Operation(summary = "User 로그인")
-  @ApiResponses({
-      @ApiResponse(responseCode = "200", description = "로그인 성공"),
-      @ApiResponse(
-          responseCode = "400",
-          description = "비밀번호 오류",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = ErrorResponse.class)
-          )
-      ),
-      @ApiResponse(
-          responseCode = "404",
-          description = "User 를 찾을 수 없음",
-          content = @Content(
-              mediaType = "application/json",
-              schema = @Schema(implementation = ErrorResponse.class)
-          )
-      ),
-  })
-  ResponseEntity<UserResponseDto> userLogin(@Parameter(required = true, description = "로그인 정보") LoginDto loginDto);
+    @Operation(summary = "User 로그인")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "로그인 성공"),
+        @ApiResponse(
+            responseCode = "400",
+            description = "비밀번호 오류",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class)
+            )
+        ),
+        @ApiResponse(
+            responseCode = "404",
+            description = "User 를 찾을 수 없음",
+            content = @Content(
+                mediaType = "application/json",
+                schema = @Schema(implementation = ErrorResponse.class)
+            )
+        ),
+    })
+    ResponseEntity<UserResponseDto> userLogin(
+        @Parameter(required = true, description = "로그인 정보") LoginDto loginDto,
+        @RequestParam(name = "remember-me") Boolean re);
 
 }

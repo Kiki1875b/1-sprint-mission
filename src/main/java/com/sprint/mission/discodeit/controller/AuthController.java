@@ -12,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Slf4j
 @Controller
@@ -19,13 +20,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/api/auth")
 public class AuthController implements AuthApiDocs {
 
-  private final AuthService authService;
+    private final AuthService authService;
 
-  @Override
-  @PostMapping("/login")
-  public ResponseEntity<UserResponseDto> userLogin(@Valid @RequestBody LoginDto loginDto) {
-    log.debug("[LOGIN REQUEST] : [USERNAME:{}]", loginDto.username());
-    UserResponseDto user = authService.login(loginDto.username(), loginDto.password());
-    return ResponseEntity.ok(user);
-  }
+    @Override
+    @PostMapping("/login")
+    public ResponseEntity<UserResponseDto> userLogin(@Valid @RequestBody LoginDto loginDto,
+        @RequestParam(name = "remember-me") Boolean re) {
+        log.debug("[LOGIN REQUEST] : [USERNAME:{}]", loginDto.username());
+        UserResponseDto user = authService.login(loginDto.username(), loginDto.password());
+        return ResponseEntity.ok(user);
+    }
 }

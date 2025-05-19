@@ -25,155 +25,166 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @ExtendWith(MockitoExtension.class)
 public class UserFacadeUnitTest {
 
-  @Mock
-  private UserManagementService userManagementService;
-  @Mock
-  private UserMapper userMapper;
-  @InjectMocks
-  private UserFacadeImpl userFacade;
+    @Mock
+    private UserManagementService userManagementService;
+    @Mock
+    private UserMapper userMapper;
+    @Mock
+    private PasswordEncoder encoder;
+
+    @InjectMocks
+    private UserFacadeImpl userFacade;
 
 
-  @Nested
-  class CreateUser {
+    @Nested
+    class CreateUser {
 
-    @Test
-    void createUser_shouldCallMapperAndServiceAndReturnResponse() {
-      // given
-      CreateUserRequest request = new CreateUserRequest("testUsername", "pwd", "test@example.com");
-      MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
-          "test".getBytes());
-      User user = mock(User.class);
-      User createdUser = mock(User.class);
-      UserResponseDto response = mock(UserResponseDto.class);
+        @Test
+        void createUser_shouldCallMapperAndServiceAndReturnResponse() {
+            // given
+            CreateUserRequest request = new CreateUserRequest("testUsername", "pwd",
+                "test@example.com");
+            MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
+                "image/jpeg",
+                "test".getBytes());
+            User user = mock(User.class);
+            User createdUser = mock(User.class);
+            UserResponseDto response = mock(UserResponseDto.class);
 
-      given(userMapper.toEntity(request)).willReturn(user);
-      given(userManagementService.createUser(user, mockProfile)).willReturn(createdUser);
-      given(userMapper.toDto(createdUser)).willReturn(response);
+            given(userMapper.toEntity(request, encoder)).willReturn(user);
+            given(userManagementService.createUser(user, mockProfile)).willReturn(createdUser);
+            given(userMapper.toDto(createdUser)).willReturn(response);
 
-      // when
-      UserResponseDto result = userFacade.createUser(request, mockProfile);
+            // when
+            UserResponseDto result = userFacade.createUser(request, mockProfile);
 
-      //then
-      assertThat(result).isEqualTo(response);
-      then(userMapper).should().toEntity(request);
-      then(userManagementService).should().createUser(user, mockProfile);
-      then(userMapper).should().toDto(createdUser);
+            //then
+            assertThat(result).isEqualTo(response);
+            then(userMapper).should().toEntity(request, encoder);
+            then(userManagementService).should().createUser(user, mockProfile);
+            then(userMapper).should().toDto(createdUser);
+        }
+
+        @Test
+        void createUser_shouldHaveNoMoreInteractionsOnMappingFail() {
+            CreateUserRequest request = new CreateUserRequest("testUsername", "pwd",
+                "test@example.com");
+            MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
+                "image/jpeg",
+                "test".getBytes());
+
+            given(userMapper.toEntity(request, encoder)).willThrow(new IllegalArgumentException());
+
+            // when & then
+            assertThatThrownBy(() -> userFacade.createUser(request, mockProfile)).isInstanceOf(
+                IllegalArgumentException.class);
+            then(userManagementService).shouldHaveNoInteractions();
+            then(userMapper).should(times(0)).toDto(any());
+        }
     }
 
-    @Test
-    void createUser_shouldHaveNoMoreInteractionsOnMappingFail() {
-      CreateUserRequest request = new CreateUserRequest("testUsername", "pwd", "test@example.com");
-      MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
-          "test".getBytes());
+    @Nested
+    class UpdateUser {
 
-      given(userMapper.toEntity(request)).willThrow(new IllegalArgumentException());
+        @Test
+        void updateUser_shouldCallMapperAndServiceAndReturnResponse() {
+            String userId = UUID.randomUUID().toString();
+            MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
+                "image/jpeg",
+                "test".getBytes());
+            UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
+            User tmpUser = mock(User.class);
+            User updatedUser = mock(User.class);
+            UserResponseDto res = mock(UserResponseDto.class);
 
-      // when & then
-      assertThatThrownBy(() -> userFacade.createUser(request, mockProfile)).isInstanceOf(
-          IllegalArgumentException.class);
-      then(userManagementService).shouldHaveNoInteractions();
-      then(userMapper).should(times(0)).toDto(any());
-    }
-  }
+            given(userMapper.toEntity(req, encoder)).willReturn(tmpUser);
+            given(userManagementService.updateUser(userId, tmpUser, mockProfile)).willReturn(
+                updatedUser);
+            given(userMapper.toDto(updatedUser)).willReturn(res);
 
-  @Nested
-  class UpdateUser {
+            // when
+            UserResponseDto response = userFacade.updateUser(userId, mockProfile, req);
 
-    @Test
-    void updateUser_shouldCallMapperAndServiceAndReturnResponse() {
-      String userId = UUID.randomUUID().toString();
-      MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
-          "test".getBytes());
-      UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
-      User tmpUser = mock(User.class);
-      User updatedUser = mock(User.class);
-      UserResponseDto res = mock(UserResponseDto.class);
+            //then
+            assertThat(response).isEqualTo(res);
+            then(userMapper).should().toEntity(req, encoder);
+            then(userManagementService).should().updateUser(userId, tmpUser, mockProfile);
+            then(userMapper).should().toDto(updatedUser);
+        }
 
-      given(userMapper.toEntity(req)).willReturn(tmpUser);
-      given(userManagementService.updateUser(userId, tmpUser, mockProfile)).willReturn(updatedUser);
-      given(userMapper.toDto(updatedUser)).willReturn(res);
+        @Test
+        void updateUser_shouldHaveNoMoreInteractionsOnMappingFail() {
+            //given
+            String userId = UUID.randomUUID().toString();
+            MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
+                "image/jpeg",
+                "test".getBytes());
+            UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
 
-      // when
-      UserResponseDto response = userFacade.updateUser(userId, mockProfile, req);
+            given(userMapper.toEntity(req, encoder)).willThrow(new IllegalArgumentException());
 
-      //then
-      assertThat(response).isEqualTo(res);
-      then(userMapper).should().toEntity(req);
-      then(userManagementService).should().updateUser(userId, tmpUser, mockProfile);
-      then(userMapper).should().toDto(updatedUser);
-    }
-
-    @Test
-    void updateUser_shouldHaveNoMoreInteractionsOnMappingFail() {
-      //given
-      String userId = UUID.randomUUID().toString();
-      MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg", "image/jpeg",
-          "test".getBytes());
-      UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
-
-      given(userMapper.toEntity(req)).willThrow(new IllegalArgumentException());
-
-      //when & then
-      assertThatThrownBy(() -> userFacade.updateUser(userId, mockProfile, req))
-          .isInstanceOf(IllegalArgumentException.class);
-      then(userManagementService).shouldHaveNoInteractions();
-      then(userMapper).should(times(0)).toDto(any(User.class));
-    }
-  }
-
-  @Nested
-  class FindUser {
-
-    @Test
-    void findUserById_shouldCall_success() {
-      // given
-      User user = TestEntityFactory.createUser("u", "u@gmail.com");
-      String userId = user.getId().toString();
-      UserResponseDto response = mock(UserResponseDto.class);
-
-      given(userManagementService.findSingleUser(userId)).willReturn(user);
-      given(userMapper.toDto(user)).willReturn(response);
-
-      //when
-      UserResponseDto result = userFacade.findUserById(userId);
-
-      // then
-      assertThat(result).isEqualTo(response);
-      then(userManagementService).should().findSingleUser(userId);
-      then(userMapper).should().toDto(user);
+            //when & then
+            assertThatThrownBy(() -> userFacade.updateUser(userId, mockProfile, req))
+                .isInstanceOf(IllegalArgumentException.class);
+            then(userManagementService).shouldHaveNoInteractions();
+            then(userMapper).should(times(0)).toDto(any(User.class));
+        }
     }
 
-    @Test
-    void findUserById_findSingleUser_throwsException() {
-      // given
-      String userId = UUID.randomUUID().toString();
-      given(userManagementService.findSingleUser(userId))
-          .willThrow(UserNotFoundException.class);
+    @Nested
+    class FindUser {
 
-      //when & then
-      assertThatThrownBy(() -> userFacade.findUserById(userId))
-          .isInstanceOf(UserNotFoundException.class);
+        @Test
+        void findUserById_shouldCall_success() {
+            // given
+            User user = TestEntityFactory.createUser("u", "u@gmail.com");
+            String userId = user.getId().toString();
+            UserResponseDto response = mock(UserResponseDto.class);
+
+            given(userManagementService.findSingleUser(userId)).willReturn(user);
+            given(userMapper.toDto(user)).willReturn(response);
+
+            //when
+            UserResponseDto result = userFacade.findUserById(userId);
+
+            // then
+            assertThat(result).isEqualTo(response);
+            then(userManagementService).should().findSingleUser(userId);
+            then(userMapper).should().toDto(user);
+        }
+
+        @Test
+        void findUserById_findSingleUser_throwsException() {
+            // given
+            String userId = UUID.randomUUID().toString();
+            given(userManagementService.findSingleUser(userId))
+                .willThrow(UserNotFoundException.class);
+
+            //when & then
+            assertThatThrownBy(() -> userFacade.findUserById(userId))
+                .isInstanceOf(UserNotFoundException.class);
+        }
     }
-  }
 
-  @Nested
-  class DeleteUser {
+    @Nested
+    class DeleteUser {
 
-    @Test
-    void deleteUser_shouldCallService() {
-      // given
-      String id = UUID.randomUUID().toString();
+        @Test
+        void deleteUser_shouldCallService() {
+            // given
+            String id = UUID.randomUUID().toString();
 
-      //when
-      userFacade.deleteUser(id);
+            //when
+            userFacade.deleteUser(id);
 
-      //then
-      then(userManagementService).should().deleteUser(id);
+            //then
+            then(userManagementService).should().deleteUser(id);
+        }
     }
-  }
 
 }

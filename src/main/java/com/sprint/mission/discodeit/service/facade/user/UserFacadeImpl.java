@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.service.user.UserManagementService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,47 +19,49 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserFacadeImpl implements UserFacade {
 
-  private final UserManagementService userManagementService;
-  private final UserMapper userMapper;
+    private final UserManagementService userManagementService;
+    private final UserMapper userMapper;
+    private final PasswordEncoder encoder;
 
-  @Override
-  @Transactional
-  public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
-    User user = userMapper.toEntity(request);
-    User createdUser = userManagementService.createUser(user, profile);
-    log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
+    @Override
+    @Transactional
+    public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
+        User user = userMapper.toEntity(request, encoder);
+        User createdUser = userManagementService.createUser(user, profile);
+        log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
 
-    return userMapper.toDto(createdUser);
-  }
+        return userMapper.toDto(createdUser);
+    }
 
-  @Override
-  @Transactional(readOnly = true)
-  public UserResponseDto findUserById(String id) {
-    User user = userManagementService.findSingleUser(id);
-    return userMapper.toDto(user);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public UserResponseDto findUserById(String id) {
+        User user = userManagementService.findSingleUser(id);
+        return userMapper.toDto(user);
+    }
 
-  @Override
-  @Transactional
-  public UserResponseDto updateUser(String userId, MultipartFile profile, UserUpdateDto updateDto) {
-    log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
-    User tmpUser = userMapper.toEntity(updateDto);
-    User updatedUser = userManagementService.updateUser(userId, tmpUser, profile);
-    log.debug("[UPDATED USER] : [ID : {}]", userId);
+    @Override
+    @Transactional
+    public UserResponseDto updateUser(String userId, MultipartFile profile,
+        UserUpdateDto updateDto) {
+        log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
+        User tmpUser = userMapper.toEntity(updateDto, encoder);
+        User updatedUser = userManagementService.updateUser(userId, tmpUser, profile);
+        log.debug("[UPDATED USER] : [ID : {}]", userId);
 
-    return userMapper.toDto(updatedUser);
-  }
+        return userMapper.toDto(updatedUser);
+    }
 
-  @Override
-  @Transactional(readOnly = true)
-  public List<UserResponseDto> findAllUsers() {
-    List<User> users = userManagementService.findAllUsers();
-    return userMapper.toDtoList(users);
-  }
+    @Override
+    @Transactional(readOnly = true)
+    public List<UserResponseDto> findAllUsers() {
+        List<User> users = userManagementService.findAllUsers();
+        return userMapper.toDtoList(users);
+    }
 
-  @Override
-  @Transactional
-  public void deleteUser(String id) {
-    userManagementService.deleteUser(id);
-  }
+    @Override
+    @Transactional
+    public void deleteUser(String id) {
+        userManagementService.deleteUser(id);
+    }
 }
