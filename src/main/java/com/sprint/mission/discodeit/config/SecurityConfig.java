@@ -19,7 +19,7 @@ public class SecurityConfig {
     public SecurityFilterChain chain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-                .ignoringRequestMatchers("/api/auth/csrf-token"))
+                .ignoringRequestMatchers("/api/auth/csrf-token", "/api/users"))
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .logout(AbstractHttpConfigurer::disable)
@@ -30,7 +30,7 @@ public class SecurityConfig {
                     "/index.html",
                     "/login",
                     "/api/auth/csrf-token",
-                    "/**"
+                    "/api/users"
                 ).permitAll()
                 .anyRequest().authenticated()
             );
