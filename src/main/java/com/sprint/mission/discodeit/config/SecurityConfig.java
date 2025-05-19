@@ -1,7 +1,11 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.security.auth.DiscodeitUsernamePasswordAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -16,10 +20,17 @@ import org.springframework.security.web.csrf.CsrfTokenRepository;
 public class SecurityConfig {
 
     @Bean
-    public SecurityFilterChain chain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain chain(HttpSecurity http, DaoAuthenticationProvider provider,
+        AuthenticationManager manager) throws Exception {
+
+        DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter();
+
+        filter.setAuthenticationManager(manager);
+
         http
             .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
                 .ignoringRequestMatchers("/api/auth/csrf-token", "/api/users"))
+            .addFilterAt(filter, DiscodeitUsernamePasswordAuthenticationFilter.class)
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
             .logout(AbstractHttpConfigurer::disable)
@@ -36,6 +47,12 @@ public class SecurityConfig {
             );
 
         return http.build();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+        throws Exception {
+        return configuration.getAuthenticationManager();
     }
 
     @Bean
