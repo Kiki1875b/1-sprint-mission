@@ -20,42 +20,43 @@ import org.springframework.security.web.context.HttpSessionSecurityContextReposi
 public class DiscodeitUsernamePasswordAuthenticationFilter extends
     UsernamePasswordAuthenticationFilter {
 
-    private final ObjectMapper mapper = new ObjectMapper();
+  private final ObjectMapper mapper = new ObjectMapper();
 
-    public DiscodeitUsernamePasswordAuthenticationFilter() {
-        setFilterProcessesUrl("/api/auth/login");
-    }
+  public DiscodeitUsernamePasswordAuthenticationFilter() {
+    setFilterProcessesUrl("/api/auth/login");
+  }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request,
-        HttpServletResponse response) throws AuthenticationException {
-        try {
-            LoginDto login = mapper.readValue(request.getInputStream(), LoginDto.class);
-            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
-                login.username(), login.password());
-            setDetails(request, authRequest);
-            return this.getAuthenticationManager().authenticate(authRequest);
-        } catch (IOException e) {
-            log.info("AUTHENTICATION FAILED : username={}, password={}", e);
-            throw new DisabledException("LOGIN FAILED");
-        }
+  @Override
+  public Authentication attemptAuthentication(HttpServletRequest request,
+      HttpServletResponse response) throws AuthenticationException {
+    try {
+      LoginDto login = mapper.readValue(request.getInputStream(), LoginDto.class);
+      UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
+          login.username(), login.password());
+      setDetails(request, authRequest);
+      return this.getAuthenticationManager().authenticate(authRequest);
+    } catch (IOException e) {
+      log.info("AUTHENTICATION FAILED : reason={}", e.getMessage());
+      throw new DisabledException("LOGIN FAILED");
     }
+  }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, FilterChain chain, Authentication authResult)
-        throws IOException, ServletException {
-        SecurityContextHolder.getContext().setAuthentication(authResult);
-        new HttpSessionSecurityContextRepository().saveContext(SecurityContextHolder.getContext(),
-            request, response);
-        response.setStatus(HttpServletResponse.SC_OK);
-    }
+  @Override
+  protected void successfulAuthentication(HttpServletRequest request,
+      HttpServletResponse response, FilterChain chain, Authentication authResult)
+      throws IOException, ServletException {
+    SecurityContextHolder.getContext().setAuthentication(authResult);
+    new HttpSessionSecurityContextRepository().saveContext(SecurityContextHolder.getContext(),
+        request, response);
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
 
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request,
-        HttpServletResponse response, AuthenticationException failed)
-        throws IOException, ServletException {
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        response.getWriter().write("{\"error\": \"Invalid username or password\"}");
-    }
+  @Override
+  protected void unsuccessfulAuthentication(HttpServletRequest request,
+      HttpServletResponse response, AuthenticationException failed)
+      throws IOException, ServletException {
+    log.warn("Login failed: {}", failed.getMessage(), failed);
+    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+    response.getWriter().write("{\"error\": \"Invalid username or password\"}");
+  }
 }

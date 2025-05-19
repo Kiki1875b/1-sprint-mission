@@ -14,58 +14,64 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity(debug = true)
 public class SecurityConfig {
 
-    @Bean
-    public SecurityFilterChain chain(HttpSecurity http, DaoAuthenticationProvider provider,
-        AuthenticationManager manager) throws Exception {
 
-        DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter();
+  @Bean
+  public SecurityFilterChain chain(HttpSecurity http, DaoAuthenticationProvider provider,
+      AuthenticationManager manager) throws Exception {
 
-        filter.setAuthenticationManager(manager);
+    DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter();
 
-        http
-            .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-                .ignoringRequestMatchers("/api/auth/csrf-token", "/api/users"))
-            .addFilterAt(filter, DiscodeitUsernamePasswordAuthenticationFilter.class)
-            .formLogin(AbstractHttpConfigurer::disable)
-            .httpBasic(AbstractHttpConfigurer::disable)
-            .logout(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
-                    "/assets/**",
-                    "/favicon.ico",
-                    "/index.html",
-                    "/login",
-                    "/api/auth/csrf-token",
-                    "/api/users"
-                ).permitAll()
-                .anyRequest().authenticated()
-            );
+    filter.setAuthenticationManager(manager);
+    filter.setRequiresAuthenticationRequestMatcher(
+        new AntPathRequestMatcher("/api/auth/login", "POST")
+    );
 
-        return http.build();
-    }
+    http
+        .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
+            .ignoringRequestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/**"))
+        .addFilterAt(filter, DiscodeitUsernamePasswordAuthenticationFilter.class)
+        .formLogin(AbstractHttpConfigurer::disable)
+        .httpBasic(AbstractHttpConfigurer::disable)
+        .logout(AbstractHttpConfigurer::disable)
+        .authorizeHttpRequests(auth -> auth
+            .requestMatchers(
+                "/assets/**",
+                "/favicon.ico",
+                "/index.html",
+                "/login",
+                "/api/auth/csrf-token",
+                "/api/users",
+                "/"
+            ).permitAll()
+            .anyRequest().authenticated()
+        );
 
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
-        throws Exception {
-        return configuration.getAuthenticationManager();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public CsrfTokenRepository csrfTokenRepository() {
-        CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
-        repository.setCookieName("CSRF-TOKEN");
-        repository.setHeaderName("X-CSRF-TOKEN");
-        return repository;
-    }
+  @Bean
+  public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration)
+      throws Exception {
+    return configuration.getAuthenticationManager();
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
+  @Bean
+  public CsrfTokenRepository csrfTokenRepository() {
+    CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
+    repository.setCookieName("CSRF-TOKEN");
+    repository.setHeaderName("X-CSRF-TOKEN");
+    return repository;
+  }
+
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder();
+  }
 }
 
