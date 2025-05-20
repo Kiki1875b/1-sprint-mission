@@ -13,13 +13,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RequiredArgsConstructor
 public class CsrfController {
 
-    private final CsrfTokenRepository csrfTokenRepository;
+  private final CsrfTokenRepository csrfTokenRepository;
 
-    @GetMapping("/api/auth/csrf-token")
-    public ResponseEntity<CsrfToken> getCsrfToken(HttpServletRequest request,
-        HttpServletResponse response) {
-        CsrfToken token = csrfTokenRepository.generateToken(request);
-        csrfTokenRepository.saveToken(token, request, response);
-        return ResponseEntity.ok(token);
-    }
+  @GetMapping("/api/auth/csrf-token")
+  public ResponseEntity<CsrfToken> getCsrfToken(HttpServletRequest request,
+      HttpServletResponse response) {
+    request.getSession(true);
+    CsrfToken token = csrfTokenRepository.generateToken(request);
+    csrfTokenRepository.saveToken(token, request, response);
+    return ResponseEntity.ok(token);
+  }
 }
