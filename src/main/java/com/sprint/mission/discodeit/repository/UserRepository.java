@@ -11,19 +11,18 @@ import org.springframework.data.repository.query.Param;
 
 public interface UserRepository extends JpaRepository<User, UUID> {
 
-  @EntityGraph(attributePaths = {"profile", "status"})
+  @EntityGraph(attributePaths = {"profile"})
   Optional<User> findById(UUID id);
 
-  @EntityGraph(attributePaths = {"profile", "status"})
+  @EntityGraph(attributePaths = {"profile"})
   List<User> findAll();
 
-  @EntityGraph(attributePaths = {"profile", "status"})
+  @EntityGraph(attributePaths = {"profile"})
   List<User> findAllByIdIn(List<UUID> userIds);
 
   @Query("""
        SELECT u FROM User u
        LEFT JOIN FETCH u.profile
-       LEFT JOIN FETCH u.status
        WHERE u.username = :username
       """)
   Optional<User> findByUsernameWithProfileAndStatus(@Param("username") String username);

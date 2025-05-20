@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorResponse;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,13 +33,16 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
   private final UserMapper userMapper;
   private final SessionRegistry sessionRegistry;
   private final RememberMeServices rememberMeServices;
+  private final UserOnlineStatusService statusService;
 
   public DiscodeitUsernamePasswordAuthenticationFilter(UserMapper userMapper,
-      SessionRegistry registry, RememberMeServices rememberMeServices) {
+      SessionRegistry registry, RememberMeServices rememberMeServices,
+      UserOnlineStatusService statusService) {
     setFilterProcessesUrl("/api/auth/login");
     this.userMapper = userMapper;
     this.sessionRegistry = registry;
     this.rememberMeServices = rememberMeServices;
+    this.statusService = statusService;
   }
 
   @Override
@@ -72,7 +76,7 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
 
     DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authResult.getPrincipal();
     User user = userDetails.getUser();
-    UserResponseDto dto = userMapper.toDto(user);
+    UserResponseDto dto = userMapper.toDto(user, statusService);
 
     sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
 

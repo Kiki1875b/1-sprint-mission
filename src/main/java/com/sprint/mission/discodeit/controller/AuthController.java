@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.AuthService;
+import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import com.sprint.mission.discodeit.service.user.UserService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ public class AuthController implements AuthApiDocs {
   private final UserMapper mapper;
   private final UserService userService;
   private final PersistentTokenRepository tokenRepository;
+  private final UserOnlineStatusService statusService;
 
   @GetMapping("/me")
   public ResponseEntity<UserResponseDto> me(Authentication authentication) {
@@ -44,7 +46,7 @@ public class AuthController implements AuthApiDocs {
     }
 
     User user = discodeitUser.getUser();
-    return ResponseEntity.ok(mapper.toDto(user));
+    return ResponseEntity.ok(mapper.toDto(user, statusService));
   }
 
   @PostMapping("/logout")
@@ -72,7 +74,8 @@ public class AuthController implements AuthApiDocs {
   public ResponseEntity<UserResponseDto> updateUserRole(
       @RequestBody RoleUpdateRequest updateRequest) {
 
-    UserResponseDto responseDto = mapper.toDto(userService.updateUserRole(updateRequest));
+    UserResponseDto responseDto = mapper.toDto(userService.updateUserRole(updateRequest),
+        statusService);
     authService.forceLogout(updateRequest.userId());
 
     return ResponseEntity.ok(responseDto);

@@ -2,9 +2,7 @@ package com.sprint.mission.discodeit.service.user;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserRole;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import java.time.Instant;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -26,11 +24,9 @@ public class AdminInitializationService implements CommandLineRunner {
       return;
     }
 
-    User user = new User("ADMIN", "ADMIN", encoder.encode("ADMIN"), null, null,
+    User user = new User("ADMIN", "ADMIN", encoder.encode("ADMIN"), null,
         UserRole.ROLE_ADMIN);
-    UserStatus status = new UserStatus(user, Instant.now());
-    user.updateStatus(status);
-    
+
     userRepository.save(user);
   }
 }

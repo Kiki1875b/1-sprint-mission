@@ -27,9 +27,7 @@ public enum ErrorCode {
 
   MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MESSAGE-001", "Could Not Find Message."),
 
-  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "Could Not Find ReadStatus."),
-
-  USER_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "USER-STATUS-001", "Could Not Find UserStatus.");
+  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "Could Not Find ReadStatus.");
 
 
   private final HttpStatus status;
