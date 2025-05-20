@@ -19,6 +19,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 
@@ -28,10 +30,15 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
 
   private final ObjectMapper mapper = new ObjectMapper();
   private final UserMapper userMapper;
+  private final SessionRegistry sessionRegistry;
+  private final RememberMeServices rememberMeServices;
 
-  public DiscodeitUsernamePasswordAuthenticationFilter(UserMapper userMapper) {
+  public DiscodeitUsernamePasswordAuthenticationFilter(UserMapper userMapper,
+      SessionRegistry registry, RememberMeServices rememberMeServices) {
     setFilterProcessesUrl("/api/auth/login");
     this.userMapper = userMapper;
+    this.sessionRegistry = registry;
+    this.rememberMeServices = rememberMeServices;
   }
 
   @Override
@@ -42,6 +49,7 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
       UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(
           login.username(), login.password());
       setDetails(request, authRequest);
+
       return this.getAuthenticationManager().authenticate(authRequest);
     } catch (IOException e) {
       log.info("AUTHENTICATION FAILED : reason={}", e.getMessage());
@@ -60,9 +68,13 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
     new HttpSessionSecurityContextRepository().saveContext(SecurityContextHolder.getContext(),
         request, response);
 
+    rememberMeServices.loginSuccess(request, response, authResult);
+
     DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authResult.getPrincipal();
     User user = userDetails.getUser();
     UserResponseDto dto = userMapper.toDto(user);
+
+    sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
 
     response.setStatus(HttpServletResponse.SC_OK);
     response.setContentType("application/json");

@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.service;
 
+import java.util.UUID;
+
 public interface AuthService {
-//  UserResponseDto login(String username, String password);
+
+  void forceLogout(UUID userId);
+
+  void printSessions();
 }

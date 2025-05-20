@@ -67,3 +67,14 @@ CREATE TABLE message_attachments
     PRIMARY KEY (message_id, attachment_id)
 );
 
+
+ALTER TABLE users
+    ADD COLUMN role VARCHAR(50) NOT NULL DEFAULT 'ROLE_USER';
+
+CREATE TABLE persistent_logins
+(
+    username  varchar(64) not null,
+    series    varchar(64) primary key,
+    token     varchar(64) not null,
+    last_used timestamp   not null
+)

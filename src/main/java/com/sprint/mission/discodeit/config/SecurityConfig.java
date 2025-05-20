@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.security.auth.DiscodeitUsernamePasswordAuthe
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
 import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
@@ -15,9 +16,13 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.session.SessionRegistry;
+import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.RememberMeServices;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -31,15 +36,18 @@ public class SecurityConfig {
 
   private final UserMapper userMapper;
 
+
   @Bean
   public SecurityFilterChain chain(HttpSecurity http, DaoAuthenticationProvider provider,
-      AuthenticationManager manager) throws Exception {
+      AuthenticationManager manager, PersistentTokenRepository tokenRepository,
+      SessionRegistry sessionRegistry,
+      RememberMeServices rememberMeServices) throws Exception {
 
     CsrfTokenRequestAttributeHandler plain =
         new CsrfTokenRequestAttributeHandler();
 
     DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter(
-        userMapper);
+        userMapper, sessionRegistry(), rememberMeServices);
 
     filter.setAuthenticationManager(manager);
     filter.setRequiresAuthenticationRequestMatcher(
@@ -47,8 +55,12 @@ public class SecurityConfig {
     );
 
     http
+        .rememberMe(rm -> rm.rememberMeServices(rememberMeServices))
+        .sessionManagement(
+            session -> session.maximumSessions(1).maxSessionsPreventsLogin(false)
+                .sessionRegistry(sessionRegistry()))
         .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository()).csrfTokenRequestHandler(plain)
-            .ignoringRequestMatchers("/api/users"))
+            .ignoringRequestMatchers("/api/users", "/api/auth/check-session"))
         .addFilterAt(filter, DiscodeitUsernamePasswordAuthenticationFilter.class)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
@@ -58,12 +70,16 @@ public class SecurityConfig {
                 "/assets/**",
                 "/favicon.ico",
                 "/index.html",
-                "/login",
+                "/api/auth/login",
                 "/api/auth/csrf-token",
                 "/api/users",
-                "/"
+                "/",
+                "/api/auth/check-session"
             ).permitAll()
-            .anyRequest().authenticated()
+            .requestMatchers(HttpMethod.GET, "/api/channels").hasRole("USER")
+            .requestMatchers("/api/auth/role").hasRole("ADMIN")
+            .requestMatchers("/api/channels/**").hasRole("CHANNEL_MANAGER")
+            .anyRequest().hasRole("USER")
         );
 
     return http.build();
@@ -97,5 +113,12 @@ public class SecurityConfig {
     handler.setRoleHierarchy(roleHierarchy);
     return handler;
   }
+
+  @Bean
+  public SessionRegistry sessionRegistry() {
+    return new SessionRegistryImpl();
+  }
+
+
 }
 
