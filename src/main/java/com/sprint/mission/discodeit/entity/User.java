@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
@@ -39,9 +41,11 @@ public class User extends BaseUpdatableEntity {
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.PERSIST, orphanRemoval = true, fetch = FetchType.LAZY)
   // nullable 고려
-
   private UserStatus status;
 
+  @Column()
+  @Enumerated(EnumType.STRING)
+  private UserRole role;
 
   public void updateFields(
       String username,
@@ -80,6 +84,10 @@ public class User extends BaseUpdatableEntity {
 
     return Objects.equals(getId(), user.getId());
 
+  }
+
+  public void updateUserRole(UserRole role) {
+    this.role = role;
   }
 
   @Override

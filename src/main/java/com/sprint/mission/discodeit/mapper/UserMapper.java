@@ -21,47 +21,49 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Mapper(uses = BinaryContentMapper.class, imports = {UUID.class, PasswordEncryptor.class})
 public interface UserMapper {
 
-    @Mapping(target = "id", ignore = true)
-    @Mapping(target = "username", source = "dto.username")
-    @Mapping(target = "password", expression = "java(encoder.encode(dto.password()))")
-    @Mapping(target = "email", source = "dto.email")
-    @Mapping(target = "profile", ignore = true)
-    @Mapping(target = "status", ignore = true)
-    User toEntity(CreateUserRequest dto, @Context PasswordEncoder encoder);
+  @Mapping(target = "id", ignore = true)
+  @Mapping(target = "username", source = "dto.username")
+  @Mapping(target = "password", expression = "java(encoder.encode(dto.password()))")
+  @Mapping(target = "email", source = "dto.email")
+  @Mapping(target = "profile", ignore = true)
+  @Mapping(target = "status", ignore = true)
+  @Mapping(target = "role", expression = "java(com.sprint.mission.discodeit.entity.UserRole.ROLE_USER)")
+  User toEntity(CreateUserRequest dto, @Context PasswordEncoder encoder);
 
-    @Mapping(target = "username", source = "newUsername")
-    @Mapping(target = "email", source = "newEmail")
-    @Mapping(target = "password", expression = "java(encoder.encode(dto.newPassword()))")
-    User toEntity(UserUpdateDto dto, @Context PasswordEncoder encoder);
+  @Mapping(target = "username", source = "newUsername")
+  @Mapping(target = "email", source = "newEmail")
+  @Mapping(target = "password", expression = "java(encoder.encode(dto.newPassword()))")
+  @Mapping(target = "role", expression = "java(com.sprint.mission.discodeit.entity.UserRole.ROLE_USER)")
+  User toEntity(UserUpdateDto dto, @Context PasswordEncoder encoder);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "username", source = "username")
-    @Mapping(target = "email", source = "email")
-    @Mapping(target = "profile", source = "profile")
-    @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
-    UserResponseDto toDto(User user);
+  @Mapping(target = "id", source = "id")
+  @Mapping(target = "username", source = "username")
+  @Mapping(target = "email", source = "email")
+  @Mapping(target = "profile", source = "profile")
+  @Mapping(target = "online", source = "status", qualifiedByName = "userStatusSetter")
+  UserResponseDto toDto(User user);
 
-    @Mapping(target = "id", source = "id")
-    @Mapping(target = "profileId", source = "profile.id")
-    CreateUserResponse toCreateUserResponse(User user);
+  @Mapping(target = "id", source = "id")
+  @Mapping(target = "profileId", source = "profile.id")
+  CreateUserResponse toCreateUserResponse(User user);
 
-    @Mapping(target = "id", source = "status.id")
-    @Mapping(target = "userId", source = "id")
-    @Mapping(target = "lastActivityAt", source = "status.lastActiveAt")
-    UserStatusResponseDto withStatus(User user);
+  @Mapping(target = "id", source = "status.id")
+  @Mapping(target = "userId", source = "id")
+  @Mapping(target = "lastActivityAt", source = "status.lastActiveAt")
+  UserStatusResponseDto withStatus(User user);
 
-    List<UserResponseDto> toDtoList(List<User> users);
+  List<UserResponseDto> toDtoList(List<User> users);
 
-    @Named("userStatusSetter")
-    default boolean userStatusToBoolean(UserStatus status) {
-        Instant now = Instant.now();
-        long minutes = Duration.between(
-                (status.getLastActiveAt() != null ? status.getLastActiveAt() : Instant.EPOCH), now)
-            .toMinutes();
-        if (minutes <= 10) {
-            return true;
-        }
-        return false;
+  @Named("userStatusSetter")
+  default boolean userStatusToBoolean(UserStatus status) {
+    Instant now = Instant.now();
+    long minutes = Duration.between(
+            (status.getLastActiveAt() != null ? status.getLastActiveAt() : Instant.EPOCH), now)
+        .toMinutes();
+    if (minutes <= 10) {
+      return true;
     }
+    return false;
+  }
 
 }
