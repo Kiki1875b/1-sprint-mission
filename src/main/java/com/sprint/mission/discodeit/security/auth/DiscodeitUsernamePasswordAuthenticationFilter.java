@@ -2,11 +2,17 @@ package com.sprint.mission.discodeit.security.auth;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.auth.LoginDto;
+import com.sprint.mission.discodeit.dto.user.UserResponseDto;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.error.ErrorResponse;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.Instant;
+import java.util.Map;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,9 +27,11 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
     UsernamePasswordAuthenticationFilter {
 
   private final ObjectMapper mapper = new ObjectMapper();
+  private final UserMapper userMapper;
 
-  public DiscodeitUsernamePasswordAuthenticationFilter() {
+  public DiscodeitUsernamePasswordAuthenticationFilter(UserMapper userMapper) {
     setFilterProcessesUrl("/api/auth/login");
+    this.userMapper = userMapper;
   }
 
   @Override
@@ -46,10 +54,22 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
       HttpServletResponse response, FilterChain chain, Authentication authResult)
       throws IOException, ServletException {
     SecurityContextHolder.getContext().setAuthentication(authResult);
+
+//    super.successfulAuthentication(request, response, chain, authResult);
+
     new HttpSessionSecurityContextRepository().saveContext(SecurityContextHolder.getContext(),
         request, response);
+
+    DiscodeitUserDetails userDetails = (DiscodeitUserDetails) authResult.getPrincipal();
+    User user = userDetails.getUser();
+    UserResponseDto dto = userMapper.toDto(user);
+
     response.setStatus(HttpServletResponse.SC_OK);
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    mapper.writeValue(response.getWriter(), dto);
   }
+
 
   @Override
   protected void unsuccessfulAuthentication(HttpServletRequest request,
@@ -57,6 +77,17 @@ public class DiscodeitUsernamePasswordAuthenticationFilter extends
       throws IOException, ServletException {
     log.warn("Login failed: {}", failed.getMessage(), failed);
     response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-    response.getWriter().write("{\"error\": \"Invalid username or password\"}");
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        "",
+        "Authorization Failed",
+        Map.of(),
+        "AuthorizationException.class",
+        401
+    );
+    response.setContentType("application/json");
+    response.setCharacterEncoding("UTF-8");
+    mapper.writeValue(response.getWriter(), errorResponse);
   }
 }
