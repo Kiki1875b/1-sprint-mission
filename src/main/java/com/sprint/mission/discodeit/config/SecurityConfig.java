@@ -1,11 +1,17 @@
 package com.sprint.mission.discodeit.config;
 
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.security.auth.DiscodeitUsernamePasswordAuthenticationFilter;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler;
+import org.springframework.security.access.expression.method.MethodSecurityExpressionHandler;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -14,18 +20,26 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
+@EnableMethodSecurity
 @EnableWebSecurity(debug = true)
+@RequiredArgsConstructor
 public class SecurityConfig {
 
+  private final UserMapper userMapper;
 
   @Bean
   public SecurityFilterChain chain(HttpSecurity http, DaoAuthenticationProvider provider,
       AuthenticationManager manager) throws Exception {
 
-    DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter();
+    CsrfTokenRequestAttributeHandler plain =
+        new CsrfTokenRequestAttributeHandler();
+
+    DiscodeitUsernamePasswordAuthenticationFilter filter = new DiscodeitUsernamePasswordAuthenticationFilter(
+        userMapper);
 
     filter.setAuthenticationManager(manager);
     filter.setRequiresAuthenticationRequestMatcher(
@@ -33,8 +47,8 @@ public class SecurityConfig {
     );
 
     http
-        .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository())
-            .ignoringRequestMatchers("/api/auth/csrf-token", "/api/users", "/api/auth/**"))
+        .csrf(csrf -> csrf.csrfTokenRepository(csrfTokenRepository()).csrfTokenRequestHandler(plain)
+            .ignoringRequestMatchers("/api/users"))
         .addFilterAt(filter, DiscodeitUsernamePasswordAuthenticationFilter.class)
         .formLogin(AbstractHttpConfigurer::disable)
         .httpBasic(AbstractHttpConfigurer::disable)
@@ -65,13 +79,23 @@ public class SecurityConfig {
   public CsrfTokenRepository csrfTokenRepository() {
     CookieCsrfTokenRepository repository = CookieCsrfTokenRepository.withHttpOnlyFalse();
     repository.setCookieName("CSRF-TOKEN");
-    repository.setHeaderName("X-CSRF-TOKEN");
+    repository.setHeaderName("X-Csrf-Token");
+    repository.setCookiePath("/");
     return repository;
   }
+
 
   @Bean
   public PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  public MethodSecurityExpressionHandler methodSecurityExpressionHandler(
+      RoleHierarchy roleHierarchy) {
+    DefaultMethodSecurityExpressionHandler handler = new DefaultMethodSecurityExpressionHandler();
+    handler.setRoleHierarchy(roleHierarchy);
+    return handler;
   }
 }
 
