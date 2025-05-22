@@ -5,11 +5,14 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.service.basic.PermissionService;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
 import java.util.List;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class UserFacadeImpl implements UserFacade {
 
+  private final PermissionService permissionService;
   private final UserManagementService userManagementService;
   private final UserMapper userMapper;
   private final PasswordEncoder encoder;
@@ -45,8 +49,11 @@ public class UserFacadeImpl implements UserFacade {
   @Override
   @Transactional
   public UserResponseDto updateUser(String userId, MultipartFile profile,
-      UserUpdateDto updateDto) {
+      UserUpdateDto updateDto, UserDetails userDetails) {
     log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
+
+    permissionService.checkIsAdminOrMe(UUID.fromString(userId), userDetails);
+
     User tmpUser = userMapper.toEntity(updateDto, encoder);
     User updatedUser = userManagementService.updateUser(userId, tmpUser, profile);
     log.debug("[UPDATED USER] : [ID : {}]", userId);

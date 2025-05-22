@@ -27,7 +27,9 @@ public enum ErrorCode {
 
   MESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "MESSAGE-001", "Could Not Find Message."),
 
-  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "Could Not Find ReadStatus.");
+  READ_STATUS_NOT_FOUND(HttpStatus.NOT_FOUND, "READ-STATUS-001", "Could Not Find ReadStatus."),
+
+  ACCESS_DENIED(HttpStatus.UNAUTHORIZED, "AUTH-001", "Not Authorized To Perform This Action.");
 
 
   private final HttpStatus status;
