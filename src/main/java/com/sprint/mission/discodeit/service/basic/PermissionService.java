@@ -27,6 +27,12 @@ public class PermissionService {
     }
   }
 
+  public void checkIsAdminOrAuthor(UUID messageId, UserDetails details) {
+    if (!checkIsAdmin(details) && !checkIsAuthor(details, messageId)) {
+      throw new DiscodeitException(ErrorCode.ACCESS_DENIED);
+    }
+  }
+
   public boolean checkIsAdmin(UserDetails userDetails) {
     if (userDetails instanceof DiscodeitUserDetails details) {
       return details.getUser().getRole() == UserRole.ROLE_ADMIN;
@@ -41,14 +47,16 @@ public class PermissionService {
     return false;
   }
 
-  public void checkIsAuthor(UserDetails userDetails, UUID messageId) {
+  public boolean checkIsAuthor(UserDetails userDetails, UUID messageId) {
     if (userDetails instanceof DiscodeitUserDetails details) {
       Message toEdit = messageRepository.findById(messageId)
           .orElseThrow(() -> new MessageNotFoundException(ErrorCode.MESSAGE_NOT_FOUND));
 
       if (!toEdit.getAuthor().getId().equals(details.getUser().getId())) {
-        throw new DiscodeitException(ErrorCode.ACCESS_DENIED);
+        return false;
       }
+      return true;
     }
+    return false;
   }
 }
