@@ -22,6 +22,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,10 +35,15 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final ReadStatusRepository readStatusRepository;
+  private final PermissionService permissionService;
 
   @Override
   @Transactional
-  public ReadStatus create(CreateReadStatusDto dto) {
+  public ReadStatus create(CreateReadStatusDto dto, UserDetails details) {
+
+    if (!permissionService.checkIsMe(UUID.fromString(dto.userId()), details)) {
+      throw new DiscodeitException(ErrorCode.ACCESS_DENIED);
+    }
 
     Channel channel = channelRepository.findById(UUID.fromString(dto.channelId())).orElseThrow(
         () -> new ChannelNotFoundException(ErrorCode.CHANNEL_NOT_FOUND,
@@ -96,7 +102,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   }
 
   @Override
-  public ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id) {
+  public ReadStatus updateById(UpdateReadStatusDto readStatusDto, String id, UserDetails details) {
 
     ReadStatus status = readStatusRepository.findById(UUID.fromString(id)).orElseThrow(
         () -> {
@@ -105,6 +111,10 @@ public class ReadStatusServiceImpl implements ReadStatusService {
               Map.of("readStatusId", id));
         }
     );
+
+    if (!permissionService.checkIsMe(status.getUser().getId(), details)) {
+      throw new DiscodeitException(ErrorCode.ACCESS_DENIED);
+    }
 
     status.updateLastReadAt(readStatusDto.newLastReadAt());
     readStatusRepository.save(status);
