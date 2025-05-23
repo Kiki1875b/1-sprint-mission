@@ -55,5 +55,6 @@ public class AuthServiceImpl implements AuthService {
       }
     }
     System.out.println("FINISHED PRINTING SESSIONS: \n");
+
   }
 }

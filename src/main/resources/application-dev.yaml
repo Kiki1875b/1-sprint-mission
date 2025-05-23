@@ -11,5 +11,6 @@ logging:
   level:
     p6spy: info
     root: info
+
 server:
   port: 8080

@@ -14,8 +14,10 @@ import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+
 import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
+
 import com.sprint.mission.discodeit.service.facade.user.UserFacadeImpl;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
 import com.sprint.mission.unit.TestEntityFactory;
@@ -27,8 +29,10 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
+
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 @ExtendWith(MockitoExtension.class)
 public class UserFacadeUnitTest {
@@ -37,10 +41,12 @@ public class UserFacadeUnitTest {
   private UserManagementService userManagementService;
   @Mock
   private UserMapper userMapper;
+
   @Mock
   private PasswordEncoder encoder;
   @Mock
   private UserOnlineStatusService userOnlineStatusService;
+
 
   @InjectMocks
   private UserFacadeImpl userFacade;
@@ -56,6 +62,7 @@ public class UserFacadeUnitTest {
           "test@example.com");
       MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
           "image/jpeg",
+
           "test".getBytes());
       User user = mock(User.class);
       User createdUser = mock(User.class);
@@ -73,10 +80,12 @@ public class UserFacadeUnitTest {
       then(userMapper).should().toEntity(request, encoder);
       then(userManagementService).should().createUser(user, mockProfile);
       then(userMapper).should().toDto(createdUser, userOnlineStatusService);
+
     }
 
     @Test
     void createUser_shouldHaveNoMoreInteractionsOnMappingFail() {
+
       CreateUserRequest request = new CreateUserRequest("testUsername", "pwd",
           "test@example.com");
       MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
@@ -89,7 +98,9 @@ public class UserFacadeUnitTest {
       assertThatThrownBy(() -> userFacade.createUser(request, mockProfile)).isInstanceOf(
           IllegalArgumentException.class);
       then(userManagementService).shouldHaveNoInteractions();
+
       then(userMapper).should(times(0)).toDto(any(), any());
+
     }
   }
 
@@ -99,8 +110,10 @@ public class UserFacadeUnitTest {
     @Test
     void updateUser_shouldCallMapperAndServiceAndReturnResponse() {
       String userId = UUID.randomUUID().toString();
+
       MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
           "image/jpeg",
+
           "test".getBytes());
       UserUpdateDto req = new UserUpdateDto("new", "new@gmail.com", "newPwd");
       User tmpUser = mock(User.class);
@@ -120,12 +133,14 @@ public class UserFacadeUnitTest {
       then(userMapper).should().toEntity(req, encoder);
       then(userManagementService).should().updateUser(userId, tmpUser, mockProfile);
       then(userMapper).should().toDto(updatedUser, userOnlineStatusService);
+
     }
 
     @Test
     void updateUser_shouldHaveNoMoreInteractionsOnMappingFail() {
       //given
       String userId = UUID.randomUUID().toString();
+
       MockMultipartFile mockProfile = new MockMultipartFile("profile", "test.jpg",
           "image/jpeg",
           "test".getBytes());
@@ -138,6 +153,7 @@ public class UserFacadeUnitTest {
           .isInstanceOf(IllegalArgumentException.class);
       then(userManagementService).shouldHaveNoInteractions();
       then(userMapper).should(times(0)).toDto(any(User.class), any());
+
     }
   }
 
@@ -161,6 +177,7 @@ public class UserFacadeUnitTest {
       assertThat(result).isEqualTo(response);
       then(userManagementService).should().findSingleUser(userId);
       then(userMapper).should().toDto(user, userOnlineStatusService);
+
     }
 
     @Test

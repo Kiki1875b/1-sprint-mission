@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import com.sprint.mission.discodeit.config.JpaConfig;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
+
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,7 +74,6 @@ public class UserRepositoryTest {
 
     assertThat(foundUser.getProfile()).isNotNull();
     assertThat(foundUser.getProfile().getFileName()).isEqualTo(user.getUsername() + ".png");
-
   }
 
   @Test
@@ -147,6 +147,7 @@ public class UserRepositoryTest {
 
     assertThat(found).isPresent();
     assertThat(found.get().getProfile().getFileName()).isEqualTo("frank.png");
+
   }
 
   @Test

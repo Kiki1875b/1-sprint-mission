@@ -2,7 +2,9 @@ package com.sprint.mission.discodeit.controller;
 
 
 import static org.mockito.BDDMockito.given;
+
 import static org.mockito.Mockito.mock;
+
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -18,6 +20,7 @@ import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.security.auth.DiscodeitUserDetails;
+
 import com.sprint.mission.discodeit.service.facade.user.UserFacade;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -28,7 +31,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
+
 import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;

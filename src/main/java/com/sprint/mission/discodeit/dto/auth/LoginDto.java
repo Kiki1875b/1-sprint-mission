@@ -8,7 +8,6 @@ public record LoginDto(
     @NotBlank(message = "Empty password not allowed")
     String password,
     Boolean rememberMe
-
 ) {
 
 }

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.user.UserResponseDto;
 import com.sprint.mission.discodeit.dto.user.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+
 import com.sprint.mission.discodeit.service.basic.PermissionService;
 import com.sprint.mission.discodeit.service.basic.UserOnlineStatusService;
 import com.sprint.mission.discodeit.service.user.UserManagementService;
@@ -14,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ public class UserFacadeImpl implements UserFacade {
   private final PasswordEncoder encoder;
   private final UserOnlineStatusService onlineStatusService;
 
+
   @Override
   @Transactional
   public UserResponseDto createUser(CreateUserRequest request, MultipartFile profile) {
@@ -37,17 +40,20 @@ public class UserFacadeImpl implements UserFacade {
     log.debug("[USER CREATED] : [USERNAME: {}]", createdUser.getUsername());
 
     return userMapper.toDto(createdUser, onlineStatusService);
+
   }
 
   @Override
   @Transactional(readOnly = true)
   public UserResponseDto findUserById(String id) {
     User user = userManagementService.findSingleUser(id);
+
     return userMapper.toDto(user, onlineStatusService);
   }
 
   @Override
   @Transactional
+
   public UserResponseDto updateUser(String userId, MultipartFile profile,
       UserUpdateDto updateDto, UserDetails userDetails) {
     log.debug("[UPDATE USER REQUEST] : [ID: {}]", userId);
@@ -66,6 +72,7 @@ public class UserFacadeImpl implements UserFacade {
   public List<UserResponseDto> findAllUsers() {
     List<User> users = userManagementService.findAllUsers();
     return userMapper.toDtoList(users, onlineStatusService);
+
   }
 
   @Override

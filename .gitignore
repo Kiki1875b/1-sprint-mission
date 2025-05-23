@@ -52,6 +52,8 @@ discodeit.env.encrypted
 /sprint-mission/**
 
 /logs/**
+
 /.env
 
 /src/test/resources/.env
+
