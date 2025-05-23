@@ -77,6 +77,7 @@ public class SecurityConfig {
                 "/api/auth/check-session"
             ).permitAll()
             .requestMatchers(HttpMethod.GET, "/api/channels").hasRole("USER")
+            .requestMatchers(HttpMethod.POST, "/api/channels/private").hasRole("USER")
             .requestMatchers("/api/auth/role").hasRole("ADMIN")
             .requestMatchers("/api/channels/**").hasRole("CHANNEL_MANAGER")
             .anyRequest().hasRole("USER")

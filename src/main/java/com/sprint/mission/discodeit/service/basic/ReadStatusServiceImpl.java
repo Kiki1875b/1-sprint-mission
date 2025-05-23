@@ -13,7 +13,6 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -22,9 +21,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.security.core.userdetails.UserDetails;
-
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -77,7 +74,7 @@ public class ReadStatusServiceImpl implements ReadStatusService {
   userId 로 user 의 read status -> 불러온 read status 에 있는 channel ID 로 다른 유저의 read status
   쿼리 2번
    */
-  @Override
+  @Override //TODO: 리펙토
   public List<ReadStatus> findAllByUserId(String userId) {
     List<ReadStatus> userStatuses = readStatusRepository.findAllByUser_Id(UUID.fromString(userId));
     List<UUID> channelIds = userStatuses.stream().map(status -> status.getChannel().getId())
@@ -89,7 +86,12 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     merged.addAll(userStatuses);
     merged.addAll(userStatuses2);
 
-    return new ArrayList<>(merged);
+//    merged.stream().filter(s -> !s.getUser().getId().equals(UUID.fromString(userId))).forEach(
+//        merged::remove);
+
+//    return new ArrayList<>(merged);
+
+    return userStatuses;
   }
 
   @Override
@@ -113,8 +115,9 @@ public class ReadStatusServiceImpl implements ReadStatusService {
               Map.of("readStatusId", id));
         }
     );
+    UUID userId = status.getUser().getId();
 
-    if (!permissionService.checkIsMe(status.getUser().getId(), details)) {
+    if (!permissionService.checkIsMe(userId, details)) {
       throw new DiscodeitException(ErrorCode.ACCESS_DENIED);
     }
 
