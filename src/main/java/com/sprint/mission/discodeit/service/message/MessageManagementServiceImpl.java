@@ -7,19 +7,19 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
 import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.event.BinaryContentUploadEvent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserService;
-import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -40,6 +40,8 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentService binaryContentService;
   private final BinaryContentStorageWrapperService binaryContentStorageWrapperService;
+
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
@@ -110,42 +112,44 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
     List<BinaryContent> savedContents = binaryContentService.saveBinaryContents(contents, files);
 
-    for (int i = 0; i < savedContents.size(); i++) {
-      BinaryContent content = savedContents.get(i);
-      MultipartFile file = files.get(i);
-      content.changeUploadStatus(UploadStatus.WAITING);
-      CompletableFuture<Boolean> future = null;
+//    for (int i = 0; i < savedContents.size(); i++) {
+//      BinaryContent content = savedContents.get(i);
+//      MultipartFile file = files.get(i);
+//      content.changeUploadStatus(UploadStatus.WAITING);
+//      CompletableFuture<Boolean> future = null;
+//
+//      try {
+//        future = binaryContentStorageWrapperService.uploadFile(content.getId(), file.getBytes());
+//      } catch (IOException e) {
+//        throw new RuntimeException(e);
+//      }
+//
+//      future.whenComplete((success, ex) -> {
+//        if (ex != null) {
+//          content.changeUploadStatus(UploadStatus.FAILED);
+//          binaryContentService.update(content);
+//          log.warn("[ATTACHMENT UPLOAD FAILED - EXCEPTION] : [CONTENT_ID: {}]", content.getId());
+//        } else if (success) {
+//          content.changeUploadStatus(UploadStatus.SUCCESS);
+//          binaryContentService.update(content);
+//          log.info("[ATTACHMENT UPLOAD SUCCESS] : [CONTENT_ID: {}]", content.getId());
+//        } else {
+//          content.changeUploadStatus(UploadStatus.FAILED);
+//          binaryContentService.update(content);
+//          log.warn("[ATTACHMENT UPLOAD FAILED - RECOVER] : [CONTENT_ID: {}]", content.getId());
+//        }
+//      });
+//    }
 
-      try {
-        future = binaryContentStorageWrapperService.uploadFile(content.getId(), file.getBytes());
-      } catch (IOException e) {
-        throw new RuntimeException(e);
-      }
-
-      future.whenComplete((success, ex) -> {
-        if (ex != null) {
-          content.changeUploadStatus(UploadStatus.FAILED);
-          binaryContentService.update(content);
-          log.warn("[ATTACHMENT UPLOAD FAILED - EXCEPTION] : [CONTENT_ID: {}]", content.getId());
-        } else if (success) {
-          content.changeUploadStatus(UploadStatus.SUCCESS);
-          binaryContentService.update(content);
-          log.info("[ATTACHMENT UPLOAD SUCCESS] : [CONTENT_ID: {}]", content.getId());
-        } else {
-          content.changeUploadStatus(UploadStatus.FAILED);
-          binaryContentService.update(content);
-          log.warn("[ATTACHMENT UPLOAD FAILED - RECOVER] : [CONTENT_ID: {}]", content.getId());
-        }
-      });
-    }
-
-    List<MessageAttachment> attachments = contents.stream()
+    List<MessageAttachment> attachments = savedContents.stream()
         .map(content -> new MessageAttachment(message, content))
         .toList();
 
     message.getAttachments().addAll(attachments);
 
     log.debug("[ATTACHMENTS SAVED]");
+
+    eventPublisher.publishEvent(new BinaryContentUploadEvent(savedContents, files));
 
   }
 }

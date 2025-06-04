@@ -4,16 +4,15 @@ import com.sprint.mission.discodeit.async.BinaryContentStorageWrapperService;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.error.ErrorCode;
-import com.sprint.mission.discodeit.exception.file.FileException;
+import com.sprint.mission.discodeit.event.BinaryContentUploadEvent;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,6 +27,7 @@ public class UserManagementServiceImpl implements UserManagementService {
   private final BinaryContentService binaryContentService;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentStorageWrapperService binaryContentStorageAsyncService;
+  private final ApplicationEventPublisher eventPublisher;
 
   @Override
   @Transactional
@@ -79,6 +79,7 @@ public class UserManagementServiceImpl implements UserManagementService {
 
 
   private void withProfile(User user, MultipartFile file) {
+
     try {
       log.debug("[SAVING USER PROFILE] : [USERNAME: {}]", user.getUsername());
       BinaryContent profile = binaryContentMapper.toProfileBinaryContent(file);
@@ -87,30 +88,32 @@ public class UserManagementServiceImpl implements UserManagementService {
 
       BinaryContent savedProfile = binaryContentService.save(profile, file.getBytes());
 
-      CompletableFuture<Boolean> future = binaryContentStorageAsyncService.uploadFile(
-          savedProfile.getId(), file.getBytes());
-
-      future.whenComplete((success, ex) -> {
-        if (ex != null) {
-          profile.changeUploadStatus(UploadStatus.FAILED);
-          binaryContentService.update(profile);
-          log.warn("[PROFILE UPLOAD FAILED - EXCEPTION] : [USERNAME: {}]", user.getUsername());
-        } else if (success) {
-          profile.changeUploadStatus(UploadStatus.SUCCESS);
-          binaryContentService.update(profile);
-          log.info("[PROFILE UPLOAD SUCCESS] : [USERNAME: {}]", user.getUsername());
-        } else {
-          profile.changeUploadStatus(UploadStatus.FAILED);
-          binaryContentService.update(profile);
-          log.warn("[PROFILE UPLOAD FAILED - RECOVER] : [USERNAME: {}]", user.getUsername());
-        }
-      });
+      eventPublisher.publishEvent(
+          new BinaryContentUploadEvent(new ArrayList<>(List.of(savedProfile)),
+              new ArrayList<>(List.of(file))));
 
     } catch (IOException e) {
-      // TODO : 저장된 파일 삭제
-      log.warn("[ERROR DURING PROFILE SAVE] : [USERNAME: {}]", user.getUsername());
-      throw new FileException(ErrorCode.FILE_ERROR,
-          Map.of("username", user.getUsername(), "fileName", file.getOriginalFilename()));
+      log.warn("[ERROR WHILE SAVING PROFILE] : {}", e.getMessage());
     }
+
+//      CompletableFuture<Boolean> future = binaryContentStorageAsyncService.uploadFile(
+//          savedProfile.getId(), file.getBytes());
+//
+//      future.whenComplete((success, ex) -> {
+//        if (ex != null) {
+//          profile.changeUploadStatus(UploadStatus.FAILED);
+//          binaryContentService.update(profile);
+//          log.warn("[PROFILE UPLOAD FAILED - EXCEPTION] : [USERNAME: {}]", user.getUsername());
+//        } else if (success) {
+//          profile.changeUploadStatus(UploadStatus.SUCCESS);
+//          binaryContentService.update(profile);
+//          log.info("[PROFILE UPLOAD SUCCESS] : [USERNAME: {}]", user.getUsername());
+//        } else {
+//          profile.changeUploadStatus(UploadStatus.FAILED);
+//          binaryContentService.update(profile);
+//          log.warn("[PROFILE UPLOAD FAILED - RECOVER] : [USERNAME: {}]", user.getUsername());
+//        }
+//      });
+
   }
 }
