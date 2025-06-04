@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.user;
 
+import com.sprint.mission.discodeit.async.BinaryContentStorageWrapperService;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
 import com.sprint.mission.discodeit.exception.file.FileException;
@@ -9,6 +11,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -24,6 +27,7 @@ public class UserManagementServiceImpl implements UserManagementService {
   private final UserService userService;
   private final BinaryContentService binaryContentService;
   private final BinaryContentMapper binaryContentMapper;
+  private final BinaryContentStorageWrapperService binaryContentStorageAsyncService;
 
   @Override
   @Transactional
@@ -78,9 +82,30 @@ public class UserManagementServiceImpl implements UserManagementService {
     try {
       log.debug("[SAVING USER PROFILE] : [USERNAME: {}]", user.getUsername());
       BinaryContent profile = binaryContentMapper.toProfileBinaryContent(file);
+      profile.changeUploadStatus(UploadStatus.WAITING);
       user.updateProfileImage(profile);
-      binaryContentService.save(profile, file.getBytes());
-      log.debug("[PROFILE SAVED] : [USERNAME: {}]", user.getUsername());
+
+      BinaryContent savedProfile = binaryContentService.save(profile, file.getBytes());
+
+      CompletableFuture<Boolean> future = binaryContentStorageAsyncService.uploadFile(
+          savedProfile.getId(), file.getBytes());
+
+      future.whenComplete((success, ex) -> {
+        if (ex != null) {
+          profile.changeUploadStatus(UploadStatus.FAILED);
+          binaryContentService.update(profile);
+          log.warn("[PROFILE UPLOAD FAILED - EXCEPTION] : [USERNAME: {}]", user.getUsername());
+        } else if (success) {
+          profile.changeUploadStatus(UploadStatus.SUCCESS);
+          binaryContentService.update(profile);
+          log.info("[PROFILE UPLOAD SUCCESS] : [USERNAME: {}]", user.getUsername());
+        } else {
+          profile.changeUploadStatus(UploadStatus.FAILED);
+          binaryContentService.update(profile);
+          log.warn("[PROFILE UPLOAD FAILED - RECOVER] : [USERNAME: {}]", user.getUsername());
+        }
+      });
+
     } catch (IOException e) {
       // TODO : 저장된 파일 삭제
       log.warn("[ERROR DURING PROFILE SAVE] : [USERNAME: {}]", user.getUsername());

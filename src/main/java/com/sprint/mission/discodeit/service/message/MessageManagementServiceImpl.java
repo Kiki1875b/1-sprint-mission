@@ -1,18 +1,22 @@
 package com.sprint.mission.discodeit.service.message;
 
+import com.sprint.mission.discodeit.async.BinaryContentStorageWrapperService;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.MessageAttachment;
+import com.sprint.mission.discodeit.entity.UploadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.channel.ChannelService;
 import com.sprint.mission.discodeit.service.user.UserService;
+import java.io.IOException;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,6 +39,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
   private final MessageMapper messageMapper;
   private final BinaryContentMapper binaryContentMapper;
   private final BinaryContentService binaryContentService;
+  private final BinaryContentStorageWrapperService binaryContentStorageWrapperService;
 
   @Override
   @Transactional
@@ -101,8 +106,38 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
   private void withFiles(List<MultipartFile> files, Message message) {
     List<BinaryContent> contents = binaryContentMapper.fromMessageFiles(files);
+    contents.forEach(content -> content.changeUploadStatus(UploadStatus.WAITING));
 
-    binaryContentService.saveBinaryContents(contents, files);
+    List<BinaryContent> savedContents = binaryContentService.saveBinaryContents(contents, files);
+
+    for (int i = 0; i < savedContents.size(); i++) {
+      BinaryContent content = savedContents.get(i);
+      MultipartFile file = files.get(i);
+      content.changeUploadStatus(UploadStatus.WAITING);
+      CompletableFuture<Boolean> future = null;
+
+      try {
+        future = binaryContentStorageWrapperService.uploadFile(content.getId(), file.getBytes());
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+
+      future.whenComplete((success, ex) -> {
+        if (ex != null) {
+          content.changeUploadStatus(UploadStatus.FAILED);
+          binaryContentService.update(content);
+          log.warn("[ATTACHMENT UPLOAD FAILED - EXCEPTION] : [CONTENT_ID: {}]", content.getId());
+        } else if (success) {
+          content.changeUploadStatus(UploadStatus.SUCCESS);
+          binaryContentService.update(content);
+          log.info("[ATTACHMENT UPLOAD SUCCESS] : [CONTENT_ID: {}]", content.getId());
+        } else {
+          content.changeUploadStatus(UploadStatus.FAILED);
+          binaryContentService.update(content);
+          log.warn("[ATTACHMENT UPLOAD FAILED - RECOVER] : [CONTENT_ID: {}]", content.getId());
+        }
+      });
+    }
 
     List<MessageAttachment> attachments = contents.stream()
         .map(content -> new MessageAttachment(message, content))
