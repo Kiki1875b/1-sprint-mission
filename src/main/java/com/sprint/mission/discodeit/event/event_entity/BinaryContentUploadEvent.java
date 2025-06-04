@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.event;
+package com.sprint.mission.discodeit.event.event_entity;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.util.List;

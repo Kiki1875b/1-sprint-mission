@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.async;
+package com.sprint.mission.discodeit.async.binary_content;
 
 
 import java.util.UUID;

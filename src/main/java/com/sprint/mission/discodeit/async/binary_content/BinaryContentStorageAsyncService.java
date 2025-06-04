@@ -1,6 +1,8 @@
-package com.sprint.mission.discodeit.async;
+package com.sprint.mission.discodeit.async.binary_content;
 
 
+import com.sprint.mission.discodeit.async.AsyncTaskFailure;
+import com.sprint.mission.discodeit.async.AsyncTaskFailureRepository;
 import com.sprint.mission.discodeit.exception.file.FileException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.UUID;
@@ -45,7 +47,7 @@ public class BinaryContentStorageAsyncService {
     log.info("requestId in recover = {}", MDC.get("requestId"));
     AsyncTaskFailure failure = new AsyncTaskFailure();
     failure.setFields(
-        "BinaryContentStorage#put2",
+        "BinaryContentStorage#put",
         MDC.get("requestId"),
         e.getMessage()
     );

@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.readstatus.CreateReadStatusDto;
 import com.sprint.mission.discodeit.dto.readstatus.UpdateReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Channel.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.error.ErrorCode;
@@ -54,6 +55,13 @@ public class ReadStatusServiceImpl implements ReadStatusService {
     );
 
     ReadStatus status = new ReadStatus(channel, user);
+
+    if (channel.getType().equals(ChannelType.PRIVATE)) {
+      status.enableNotification();
+    } else {
+      status.disableNotification();
+    }
+
     status.updateLastReadAt(dto.lastReadAt());
     return readStatusRepository.save(status);
   }

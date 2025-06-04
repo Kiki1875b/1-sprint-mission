@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.event;
 
 
-import com.sprint.mission.discodeit.async.BinaryContentStorageWrapperService;
+import com.sprint.mission.discodeit.async.binary_content.BinaryContentStorageWrapperService;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.UploadStatus;
+import com.sprint.mission.discodeit.event.event_entity.BinaryContentUploadEvent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import java.io.IOException;
 import java.util.List;
