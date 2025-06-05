@@ -90,30 +90,11 @@ public class UserManagementServiceImpl implements UserManagementService {
 
       eventPublisher.publishEvent(
           new BinaryContentUploadEvent(new ArrayList<>(List.of(savedProfile)),
-              new ArrayList<>(List.of(file))));
+              new ArrayList<>(List.of(file)), user));
 
     } catch (IOException e) {
       log.warn("[ERROR WHILE SAVING PROFILE] : {}", e.getMessage());
     }
-
-//      CompletableFuture<Boolean> future = binaryContentStorageAsyncService.uploadFile(
-//          savedProfile.getId(), file.getBytes());
-//
-//      future.whenComplete((success, ex) -> {
-//        if (ex != null) {
-//          profile.changeUploadStatus(UploadStatus.FAILED);
-//          binaryContentService.update(profile);
-//          log.warn("[PROFILE UPLOAD FAILED - EXCEPTION] : [USERNAME: {}]", user.getUsername());
-//        } else if (success) {
-//          profile.changeUploadStatus(UploadStatus.SUCCESS);
-//          binaryContentService.update(profile);
-//          log.info("[PROFILE UPLOAD SUCCESS] : [USERNAME: {}]", user.getUsername());
-//        } else {
-//          profile.changeUploadStatus(UploadStatus.FAILED);
-//          binaryContentService.update(profile);
-//          log.warn("[PROFILE UPLOAD FAILED - RECOVER] : [USERNAME: {}]", user.getUsername());
-//        }
-//      });
 
   }
 }

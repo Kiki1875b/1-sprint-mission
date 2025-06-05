@@ -67,7 +67,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
     if (files != null && !files.isEmpty()) {
       log.debug("[ATTACHMENTS FOUND] : [CHANNEL_ID : {}]", channelId);
-      withFiles(files, message);
+      withFiles(author, files, message);
     }
 
     Message sentMessage = messageService.createMessage(message);
@@ -131,40 +131,11 @@ public class MessageManagementServiceImpl implements MessageManagementService {
     messageService.deleteMessage(messageId);
   }
 
-  private void withFiles(List<MultipartFile> files, Message message) {
+  private void withFiles(User author, List<MultipartFile> files, Message message) {
     List<BinaryContent> contents = binaryContentMapper.fromMessageFiles(files);
     contents.forEach(content -> content.changeUploadStatus(UploadStatus.WAITING));
 
     List<BinaryContent> savedContents = binaryContentService.saveBinaryContents(contents, files);
-
-//    for (int i = 0; i < savedContents.size(); i++) {
-//      BinaryContent content = savedContents.get(i);
-//      MultipartFile file = files.get(i);
-//      content.changeUploadStatus(UploadStatus.WAITING);
-//      CompletableFuture<Boolean> future = null;
-//
-//      try {
-//        future = binaryContentStorageWrapperService.uploadFile(content.getId(), file.getBytes());
-//      } catch (IOException e) {
-//        throw new RuntimeException(e);
-//      }
-//
-//      future.whenComplete((success, ex) -> {
-//        if (ex != null) {
-//          content.changeUploadStatus(UploadStatus.FAILED);
-//          binaryContentService.update(content);
-//          log.warn("[ATTACHMENT UPLOAD FAILED - EXCEPTION] : [CONTENT_ID: {}]", content.getId());
-//        } else if (success) {
-//          content.changeUploadStatus(UploadStatus.SUCCESS);
-//          binaryContentService.update(content);
-//          log.info("[ATTACHMENT UPLOAD SUCCESS] : [CONTENT_ID: {}]", content.getId());
-//        } else {
-//          content.changeUploadStatus(UploadStatus.FAILED);
-//          binaryContentService.update(content);
-//          log.warn("[ATTACHMENT UPLOAD FAILED - RECOVER] : [CONTENT_ID: {}]", content.getId());
-//        }
-//      });
-//    }
 
     List<MessageAttachment> attachments = savedContents.stream()
         .map(content -> new MessageAttachment(message, content))
@@ -174,7 +145,7 @@ public class MessageManagementServiceImpl implements MessageManagementService {
 
     log.debug("[ATTACHMENTS SAVED]");
 
-    eventPublisher.publishEvent(new BinaryContentUploadEvent(savedContents, files));
+    eventPublisher.publishEvent(new BinaryContentUploadEvent(savedContents, files, author));
 
   }
 }

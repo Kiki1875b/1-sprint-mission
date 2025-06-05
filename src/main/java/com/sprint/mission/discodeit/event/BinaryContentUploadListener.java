@@ -26,6 +26,7 @@ public class BinaryContentUploadListener {
 
   @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
   public void handleUpload(BinaryContentUploadEvent event) {
+
     List<BinaryContent> contents = event.getContents();
     List<MultipartFile> files = event.getFiles();
 
@@ -35,6 +36,7 @@ public class BinaryContentUploadListener {
 
       try {
         CompletableFuture<Boolean> future = binaryContentStorageWrapperService.uploadFile(
+            event.getUser(),
             content.getId(), file.getBytes());
 
         future.whenComplete((success, ex) -> {

@@ -20,6 +20,7 @@ import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 @Slf4j
@@ -47,6 +48,10 @@ public class NotificationService {
   @Transactional
   public List<NotificationDto> createNotificationsFromEvent(NotificationEvent event) {
 
+    if (true) {
+      throw new RuntimeException();
+    }
+
     List<Notification> notifications = event.receivers().stream()
         .map(user -> notificationMapper.toEntityFromEvent(event, user))
         .collect(Collectors.toList());
@@ -57,16 +62,17 @@ public class NotificationService {
   }
 
   @Recover
-  @Transactional
-  public void recoverNotificationFailure(Exception e, NotificationEvent event) {
+  @Transactional(propagation = Propagation.REQUIRES_NEW)
+  public List<NotificationDto> recoverNotificationFailure(Exception e, NotificationEvent event) {
     AsyncTaskFailure failure = new AsyncTaskFailure();
 
     failure.setFields(
         "NotificationService#createNotification",
         MDC.get("requestId"),
-        e.getMessage()
+        e.getMessage() != null ? e.getMessage() : "ERROR"
     );
 
     failureRepository.save(failure);
+    return Collections.emptyList();
   }
 }
