@@ -10,12 +10,15 @@ import com.sprint.mission.discodeit.event.event_entity.NotificationEvent;
 import com.sprint.mission.discodeit.mapper.NotificationMapper;
 import com.sprint.mission.discodeit.repository.NotificationRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.util.CacheUtil;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Recover;
 import org.springframework.retry.annotation.Retryable;
@@ -32,11 +35,12 @@ public class NotificationService {
   private final NotificationRepository notificationRepository;
   private final UserRepository userRepository;
   private final AsyncTaskFailureRepository failureRepository;
+  private final CacheManager cacheManager;
 
   @Transactional(readOnly = true)
+  @Cacheable(cacheNames = "userNotificationList", key = "#user.id")
   public List<NotificationDto> getUserNotifications(User user) {
     List<Notification> notifications = notificationRepository.findByReceiver(user);
-
     return Collections.unmodifiableList(notificationMapper.toDtoList(notifications));
   }
 
@@ -47,16 +51,15 @@ public class NotificationService {
   )
   @Transactional
   public List<NotificationDto> createNotificationsFromEvent(NotificationEvent event) {
-
-    if (true) {
-      throw new RuntimeException();
-    }
-
     List<Notification> notifications = event.receivers().stream()
         .map(user -> notificationMapper.toEntityFromEvent(event, user))
         .collect(Collectors.toList());
 
     notificationRepository.saveAll(notifications);
+
+    List<String> userIds = event.receivers().stream().map(u -> u.getId().toString())
+        .collect(Collectors.toList());
+    CacheUtil.evictCache(cacheManager, userIds, "userNotificationList");
 
     return Collections.unmodifiableList(notificationMapper.toDtoList(notifications));
   }
